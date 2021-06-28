@@ -27,6 +27,7 @@ posangle = 0 ; позиционный угол:
              ; для нулевого азимута РАТАН-600 равен позиционному углу Солнца
              ; для ненулевого азимута РАТАН-600 может быть получен утилитой asu_ratan_position_angle
 freq = 5.7e9 ; Hz - частота
+freq = 4e9 ; Hz - частота
 
 ;---------------------------------------------------------------------------------------
 ; подготовка библиотеки, установка магнитного поля и разметка радиокарты ---------------
@@ -35,10 +36,11 @@ ptr = reo_prepare_calc_map( $
       box, visstep $ ; GX-модель и шаг радиокарты 
     , M, base $ результат: размер и смещение радиокарты
     , posangle = posangle $  
-    , freefree = 0 $ ; no free-free considered
+    , freefree = 1 $ ; no free-free considered
     , arcbox = arcbox $ ; вернет границы радиокарты в угл. секундах
     , field = field $ ; вернет полное поле на фотосфере, как мы видим его с Земли
 ;    , /model $
+    , dll_location = 's:\Projects\Physics104_291\ProgramD64\agsGeneralRadioEmission.dll' $
     , version_info = version_info $ ; когда, где и в какой версии библиотеки мы работаем - для контроля
     )
 
@@ -62,6 +64,7 @@ cB = contour(Bph, RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = '
 ; вычисление радиокарт и сканов --------------------------------------------------------
 rc = reo_calculate_map( $
       ptr, H, Temp, Dens, freq $
+    , harmonics = [2, 3, 4] $
     , FluxR = FluxR $
     , FluxL = FluxL $
     , scanR = scanR $

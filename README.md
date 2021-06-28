@@ -7,3 +7,7 @@ Contains common routines and call samples, mostly for radioemission calculation 
 
 ## Update History
 * 26 June 2021: Initial commit.
+* 28 June 2021: 
+	* Small bugs fixed
+	* IDL interface to LOS
+	* map calculations for models.

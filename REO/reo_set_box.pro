@@ -3,7 +3,7 @@ function reo_set_box, ptr, box, visstep0, Mout, base, boxdata, posangle = posang
 dll_location = getenv('reo_dll_location')
 
 if keyword_set(model) then begin
-    boxdata = {dx:box.modstep, rsun:975d, vcos:[0d, 0d, 1d]}
+    boxdata = {dx:box.modstep, rsun:960d, vcos:[0d, 0d, 1d]}
 endif else begin  
     asu_box_get_coord, box, boxdata
 endelse

@@ -24,27 +24,29 @@
 ;   (in)      T               (n-elements fload/double array)         K   Corresponding temperatures (non-negative, no greater 10^8)
 ;   (in)      D               (n-elements fload/double array)    cm^{-3}  Corresponding electron densities (non-negative)
 ;                                                                         Note: all 3 arrays should be of the same length
-;   (in)      freq            (fload/double)                         Hz   Frequency to calculate radioemission  
+;   (in)      freq            (fload/double)                          Hz  Frequency to calculate radioemission  
 ;   
 ; Parameters optional (in):
 ;   (in)      _extra          (various data types)                        Additional setting (such as tuning parameters, additional 
 ;                                                                         conditions etc.), partially:
-;   (in)      freefree                        (integer/long)        -----     (see description in reo_prepare_calc_map.pro)
-;   (in)      cycloCalc_Distribution_Type     (integer/long)        -----     (see description in reo_prepare_calc_map.pro)
-;   (in)      cycloCalc_Distribution_kappaK   (float/double)        -----     (see description in reo_prepare_calc_map.pro)
-;   (in)      cycloCalc_LaplasMethod_Use      (integer/long)        -----     (see description in reo_prepare_calc_map.pro)
-;   (in)      useqt                           (integer/long)        -----     (see description in reo_prepare_calc_map.pro)
-;   (in)      usealtlibrary                   (integer/long)        -----     (see description in reo_prepare_calc_map.pro)
+;   (in)      harmonics                       (integer/long)              Calculated harmonic numbers (default [2, 3, 4]) 
+;   (in)      tau_ctrl                        (float/double)              NB! To be described!
+;   (in)      freefree                        (integer/long)       -----  (see description in reo_prepare_calc_map.pro)
+;   (in)      cycloCalc_Distribution_Type     (integer/long)       -----  (see description in reo_prepare_calc_map.pro)
+;   (in)      cycloCalc_Distribution_kappaK   (float/double)       -----  (see description in reo_prepare_calc_map.pro)
+;   (in)      cycloCalc_LaplasMethod_Use      (integer/long)       -----  (see description in reo_prepare_calc_map.pro)
+;   (in)      useqt                           (integer/long)       -----  (see description in reo_prepare_calc_map.pro)
+;   (in)      usealtlibrary                   (integer/long)       -----  (see description in reo_prepare_calc_map.pro)
 
 ;   (in)      viewmask        (integer/long 2-D array)                    if viewmask[i,j] = 0, corresponding element of radiomaps will not be calculated
 ;                                                                         and set to zero. If viewmask omitted, whole map will be calculated.(*) 
 ;   (in)      mode, beam_c, beam_b, scan_lim                              RATAN-600 scan specific (see reo_convolve_map.pro and separate document)(**)  
 ;
 ; Parameters optional (out):
-;   (out)     FluxR           (double 2-D array)                s.f.u.    Radiomap of the flux in the right polarization  
-;   (out)     FluxL           (double 2-D array)                s.f.u.    Radiomap of the flux in the left polarization
-;   (out)     scanR           (double 1-D array)        s.f.u./arcsec     Emulated RATAN-600 scan, right polarization, specific for RATAN-600(**)
-;   (out)     scanL           (double 1-D array)        s.f.u./arcsec     Emulated RATAN-600 scan, left polarization, specific for RATAN-600(**)
+;   (out)     FluxR           (double 2-D array)                  s.f.u.  Radiomap of the flux in the right polarization  
+;   (out)     FluxL           (double 2-D array)                  s.f.u.  Radiomap of the flux in the left polarization
+;   (out)     scanR           (double 1-D array)           s.f.u./arcsec  Emulated RATAN-600 scan, right polarization, specific for RATAN-600(**)
+;   (out)     scanL           (double 1-D array)           s.f.u./arcsec  Emulated RATAN-600 scan, left polarization, specific for RATAN-600(**)
 ; 
 ; *  Note: viewmask (int) should be of 'Mout' size (see output 'Mout' in reo_prepare_calc_map.pro). 
 ;          FluxR, FluxL (out) will be of the same size
