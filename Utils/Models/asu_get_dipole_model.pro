@@ -1,4 +1,4 @@
-function asu_get_dipole_model, req_depth, req_Bph, filename = filename, maxB = maxB
+function asu_get_dipole_model, req_depth, req_Bph, filename = filename, maxB = maxB, latitude = latitude, longitude = longitude
 
 if n_elements(filename) eq 0 then begin
     dirpath = file_dirname((ROUTINE_INFO('asu_get_dipole_model', /source, /functions)).path, /mark)
@@ -37,6 +37,11 @@ BZ = BZ[*,*,0:uplim]
 
 print, 'Real depth = ' + asu_compstr(real_depth*1e-8) + ' Mm'
 
-return, {BX:BX, BY:BY, BZ:BZ, modstep:modstep, depth:real_depth, Bmax:req_Bph}
+if n_elements(latitude) eq 0 then latitude = 0
+if n_elements(longitude) eq 0 then longitude = 0
+asu_get_direction_cosine, latitude, longitude, dircos
+
+return, {BX:double(BX), BY:double(BY), BZ:double(BZ), modstep:double(modstep) $
+       , vcos:double(dircos), rsun:double(Ra), depth:double(real_depth), Bmax:double(req_Bph)}
 
 end

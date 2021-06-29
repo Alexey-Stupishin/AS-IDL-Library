@@ -11,7 +11,7 @@ ptr = reo_prepare_calc_map( $
 ;    , Debug_AtPoint_ZoneTrace_i = 0 $
 ;    , Debug_AtPoint_ZoneTrace_j = 249 $
 ;    , Debug_AtPoint_ZoneTrace_GyroLayerProfile = 1 $
-;    , dll_location = 's:\Projects\Physics104_291\ProgramD64\agsGeneralRadioEmission.dll' $
+    , dll_location = 's:\Projects\Physics104_291\ProgramD64\agsGeneralRadioEmission.dll' $
     )
 
 print, version_info

@@ -27,4 +27,25 @@ pL = plot(result.freqs, result.FLUXL, '-b2', overplot = pR)
 pR = plot(result.freqs, result.MAXR, '-r2')
 pL = plot(result.freqs, result.MAXL, '-b2', overplot = pR)
 
+
+;----------------------------------------------------------------------
+; не в центре диска
+latitude = 20
+longitude = 30
+box = asu_get_dipole_model(depth, Bph, latitude = latitude, longitude = longitude)
+
+;----------------------------------------------------------------------
+tt = systime(/seconds)
+result = reo_calc_scans_by_box(box, visstep, H, Temp, Dens, freqs, harmonics, freefree, /model)
+print, 'Performed in ' + asu_sec2hms(systime(/seconds)-tt, /issecs)
+;----------------------------------------------------------------------
+
+; полный поток источника
+pR = plot(result.freqs, result.FLUXR, '-r2')
+pL = plot(result.freqs, result.FLUXL, '-b2', overplot = pR)
+
+; поток в максимуме скана
+pR = plot(result.freqs, result.MAXR, '-r2')
+pL = plot(result.freqs, result.MAXL, '-b2', overplot = pR)
+
 end
