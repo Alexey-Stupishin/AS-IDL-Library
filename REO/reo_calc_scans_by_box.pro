@@ -1,32 +1,17 @@
-function test_calc_model, H, Temp, Dens, Bph, freqs, harmonics, freefree
-
-dirpath = file_dirname((ROUTINE_INFO('test_calc_model', /source, /functions)).path, /mark)
-filename = dirpath + 'dipole_18Mm_2500G_1arc_largeFOV.sav' 
-restore, filename ; GX-box
-
-visstep = 1
-posangle = 0
-
-;B = sqrt(BX^2 + BY^2 + BZ^2)
-;factor = Bph/max(B)
-;BX *= factor
-;BY *= factor
-;BZ *= factor
-
-box = {BX:BX, BY:BY, BZ:BZ, modstep:modstep}
+function reo_calc_scans_by_box, box, visstep, H, Temp, Dens, freqs, harmonics, freefree, posangle = posangle, model = model
 
 ptr = reo_prepare_calc_map( $
       box, visstep $ ; GX-модель и шаг радиокарты 
     , M, base $ результат: размер и смещение радиокарты
     , posangle = posangle $  
     , freefree = freefree $
-    , /model $
+    , model = model $
     , version_info = version_info $ ; когда, где и в какой версии библиотеки мы работаем - для контроля
-    , cycloMap_nThreadsInitial = 1 $
-    , Debug_AtPoint_ZoneTrace_i = 0 $
-    , Debug_AtPoint_ZoneTrace_j = 249 $
-    , Debug_AtPoint_ZoneTrace_GyroLayerProfile = 1 $
-    , dll_location = 's:\Projects\Physics104_291\ProgramD64\agsGeneralRadioEmission.dll' $
+;    , cycloMap_nThreadsInitial = 1 $
+;    , Debug_AtPoint_ZoneTrace_i = 0 $
+;    , Debug_AtPoint_ZoneTrace_j = 249 $
+;    , Debug_AtPoint_ZoneTrace_GyroLayerProfile = 1 $
+;    , dll_location = 's:\Projects\Physics104_291\ProgramD64\agsGeneralRadioEmission.dll' $
     )
 
 print, version_info

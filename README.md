@@ -11,3 +11,4 @@ Contains common routines and call samples, mostly for radioemission calculation 
 	* Small bugs fixed
 	* IDL interface to LOS
 	* map calculations for models.
+* 29 June 2021: improvements for version 28 June 2021
