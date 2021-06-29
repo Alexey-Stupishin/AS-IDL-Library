@@ -31,10 +31,10 @@ for i = 0, n-1 do begin
         )
 
     rcr = reo_convolve_map( $
-          ptr, FluxR-FluxR[0, 0], freq, scanR $
+          ptr, FluxR-min(FluxR), freq, scanR $
         )
     rcl = reo_convolve_map( $
-          ptr, FluxL-FluxL[0, 0], freq, scanL $
+          ptr, FluxL-min(FluxL), freq, scanL $
         )
        
     spMaxR[i] = max(scanR)        

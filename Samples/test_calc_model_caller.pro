@@ -9,7 +9,7 @@ Bph = 3000 ; поле на фотосфере в центре, Гс
 visstep = 1 ; шаг радиокарты, угл.сек (чем мельче, тем точнее, но дольше считать)
 harmonics = [2, 3, 4] ; номера учитываемых гармоник
 freefree = 0 ; 1 - учет freefree, 0 - игнорировать
-freqs = asu_linspace(3, 18, 10)*1e9 ; частоты
+freqs = asu_linspace(3, 18, 25)*1e9 ; частоты
 
 box = asu_get_dipole_model(depth, Bph)
 
