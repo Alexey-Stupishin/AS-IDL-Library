@@ -54,7 +54,7 @@ foreach source, sources do begin
     x_arc = [0, fov[0]] + frame2work.crval1 - frame2work.crpix1*frame2work.cdelt1
     y_arc = [0, fov[1]] + frame2work.crval2 - frame2work.crpix2*frame2work.cdelt2
 
-    json = {x_arc:fix(x_arc), y_arc:fix(y_arc), fits_n:fits_n}
+    json = {x_arc:fix(x_arc), y_arc:fix(y_arc), fits_n:fits_n, id:id, filename:sav_file}
 
     json_out = to + path_sep() + id + '.json'
     asu_json_save_list, json, json_out
