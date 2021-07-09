@@ -54,9 +54,6 @@ endif else begin
     frame2work = frames[ctrl_frame]
 endelse
 
-json = {x_arc:fix(x_arc), y_arc:fix(y_arc), fits_n:fits_n, id:id, filename:filename}
-asu_json_save_list, json, json_out
-
 mfo_box_load, frame2work.time_obs, id, x_arc, y_arc, km, boxespath, cachepath $
             , box = box $
             , size_fov = size_fov $
@@ -97,5 +94,8 @@ parameters = {x_arc:x_arc, y_arc:y_arc, size_fov:size_fov, ctrl_frame:ctrl_frame
             
 save, filename = outfile, details, frames, coords, rotcrds, box, boxdata, parameters $
     , NLFFF_filename, POT_filename, BND_filename
+
+json = {x_arc:fix(x_arc), y_arc:fix(y_arc), fits_n:fits_n, id:id, filename:filename}
+asu_json_save_list, json, json_out
     
 end

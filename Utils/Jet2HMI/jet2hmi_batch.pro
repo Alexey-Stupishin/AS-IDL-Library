@@ -5,7 +5,15 @@ end
 
 function jet2hmi_batch, config_path = config_path, _extra = _extra
 
-configs = file_search(filepath('config*.json', root_dir = config_path))
+boxespath = '/home/stupishin/hmi_boxes'
+cachepath = '/home/stupishin/hmi_cache'
+confoutpath = '/home/stupishin/coronal_jets/hmi_conf_1'
+outpath = '/home/stupishin/coronal_jets/hmi_data'
+pictpath = '/home/stupishin/coronal_jets/hmi_images'
+km = 2000
+no_NLFFF = 1
+
+configs = file_search(filepath('*.json', root_dir = config_path))
 
 now = systime()
 while (((pos = strpos(now, ' '))) ne -1) do strput, now, '_', pos
@@ -29,10 +37,27 @@ foreach config_file, configs, i do begin
         continue
     endif
     
+    openr, lun, config_file, /get_lun
+    str = ""
+    result = ""
+    while not EOF(lun) do begin
+        readf, lun, str
+        result += str
+    endwhile
+    close, lun
+    free_lun,lun
+  
+    jsonr = json_parse(result)
+    id = jsonr.id 
+    filename = jsonr.filename
+    outfile = outpath + path_sep() + id + '.sav'
+    outpict = pictpath + path_sep() + id + '.png'
+    json_out = confoutpath + path_sep() + id + '.json'
+    
     t0 = systime(/seconds)
-    cands = pipeline_aia_all(config_file = config_file, _extra = _extra)
+    asuml_candall2ml, id, filename, outfile, outpict, json_in = config_file, json_out = json_out, boxespath = boxespath, cachepath = cachepath, km = km, fov = fov, no_NLFFF = no_NLFFF
     l_jet2hmi_batch_report, U, config_file, t0, i, ntot
-    printf, U, '  -> Successfully, found ', pipeline_aia_cand_report(cands)
+    printf, U, '  -> Successfully'
     flush, U
 endforeach
 
