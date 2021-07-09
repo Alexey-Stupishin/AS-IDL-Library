@@ -9,6 +9,7 @@ if n_elements(boxespath) eq 0 then boxespath = 'g:\BIGData\UData\SDOBoxes'
 if n_elements(cachepath) eq 0 then cachepath = 'g:\BIGData\UCache\HMI'
 
 asuml_candidates2ml, filename, details, frames, coords, rotcrds
+if details eq !NULL then return
 
 if n_elements(json_in) eq 0 then begin
     maxcard = 0L;

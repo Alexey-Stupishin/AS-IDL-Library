@@ -16,7 +16,7 @@ foreach source, sources do begin
     if ~f_inf.exists then continue
     
     asuml_candidates2ml, sav_file, details, frames, coords, rotcrds
-    if n_elements(details) eq 0 then continue
+    if details eq !NULL then continue
     
     maxcard = 0L;
     kmax = -1;
