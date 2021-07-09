@@ -91,10 +91,12 @@ pro gx_box_prepare_box_as, time, centre, size_pix, dx_km, out_dir = out_dir, tmp
     if have_tag(files,'aia_1700') then gx_box_add_refmap, box, files.aia_1700,  id = 'AIA_1700'
   endif
   
-  save, box, file =filepath(box.id+".sav",root_dir = out_dir)
-  if keyword_set(make_pbox) then begin
-    box = pbox
-    save, box, file =filepath(box.id+".sav",root_dir = out_dir)
-  endif
+;  save, box, file =filepath(box.id+".sav",root_dir = out_dir)
+;  if keyword_set(make_pbox) then begin
+;    sbox = box
+;    box = pbox
+;    save, box, file =filepath(box.id+".sav",root_dir = out_dir)
+;    box = sbox
+;  endif
   ;stop
 end

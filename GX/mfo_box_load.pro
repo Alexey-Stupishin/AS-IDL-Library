@@ -86,19 +86,24 @@
 
 pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , dll_location = dll_location $
+                , box = box $
                 , dx_maxsize = dx_maxsize $
+                , size_fov = size_fov $
                 , save_pbox = save_pbox $
                 , version_info = version_info, NLFFF_filename = NLFFF_filename $
+                , POT_filename = POT_filename, BND_filename = BND_filename $
                 , save_sst = save_sst $
                 , no_sel_check = no_sel_check $
                 , ask_NLFFF = ask_NLFFF, no_NLFFF = no_NLFFF, winclose = winclose $
                 , aia_uv = aia_uv, aia_euv = aia_euv $
-                , pict_dir = pict_dir, _extra = _extra 
+                , pict_dir = pict_dir, pict_win = pict_win, sun_graph = sun_graph, ph_graph = ph_graph $
+                , x_mag = x_mag, y_mag = y_mag $
+                , _extra = _extra 
 
     setenv, 'WCS_RSUN=6.96d8'
     pro2searchDLL = 'gx_box_prepare_box'
-    arc_km_approx = 750d ; km in arcsec, approximately
-    arc_RSun = 950d ; RSun in arcsec, approximately
+    arc_RSun = 960d ; RSun in arcsec, approximately
+    arc_km_approx = 6.96d5/arc_RSun ; km in arcsec, approximately
       
     centre = dblarr(2)
     centre[0] = double((x_arc[0]+x_arc[1])/2.); 
@@ -135,23 +140,45 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     bb = sqrt(box.bx^2+box.by^2+box.bz^2)
     bm = max(bb[*,*,0])
     title = '<' + prefix +'> ' + anytim(obstime, out_style = 'ECS') + ', [' + asu_compstr(fix(centre[0])) + ', ' + asu_compstr(fix(centre[1])) + '], Bmax = ' + asu_compstr(fix(bm))
-    win = window(dimensions = windim, WINDOW_TITLE = title)
-    cb = contour(box.bz[*,*,0], RGB_TABLE = 0, N_LEVELS=10, ASPECT_RATIO=1.0, LAYOUT=[2,1,1], /FILL, TITLE = title, /CURRENT)
+    pict_win = window(dimensions = windim, WINDOW_TITLE = title)
+    ;ph_graph = contour(box.bz[*,*,0], RGB_TABLE = 0, N_LEVELS=10, ASPECT_RATIO=1.0, LAYOUT=[2,1,1], /FILL, TITLE = title, /CURRENT)
+    
+    sz = size(box.bx)
+    x = indgen(sz[1])*box.index.cdelt1
+    y = indgen(sz[2])*box.index.cdelt2
+    ph_graph = image(box.bz[*,*,0], RGB_TABLE = 0, ASPECT_RATIO=1.0, LAYOUT=[2,1,1], TITLE = title, /CURRENT)
+    xax = axis('X', LOCATION=[x[0],y[0]], target = ph_graph)
+    xax.tickdir = 1
+    yax = axis('Y', LOCATION=[x[0],y[0]], target = ph_graph)
+    yax.tickdir = 1
+    
     mdata = magnetogram.data
     idxex = where(abs(magnetogram.data) gt 7000, /NULL)
     mdata(idxex) = 0
-    szmd = size(mdata)
-    x = asu_linspace(x_arc[0], x_arc[1], szmd[1])
-    y = asu_linspace(y_arc[0], y_arc[1], szmd[2])
-    cm = contour(mdata, x, y, RGB_TABLE = 0, N_LEVELS=10, ASPECT_RATIO=1.0, LAYOUT=[2,1,2], /FILL, /CURRENT)
+    size_fov = size(mdata)
+    x_mag = (indgen(size_fov[1])-size_fov[1]/2d)*magnetogram.dx + magnetogram.xc
+    y_mag = (indgen(size_fov[2])-size_fov[2]/2d)*magnetogram.dy + magnetogram.yc
+    ;sun_graph = contour(mdata, x, y, RGB_TABLE = 0, N_LEVELS=10, ASPECT_RATIO=1.0, LAYOUT=[2,1,2], /FILL, /CURRENT)
+    
+    sun_graph = image(mdata, x_mag, y_mag, RGB_TABLE = 0, ASPECT_RATIO=1.0, LAYOUT=[2,1,2], /CURRENT)
+    xax = axis('X', LOCATION=[x_mag[0],y_mag[0]], target = sun_graph)
+    xax.tickdir = 1
+    yax = axis('Y', LOCATION=[x_mag[0],y_mag[0]], target = sun_graph)
+    yax.tickdir = 1
+    
     if keyword_set(pict_dir) && pict_dir ne '' then begin
         outfile = pict_dir + path_sep() + asu_str2filename(anytim(obstime, out_style = 'ECS') $
                 + '_' + asu_compstr(fix(centre[0])) + '_' + asu_compstr(fix(centre[1]))) + '_' + asu_compstr(fix(bm)) + '.png'
-        win.Save, outfile, width = windim[0], height = windim[1], bit_depth = 2
+        pict_win.Save, outfile, width = windim[0], height = windim[1], bit_depth = 2
     endif
-    if keyword_set(winclose)then win.Close
+    if keyword_set(winclose)then begin
+        pict_win.Close
+        pict_win = !NULL
+    endif
       
     NLFFF_filename = ''
+    POT_filename = ''
+    BND_filename = ''
     
     if not keyword_set(no_sel_check) then begin
         ans = ''
@@ -160,8 +187,8 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     endif
 
     if keyword_set(contour_only) then return
-        
-    fileid = prefix+'_'+box.id+'_'+strtrim(string(fix(dx_kmc)), 2)
+    
+    sst_post = '_' + strtrim(string(fix(dx_kmc)), 2) + '_sst'
 
     asu_box_aia_from_box, box, aia
   
@@ -169,20 +196,27 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     input_coords = {x:x_arc, y:y_arc}
 
     if not keyword_set(save_sst) then save_sst = 0
-    if save_sst gt 0 then begin
-        asu_box_create_mfodata, mfodata, box, box, aia, boxdata, fileid, input_coords=input_coords
-        foutname = out_dir+path_sep()+fileid+'_sst.sav'
-        save, file = foutname, mfodata 
-        message, 'Box structure (potential+boundary) saved to ' + foutname,/cont
-    endif
     if not keyword_set(save_pbox) then save_pbox = 0
+    
+    bndp = prefix+'_'+box.id
+    save, box, file = filepath(bndp+".sav", root_dir = out_dir)
+    if save_sst gt 0 then begin
+        fileid = bndp+sst_post
+        asu_box_create_mfodata, mfodata, box, box, aia, boxdata, fileid, input_coords=input_coords
+        BND_filename = filepath(fileid+".sav", root_dir = out_dir)
+        save, file = BND_filename, mfodata 
+        message, 'Box structure (potential+boundary) saved to ' + BND_filename,/cont
+    endif
     if save_pbox gt 0 then begin
-        foutname = out_dir+path_sep()+prefix+'_'+pbox.id+'.sav'
-        save, file = foutname, pbox
+        potp = prefix+'_'+pbox.id
+        sbox = box
+        save, file = filepath(potp+".sav", root_dir = out_dir), box
+        box = sbox
         if save_sst gt 0 then begin
-            asu_box_create_mfodata, mfodata, pbox, box, aia, boxdata, prefix+'_'+pbox.id+'_'+strtrim(string(fix(dx_kmc)), 2), input_coords=input_coords
-            foutname = out_dir+path_sep()+fileid+'_sst.sav'
-            save, file = foutname, mfodata
+            fileid = potp+sst_post
+            asu_box_create_mfodata, mfodata, pbox, box, aia, boxdata, fileid, input_coords=input_coords
+            POT_filename = filepath(fileid+".sav", root_dir = out_dir)
+            save, file = POT_filename, mfodata
         endif 
     endif
   
@@ -211,12 +245,12 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     print, version_info
     fileid = prefix+'_'+box.id+'_'+strtrim(string(fix(dx_kmc)), 2)
       
-    foutname = out_dir+path_sep()+fileid+'.sav'
-    save, file = foutname, box
-       
+    nlfp = prefix+'_'+box.id
+    save, file = filepath(nlfp+".sav", root_dir = out_dir), box
     if save_sst gt 0 then begin
+        fileid = nlfp+sst_post
         asu_box_create_mfodata, mfodata, box, box, aia, boxdata, fileid, version_info=version_info, input_coords=input_coords
-        NLFFF_filename = out_dir+path_sep()+fileid+'_sst.sav'
+        NLFFF_filename = filepath(fileid+".sav", root_dir = out_dir)
         save, file = NLFFF_filename, mfodata 
         message, 'Box structure (NLFFF) saved to ' + NLFFF_filename,/cont
     endif
