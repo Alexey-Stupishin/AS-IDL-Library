@@ -2,7 +2,10 @@ pro asuml_candidates2ml, filename, details, frames, coords, rotcrds
 
 restore, filename
 
+details = !NULL
 cntdet = found_candidates.Count();
+if cntdet eq 0 then return 
+
 cntfrm = 0;
 cntcrd = 0;
 foreach cand, found_candidates, i do begin
