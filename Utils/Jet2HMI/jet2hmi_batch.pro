@@ -3,15 +3,19 @@ pro l_jet2hmi_batch_report, U, config_file, t0, i, ntot
           , ' performed in ', asu_sec2hms(systime(/seconds)-t0, /issecs)
 end
 
-function jet2hmi_batch, config_path = config_path, _extra = _extra
+function jet2hmi_batch, config_path = config_path $
+                      , boxespath = boxespath, cachepath = cachepath $
+                      , confoutpath = confoutpath, outpath = outpath, pictpath = pictpath $
+                      , km = km, no_NLFFF = no_NLFFF 
 
 boxespath = '/home/stupishin/hmi_boxes'
 cachepath = '/home/stupishin/hmi_cache'
 confoutpath = '/home/stupishin/coronal_jets/hmi_conf_1'
 outpath = '/home/stupishin/coronal_jets/hmi_data'
 pictpath = '/home/stupishin/coronal_jets/hmi_images'
-km = 2000
-no_NLFFF = 1
+
+if n_elements(km) eq 0 then km = 2000d
+if n_elements(no_NLFFF) eq 0 then no_NLFFF = 0
 
 configs = file_search(filepath('*.json', root_dir = config_path))
 
