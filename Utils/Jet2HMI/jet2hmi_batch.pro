@@ -8,12 +8,6 @@ function jet2hmi_batch, config_path = config_path $
                       , confoutpath = confoutpath, outpath = outpath, pictpath = pictpath $
                       , km = km, no_NLFFF = no_NLFFF 
 
-boxespath = '/home/stupishin/hmi_boxes'
-cachepath = '/home/stupishin/hmi_cache'
-confoutpath = '/home/stupishin/coronal_jets/hmi_conf_1'
-outpath = '/home/stupishin/coronal_jets/hmi_data'
-pictpath = '/home/stupishin/coronal_jets/hmi_images'
-
 if n_elements(km) eq 0 then km = 2000d
 if n_elements(no_NLFFF) eq 0 then no_NLFFF = 0
 
