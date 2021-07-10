@@ -67,7 +67,8 @@ mfo_box_load, frame2work.time_obs, id, x_arc, y_arc, km, boxespath, cachepath $
             , BND_filename = BND_filename $
             , sun_graph = sun_graph $
             , pict_win = pict_win $
-            , x_mag = x_mag, y_mag = y_mag
+            , x_mag = x_mag, y_mag = y_mag, bmax = bmax $
+            , /no_title_prefix
 
 asu_box_get_coord, box, boxdata
 
@@ -83,19 +84,21 @@ for k = frame2work.CoordPtr, frame2work.CoordPtr + frame2work.Card - 1 do begin
     jet[px, py] = 1
 endfor  
 
-rcont = contour(gauss_smooth(double(jet),3,/edge_truncate),x_mag,y_mag, min_value = 0, max_value = 0.3, n_levels = 1, overplot = sun_graph, color = 'crimson', c_thick = 3)
-;jimage = image(jet, x, y, OVERPLOT = sun_graph)
+;rcont = contour(gauss_smooth(double(jet),3,/edge_truncate),x_mag,y_mag, min_value = 0, max_value = 0.3, n_levels = 1, overplot = sun_graph, color = 'crimson', c_thick = 3)
+rcont = contour(gauss_smooth(double(jet),3,/edge_truncate),x_mag,y_mag, min_value = 0, max_value = 0.3, n_levels = 2, overplot = sun_graph, color = 'crimson', c_thick = 3)
+;jimage = image(jet, x_mag, y_mag, OVERPLOT = sun_graph)
 ;jimage.transparency = 50
 
 pict_win.Save, outpict, width = 1200, height = 700, bit_depth = 2
 pict_win.Close
 
-parameters = {x_arc:x_arc, y_arc:y_arc, size_fov:size_fov, ctrl_frame:ctrl_frame}
+szbox = size(box.bx)
+parameters = {x_arc:x_arc,      y_arc:y_arc,      fits_n:fits_n, id:id, filename:filename, km:km, size_box:szbox[1:3], size_fov:size_fov[1:2], ctrl_frame:ctrl_frame, bmax:fix(bmax)}
+json =       {x_arc:fix(x_arc), y_arc:fix(y_arc), fits_n:fits_n, id:id, filename:filename, km:km, size_box:szbox[1:3], size_fov:size_fov[1:2], ctrl_frame:ctrl_frame, bmax:fix(bmax)}
             
 save, filename = outfile, details, frames, coords, rotcrds, box, boxdata, parameters $
     , NLFFF_filename, POT_filename, BND_filename
 
-json = {x_arc:fix(x_arc), y_arc:fix(y_arc), fits_n:fits_n, id:id, filename:filename}
 asu_json_save_list, json, json_out
     
 end

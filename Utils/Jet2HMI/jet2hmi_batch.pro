@@ -47,7 +47,7 @@ foreach config_file, configs, i do begin
     close, lun
     free_lun,lun
   
-    jsonr = json_parse(result)
+    jsonr = json_parse(result, /tostruct)
     id = jsonr.id 
     filename = jsonr.filename
     outfile = outpath + path_sep() + id + '.sav'

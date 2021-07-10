@@ -98,6 +98,8 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , aia_uv = aia_uv, aia_euv = aia_euv $
                 , pict_dir = pict_dir, pict_win = pict_win, sun_graph = sun_graph, ph_graph = ph_graph $
                 , x_mag = x_mag, y_mag = y_mag $
+                , bmax = bmax $
+                , no_title_prefix = no_title_prefix $
                 , _extra = _extra 
 
     setenv, 'WCS_RSUN=6.96d8'
@@ -138,8 +140,9 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     windim = [1200, 700]
     
     bb = sqrt(box.bx^2+box.by^2+box.bz^2)
-    bm = max(bb[*,*,0])
-    title = '<' + prefix +'> ' + anytim(obstime, out_style = 'ECS') + ', [' + asu_compstr(fix(centre[0])) + ', ' + asu_compstr(fix(centre[1])) + '], Bmax = ' + asu_compstr(fix(bm))
+    bmax = max(bb[*,*,0])
+    title = anytim(obstime, out_style = 'ECS') + ', [' + asu_compstr(fix(centre[0])) + ', ' + asu_compstr(fix(centre[1])) + '], Bmax = ' + asu_compstr(fix(bmax))
+    if n_elements(no_title_prefix) eq 0 || no_title_prefix eq 0 then title += ' <' + prefix +'>'
     pict_win = window(dimensions = windim, WINDOW_TITLE = title)
     ;ph_graph = contour(box.bz[*,*,0], RGB_TABLE = 0, N_LEVELS=10, ASPECT_RATIO=1.0, LAYOUT=[2,1,1], /FILL, TITLE = title, /CURRENT)
     
