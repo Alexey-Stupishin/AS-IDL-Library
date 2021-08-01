@@ -100,12 +100,16 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , x_mag = x_mag, y_mag = y_mag $
                 , bmax = bmax $
                 , no_title_prefix = no_title_prefix $
+                , find_B_region = find_B_region $
                 , _extra = _extra 
 
     setenv, 'WCS_RSUN=6.96d8'
     pro2searchDLL = 'gx_box_prepare_box'
     arc_RSun = 960d ; RSun in arcsec, approximately
     arc_km_approx = 6.96d5/arc_RSun ; km in arcsec, approximately
+      
+    file_mkdir, out_dir
+    file_mkdir, tmp_dir
       
     centre = dblarr(2)
     centre[0] = double((x_arc[0]+x_arc[1])/2.); 
@@ -240,7 +244,7 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     message, 'Performing NLFFF extrapolation (can take some minutes, or tens of minutes) ...', /cont
     t0 = systime(/seconds)
       
-    ;version_info = ''
+    version_info = ''
     return_code = gx_box_make_nlfff_wwas_field(dll_location, box, version_info = version_info, _extra = _extra)
       
     message, strcompress(string(systime(/seconds)-t0,format="('NLFFF extraplolation performed in ',g0,' seconds')")), /cont
