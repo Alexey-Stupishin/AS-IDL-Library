@@ -1,4 +1,4 @@
-pro asuml_candidates2ml, filename, details, frames, coords, rotcrds
+pro jet2hmi_candidates2arrays, filename, details, frames, coords, rotcrds
 
 restore, filename
 

@@ -15,7 +15,7 @@ foreach source, sources do begin
     f_inf = file_info(sav_file)
     if ~f_inf.exists then continue
     
-    asuml_candidates2ml, sav_file, details, frames, coords, rotcrds
+    jet2hmi_candidates2arrays, sav_file, details, frames, coords, rotcrds
     if details eq !NULL then continue
     
     maxcard = 0L;

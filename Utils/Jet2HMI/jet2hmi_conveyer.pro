@@ -1,4 +1,4 @@
-pro asuml_candall2ml, id, filename, outfile, outpict, json_in = json_in, json_out = json_out, boxespath = boxespath, cachepath = cachepath, km = km, fov = fov, no_NLFFF = no_NLFFF
+pro jet2hmi_conveyer, id, filename, outfile, outpict, json_in = json_in, json_out = json_out, boxespath = boxespath, cachepath = cachepath, km = km, fov = fov, no_NLFFF = no_NLFFF
 
 if n_elements(dll_location) eq 0 then dll_location = 's:\Projects\Physics104_291\ProgramD64\WWNLFFFReconstruction.dll'
 
@@ -8,7 +8,7 @@ if n_elements(fov) eq 0 then fov = 500d ; arcsec
 if n_elements(boxespath) eq 0 then boxespath = 'g:\BIGData\UData\SDOBoxes'
 if n_elements(cachepath) eq 0 then cachepath = 'g:\BIGData\UCache\HMI'
 
-asuml_candidates2ml, filename, details, frames, coords, rotcrds
+jet2hmi_candidates2arrays, filename, details, frames, coords, rotcrds
 if details eq !NULL then return
 
 if n_elements(json_in) eq 0 then begin

@@ -53,7 +53,7 @@ foreach config_file, configs, i do begin
     json_out = confoutpath + path_sep() + id + '.json'
     
     t0 = systime(/seconds)
-    asuml_candall2ml, id, filename, outfile, outpict, json_in = config_file, json_out = json_out, boxespath = boxespath, cachepath = cachepath, km = km, fov = fov, no_NLFFF = no_NLFFF
+    jet2hmi_conveyer, id, filename, outfile, outpict, json_in = config_file, json_out = json_out, boxespath = boxespath, cachepath = cachepath, km = km, fov = fov, no_NLFFF = no_NLFFF
     l_jet2hmi_batch_report, U, config_file, t0, i, ntot
     printf, U, '  -> Successfully'
     flush, U
