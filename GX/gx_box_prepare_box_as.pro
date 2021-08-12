@@ -34,7 +34,7 @@ pro gx_box_prepare_box_as, time, centre, size_pix, dx_km, out_dir = out_dir, tmp
                   aia_euv = aia_euv, aia_uv = aia_uv, top = top, cea = cea,$
                   carrington = carrington, sfq = sfq, make_pbox = make_pbox,$
                   HMI_time_window = HMI_time_window, AIA_time_window = AIA_time_window,$
-                  box = box, pbox = pbox, hmi_files = hmi_files, magnetogram = magnetogram 
+                  box = box, pbox = pbox, hmi_files = hmi_files, magnetogram = magnetogram, full_Bz = full_Bz
   if not keyword_set(out_dir) then cd, current = out_dir
   if not file_test(out_dir) then file_mkdir, out_dir
   if not keyword_set(tmp_dir) then tmp_dir = filepath('jsoc_cache',root = GETENV('IDL_TMPDIR'))
@@ -59,12 +59,16 @@ pro gx_box_prepare_box_as, time, centre, size_pix, dx_km, out_dir = out_dir, tmp
      files.continuum, centre, size_pix, dx_km,top = top, cea = cea, carrington = carrington, sfq = sfq)
   gx_box_add_refmap, box, files.continuum, id = 'Continuum'
   gx_box_add_refmap, box, files.magnetogram, id = 'LOS_magnetogram'
+  gx_box_add_vertical_current_map, box, files.field, files.inclination, files.azimuth, files.disambig
+  
   refmaps=*(box.Refmaps())
   for i=0, refmaps->get(/count)-1 do begin
     if refmaps->get(i,/id) eq 'LOS_magnetogram' then magnetogram = refmaps->get(i,/map)
   endfor
-  gx_box_add_vertical_current_map, box, files.field, files.inclination, files.azimuth, files.disambig
   
+  read_sdo, files.magnetogram, index, data, /uncomp_delete;, /use_shared_lib
+  full_Bz = {index:index, data:data};
+
   if keyword_set(make_pbox) then begin
     gx_box_make_potential_field, box, pbox
   endif else begin

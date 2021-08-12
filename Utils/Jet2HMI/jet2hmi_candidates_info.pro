@@ -1,4 +1,4 @@
-pro jet2hmi_candidates_info, fncsv
+pro jet2hmi_candidates_info, fncsv, info
 
 ; fncsv = 'g:\BIGData\UData\Jets\HMI\Take_1\jets4hmi\20100916_235930_20100917_005930_57_-511_500_500\objects_m2\171.csv'    
 res = read_ascii(fncsv, template = jet2hmi_load_csv_template(), data_start = 1, header = header, count = count)
@@ -9,8 +9,6 @@ for i = 0, count-1 do begin
     info[i].tstart = res.tstart[i]
     info[i].tmax = res.tmax[i]
     info[i].tend = res.tend[i]
-    info[i].N = res.N[i]
-    info[i].duration = res.duration[i]
     info[i].maxcard = res.maxcard[i]
     info[i].jet_aspect = res.jet_aspect[i]
     info[i].max_aspect = res.max_aspect[i]

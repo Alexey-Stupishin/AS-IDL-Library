@@ -97,7 +97,7 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , ask_NLFFF = ask_NLFFF, no_NLFFF = no_NLFFF, winclose = winclose $
                 , aia_uv = aia_uv, aia_euv = aia_euv $
                 , pict_dir = pict_dir, pict_win = pict_win, sun_graph = sun_graph, ph_graph = ph_graph $
-                , x_mag = x_mag, y_mag = y_mag $
+                , x_mag = x_mag, y_mag = y_mag, full_Bz = full_Bz $
                 , bmax = bmax $
                 , no_title_prefix = no_title_prefix $
                 , find_B_region = find_B_region $
@@ -139,7 +139,7 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     print, '***** dx_km = ' + asu_compstr(dx_kmc) + ', box = ' + asu_compstr(size_pix[0]) + ' x ' + asu_compstr(size_pix[1]) + ' x ' + asu_compstr(size_pix[2])
      
     gx_box_prepare_box_as, obstime, centre, size_pix, dx_kmc, out_dir = out_dir, tmp_dir = tmp_dir $
-                      , box = box, make_pbox = save_pbox, pbox = pbox, aia_uv = aia_uv, aia_euv = aia_euv, magnetogram = magnetogram
+                      , box = box, make_pbox = save_pbox, pbox = pbox, aia_uv = aia_uv, aia_euv = aia_euv, magnetogram = magnetogram, full_Bz = full_Bz
     
     windim = [1200, 700]
     
