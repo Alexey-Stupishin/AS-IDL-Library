@@ -1,7 +1,7 @@
 function jets2hmi_mag_fov, data, index, center, params, xfov, yfov
 
-xfov = lonarr(2)
-yfov = lonarr(2)
+xfov = dblarr(2)
+yfov = dblarr(2)
 
 idx = where(finite(data,/nan))
 data[idx] = 0 
@@ -82,8 +82,11 @@ pos = qh[0,*]
 
 xfov[0] = max([0,       min(ids[0, pos])+xs[0]-params.exlim])
 xfov[1] = min([sz[1]+1, max(ids[0, pos])+xs[0]+params.exlim])
+xfov = (xfov - index.crpix1)*index.cdelt1
+
 yfov[0] = max([0,       min(ids[1, pos])+ys[0]-params.exlim])
 yfov[1] = min([sz[2]+1, max(ids[1, pos])+ys[0]+params.exlim])
+yfov = (yfov - index.crpix2)*index.cdelt2
 
 return, 1 
 

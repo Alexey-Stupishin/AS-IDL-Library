@@ -1,11 +1,15 @@
-pro l_jet2hmi_batch_report, U, config_file, t0, i, ntot
+pro l_jet2hmi_batch_v0_report, U, config_file, t0, i, ntot
     printf, U, '***** config ', strcompress(string(i+1), /remove_all), ' of ', strcompress(string(ntot), /remove_all), ' = ', file_basename(config_file) $
           , ' performed in ', asu_sec2hms(systime(/seconds)-t0, /issecs)
 end
 
-function jet2hmi_batch, config_path = config_path, params $
+function jet2hmi_batch_v0, config_path = config_path $
                       , boxespath = boxespath, cachepath = cachepath $
-                      , confoutpath = confoutpath, outpath = outpath, pictpath = pictpath
+                      , confoutpath = confoutpath, outpath = outpath, pictpath = pictpath $
+                      , km = km, no_NLFFF = no_NLFFF 
+
+if n_elements(km) eq 0 then km = 2000d
+if n_elements(no_NLFFF) eq 0 then no_NLFFF = 0
 
 configs = file_search(filepath('*.json', root_dir = config_path))
 
@@ -44,15 +48,12 @@ foreach config_file, configs, i do begin
     jsonr = json_parse(result, /tostruct)
     id = jsonr.id 
     filename = jsonr.filename
-    fdir = file_dirname(filename)
-    fname = file_basename(filename)
-    expr = stregex(fname, '(.*)\..*',/subexpr,/extract)
-    if n_elements(expr) ne 2 then continue
-    csvname = fdir + path_sep() + expr[1] + '.csv'  
+    outfile = outpath + path_sep() + id + '.sav'
+    outpict = pictpath + path_sep() + id + '.png'
+    json_out = confoutpath + path_sep() + id + '.json'
     
     t0 = systime(/seconds)
-    
-    res = jet2hmi_conveyer(id, params, filename, csvname, outpath, pictpath, confoutpath, boxespath = boxespath, cachepath = cachepath)
+    jet2hmi_conveyer_v0, id, filename, outfile, outpict, json_in = config_file, json_out = json_out, boxespath = boxespath, cachepath = cachepath, km = km, fov = fov, no_NLFFF = no_NLFFF
     l_jet2hmi_batch_report, U, config_file, t0, i, ntot
     printf, U, '  -> Successfully'
     flush, U
