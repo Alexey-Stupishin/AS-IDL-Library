@@ -1,0 +1,239 @@
+pro test_calc_map_scan_fill_1, Hf, Tf, Df, dh, addT, NT, H, Temp, Dens
+
+length = n_elements(Hf)
+n_add = n_elements(addT)
+H = dblarr(length+n_add)
+H[0:-(n_add+1)] = Hf
+Temp = dblarr(length+n_add)
+Temp[0:-(n_add+1)] = Tf
+Dens = dblarr(length+n_add)
+Dens[0:-(n_add+1)] = Df
+for k = 0, n_add-1 do begin
+    H[-(n_add-k)] = H[-(n_add-k+1)] + dh[k]
+    Temp[-(n_add-k)] = addT[k]
+    Dens[-(n_add-k)] = NT/Temp[-(n_add-k)]
+endfor
+
+end
+
+;--------------------------------------------------------------------------------------
+pro test_calc_map_scan_1
+;
+; Набор примеров, иллюстрирующих использование библиотеки расчетов радиокарт и сканов
+; Рекомендуется пошаговое выполнение
+; 
+;---------------------------------------------------------------------------------------
+; загрузка GX-box ----------------------------------------------------------------------
+;     пример из поставляемого пакета:
+dirpath = file_dirname((ROUTINE_INFO('test_calc_map_scan_1', /source)).path, /mark)
+filename = dirpath + '12470_hmi.M_720s.20151218_125809.W86N13CR.CEA.NAS_1000.sav' 
+;     либо использовать путь, сохраненный в примере test_mfo_box_load:
+;filename = getenv('mfo_NLFFF_filename')
+;     либо задать путь к файлу явно
+;filename = 'c:\temp\mod_dipole.sav'
+ 
+restore, filename ; GX-box
+
+;---------------------------------------------------------------------------------------
+; параметры моделирования: -------------------------------------------------------------
+length = asu_get_fontenla2009(7, Hf, Tf, Df)
+; доопределим модель в корону:
+test_calc_map_scan_fill_1, Hf, Tf, Df, [1e7, 1e8, 3e9], [2e6, 3e6, 3e6], 3e15, H, Temp, Dens
+ht = plot(H, Temp, /ylog, xrange = [0, 3e8])
+hd = plot(H, Dens, /ylog, xrange = [0, 3e8])
+;H =    [1,   1e8, 1.1e8, 2e10] ; cm - высота над фотосферой
+;Temp = [1e4, 1e4, 2e6,   2e6] ; K - температуры на соответствующих высотах
+;Dens = 3e15/Temp ; cm^{-3} - плотности электронов там же
+
+visstep = 0.5 ; arcsec - шаг видимой сетки радиокарты
+
+posangle = 0 ; позиционный угол: 
+             ; для нулевого азимута РАТАН-600 равен позиционному углу Солнца
+             ; для ненулевого азимута РАТАН-600 может быть получен утилитой asu_ratan_position_angle
+freq = 5.7e9 ; Hz - частота
+freq = 4e9 ; Hz - частота
+
+;---------------------------------------------------------------------------------------
+; подготовка библиотеки, установка магнитного поля и разметка радиокарты ---------------
+;   
+ptr = reo_prepare_calc_map( $
+      box, visstep $ ; GX-модель и шаг радиокарты 
+    , M, base $ результат: размер и смещение радиокарты
+    , posangle = posangle $  
+    , freefree = 0 $ ; no free-free considered
+    , arcbox = arcbox $ ; вернет границы радиокарты в угл. секундах
+    , field = field $ ; вернет полное поле на фотосфере, как мы видим его с Земли
+;    , /model $
+    , dll_location = 's:\Projects\Physics104_291\ProgramD64\agsGeneralRadioEmission.dll' $
+    , version_info = version_info $ ; когда, где и в какой версии библиотеки мы работаем - для контроля
+    )
+
+if ptr eq 0 then begin ; что-то пошло не так ...
+    message, 'Prepare Library Problem', /cont
+    return
+endif
+
+print, version_info
+
+
+;---------------------------------------------------------------------------------------
+; нарисуем полное поле на фотосфере, как мы видим его с Земли --------------------------
+; (это не совсем то, что получено со спутника; данные наблюдений преобразованы в систему координат,
+; связанную с фотосферой АО, а потом опять в систему наблюдателя, но уже с другим шагом сетки, да еще
+; и повернутые на позиционный угол РАТАНа)
+Bph = sqrt(field.bx^2 + field.by^2 + field.bz^2)
+;cB = contour(Bph, RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Photosphere Field', /FILL)
+
+;---------------------------------------------------------------------------------------
+; вычисление радиокарт и сканов --------------------------------------------------------
+rc = reo_calculate_map( $
+      ptr, H, Temp, Dens, freq $
+    , harmonics = [2, 3, 4] $
+    , FluxR = FluxR $
+    , FluxL = FluxL $
+    , scanR = scanR $
+    , scanL = scanL $
+    )
+    
+; ну и нарисуем что получилось:
+; радиокарты ...
+cR = contour(alog10(FluxR), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map', /FILL)
+cL = contour(alog10(FluxL), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map', /FILL)
+
+; ... и сканы:
+xarc = asu_linspace(arcbox[0, 0], arcbox[1, 0], n_elements(scanR))         
+pR = plot(xarc, scanR, window_title = 'Right scan')
+pL = plot(xarc, scanL, window_title = 'Left scan')
+
+; пересчитаем карты в яркостные температуры:
+FluxRT = asu_fluxpixel2temp(FluxR, freq, visstep)
+FluxLT = asu_fluxpixel2temp(FluxL, freq, visstep)
+
+;---------------------------------------------------------------------------------------
+; вычисление сканов по радиокарте (здесь для примера - скан в более широких границах, 
+; дальше будет полезно при расчетах с масками)
+; ВАЖНО! сканы отдельно могут быть вычислены только в контексте существующей разметки поля!
+; т.е. размер радиокарты должен соответствовать размеру, который вернул вызов reo_prepare_calc_map,
+; и позиционирована она относительно диска Солнца будет так же, как и при полном расчете reo_calculate_map    
+;---------------------------------------------------------------------------------------
+; расширим границы скана: --------------------------------------------------------------
+scan_lim = arcbox[*, 0] + [-40.5, 40.7] ; на сорок с копейками арксекунд вправо и влево
+print, scan_lim
+rcr = reo_convolve_map( $
+      ptr, FluxR, freq, scanRCEx $
+    , scan_lim = scan_lim $
+    )
+print, scan_lim
+; заметим, что границы скорректированы для подгонки к шагу сетки
+rcr = reo_convolve_map( $
+      ptr, FluxL, freq, scanLCEx $
+    , scan_lim = scan_lim $
+    )
+print, scan_lim
+
+; ... и нарисуем туда же ---------------------------------------------------------------
+xarc = asu_linspace(scan_lim[0], scan_lim[1], n_elements(scanRCEx))         
+pRCEx = plot(xarc, scanRCEx, '--g2', OVERPLOT = pR)
+pLCEx = plot(xarc, scanLCEx, '--g2', OVERPLOT = pL)
+
+;---------------------------------------------------------------------------------------
+; используем маску для работы с разными моделями ---------------------------------------
+B_threshold = 1800 ; порог 1800 Гаусс
+
+;  выделяем поле больше порога
+umbra = Bph ge B_threshold
+; ... и считаем потоки (сканы посчитаем потом)
+rc = reo_calculate_map( $
+      ptr, H, Temp, Dens, freq $
+    , viewMask = umbra $
+    , FluxR = FluxRu $
+    , FluxL = FluxLu $
+    )
+
+; выделяем поле меньше порога ...
+outumbra = Bph lt B_threshold
+; ... и задаем другую модель
+Hx =    [1,   2e8, 2.1e8, 2e10] ; cm - высота над фотосферой
+Tempx = [1e4, 1e4,   3e6,  3e6] ; K - температуры на соответствующих высотах
+Densx = 3e15/Temp ; cm^{-3} - плотности электронов там же
+; ... и опять потоки
+rc = reo_calculate_map( $
+      ptr, Hx, Tempx, Densx, freq $
+    , viewMask = outumbra $
+    , FluxR = FluxRx $
+    , FluxL = FluxLx $
+    )
+    
+; объединим потоки и построим сканы
+FluxR = FluxRu + FluxRx    
+FluxL = FluxLu + FluxLx
+rcr = reo_convolve_map(ptr, FluxR, freq, scanRCm)
+rcr = reo_convolve_map(ptr, FluxL, freq, scanLCm)
+
+; и опять все рисуем:
+cR = contour(alog10(FluxR), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map (2 models)', /FILL)
+cL = contour(alog10(FluxL), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map (2 models)', /FILL)
+xarc = asu_linspace(arcbox[0, 0], arcbox[1, 0], n_elements(scanRCm))         
+pRC = plot(xarc, scanRCm, '-:m4', OVERPLOT = pR)
+pLC = plot(xarc, scanLCm, '-:m4', OVERPLOT = pL)
+
+;---------------------------------------------------------------------------------------
+; Другое построение маски, с учетом поля и излучения в континууме ----------------------
+
+rc = reo_get_markup_scalar(ptr, box.base.ic, cont, cmask)
+model_mask = decompose(field.bz, cont); see Fontenla 2009. e.g. 7 - umbra, 6 - penumbra etc.
+idx = where(cmask eq 0, count)
+if count gt 0 then begin
+    model_mask[idx] = 0
+endif
+
+; выделим точки, принадлежащие тени:
+umbra = model_mask eq 7
+; построим модель хромосферы в тени до 2е5 К 
+length = asu_get_fontenla2009(7, Hf, Tf, Df)
+; доопределим модель в корону:
+test_calc_map_scan_fill_1, Hf, Tf, Df, [1e7, 1e8, 3e9], [2e6, 3e6, 3e6], 3e15, H, Temp, Dens
+ht = plot(H, Temp, /ylog, xrange = [0, 3e8])
+hd = plot(H, Dens, /ylog, xrange = [0, 3e8])
+
+; ... и считаем потоки (сканы посчитаем потом)
+rc = reo_calculate_map( $
+      ptr, H, Temp, Dens, freq $
+    , viewMask = umbra $
+    , FluxR = FluxRu $
+    , FluxL = FluxLu $
+    )
+    
+; выделим точки, принадлежащие полутени:
+penumbra = model_mask eq 6
+; построим модель хромосферы в полутени до 2е5 К 
+length = asu_get_fontenla2009(7, Hf, Tf, Df)
+; доопределим модель в корону:
+test_calc_map_scan_fill_1, Hf, Tf, Df, [1e7, 1e8, 3e9], [2e6, 3e6, 3e6], 3e15, H, Temp, Dens
+ht = plot(H, Temp, /ylog, xrange = [0, 3e8])
+hd = plot(H, Dens, /ylog, xrange = [0, 3e8])
+
+; ... и считаем потоки (сканы посчитаем потом)
+rc = reo_calculate_map( $
+      ptr, H, Temp, Dens, freq $
+    , viewMask = penumbra $
+    , FluxR = FluxRp $
+    , FluxL = FluxLp $
+    )
+
+; объединим потоки и построим сканы
+FluxR = FluxRu + FluxRp    
+FluxL = FluxLu + FluxLp
+rcr = reo_convolve_map(ptr, FluxR, freq, scanRCm)
+rcr = reo_convolve_map(ptr, FluxL, freq, scanLCm)
+
+; и опять все рисуем:
+cR = contour(alog10(FluxR), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map (2 models)', /FILL)
+cL = contour(alog10(FluxL), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map (2 models)', /FILL)
+xarc = asu_linspace(arcbox[0, 0], arcbox[1, 0], n_elements(scanRCm))         
+pRC = plot(xarc, scanRCm, '-:g4', OVERPLOT = pR)
+pLC = plot(xarc, scanLCm, '-:g4', OVERPLOT = pL)
+    
+rc = reo_uninit(ptr)
+    
+end
