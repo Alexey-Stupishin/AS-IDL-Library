@@ -26,6 +26,7 @@ y_fov[0] = min([y_fov[0], double(csvinfo.y[0])])
 y_fov[1] = max([y_fov[1], double(csvinfo.y[1])])
 mfo_box_load, csvinfo.tmax, id, x_fov, y_fov, 400, boxespath, cachepath $
             , box = box $
+            , aia_euv = [171] $
             , /no_sel_check $
             , /no_NLFFF $
             , dx_maxsize = params.dx_maxsize $
