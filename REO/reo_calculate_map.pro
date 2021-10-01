@@ -103,7 +103,7 @@ vH = double(H)
 vT = double(T)
 vD = double(D)
 vfreq = double(freq)
-vharm = [2L, 3L]
+vharm = [2L, 3L, 4L]
 vtau = 25d
 
 vMask = 0L
