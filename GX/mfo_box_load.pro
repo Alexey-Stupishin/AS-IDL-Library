@@ -101,6 +101,7 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , bmax = bmax $
                 , no_title_prefix = no_title_prefix $
                 , find_B_region = find_B_region $
+                , no_hmi_prep = no_hmi_prep $
                 , _extra = _extra 
 
     setenv, 'WCS_RSUN=6.96d8'
@@ -139,7 +140,8 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     print, '***** dx_km = ' + asu_compstr(dx_kmc) + ', box = ' + asu_compstr(size_pix[0]) + ' x ' + asu_compstr(size_pix[1]) + ' x ' + asu_compstr(size_pix[2])
      
     gx_box_prepare_box_as, obstime, centre, size_pix, dx_kmc, out_dir = out_dir, tmp_dir = tmp_dir $
-                      , box = box, make_pbox = save_pbox, pbox = pbox, aia_uv = aia_uv, aia_euv = aia_euv, magnetogram = magnetogram, full_Bz = full_Bz
+                      , box = box, make_pbox = save_pbox, pbox = pbox, aia_uv = aia_uv, aia_euv = aia_euv, magnetogram = magnetogram, full_Bz = full_Bz, no_hmi_prep = no_hmi_prep
+                      
     
     windim = [1200, 700]
     

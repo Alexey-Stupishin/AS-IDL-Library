@@ -19,7 +19,8 @@ end
 ;--------------------------------------------------------------------------------------
 pro test_calc_map_scan_by_mask
 dirpath = file_dirname((ROUTINE_INFO('test_calc_map_scan_by_mask', /source)).path, /mark)
-filename = dirpath + '12470_hmi.M_720s.20151218_125809.W86N13CR.CEA.NAS_1000.sav' 
+;filename = dirpath + '12470_hmi.M_720s.20151218_125809.W86N13CR.CEA.NAS_1000.sav' 
+filename = 'g:\BIGData\UData\SDOBoxes_HMI_Select\12419\IDL\12419_hmi.M_720s.20150918_095819.E160N10CR.CEA.NAS.sav' 
 restore, filename ; GX-box
 
 length = asu_get_fontenla2009(7, Hf, Tf, Df)
@@ -53,7 +54,7 @@ endif
 print, version_info
 
 Bph = sqrt(field.bx^2 + field.by^2 + field.bz^2)
-;cB = contour(Bph, RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Photosphere Field', /FILL)
+cB = contour(Bph, RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Photosphere Field', /FILL)
 
 rc = reo_calculate_map( $
       ptr, H, Temp, Dens, freq $
@@ -73,7 +74,7 @@ pL = plot(xarc, scanL, window_title = 'Left scan')
 ;---------------------------------------------------------------------------------------
 ; Другое построение маски, с учетом поля и излучения в континууме ----------------------
 
-model_mask = reo_get_model_mask(ptr, Bph, box.base.ic, outIC, cont = cont, cmask = cmask)
+model_mask = reo_get_model_mask(ptr, Bph, box.base.ic, cont = cont, used = used)
 
 umbra = model_mask eq 7
 length = asu_get_fontenla2009(7, Hf, Tf, Df)
