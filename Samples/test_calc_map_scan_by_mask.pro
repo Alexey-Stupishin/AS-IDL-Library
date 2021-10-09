@@ -19,17 +19,8 @@ end
 ;--------------------------------------------------------------------------------------
 pro test_calc_map_scan_by_mask
 dirpath = file_dirname((ROUTINE_INFO('test_calc_map_scan_by_mask', /source)).path, /mark)
-;filename = dirpath + '12470_hmi.M_720s.20151218_125809.W86N13CR.CEA.NAS_1000.sav' 
-filename = 'g:\BIGData\UData\SDOBoxes_HMI_Select\12419\IDL\12419_hmi.M_720s.20150918_095819.E160N10CR.CEA.NAS.sav' 
+filename = dirpath + '12470_hmi.M_720s.20151218_125809.W86N13CR.CEA.NAS_1000.sav' 
 restore, filename ; GX-box
-
-length = asu_get_fontenla2009(7, Hf, Tf, Df)
-test_calc_map_scan_fill_by_mask, Hf, Tf, Df, [1e7, 1e8, 3e9], [2e6, 3e6, 3e6], 3e15, H, Temp, Dens
-ht = plot(H, Temp, /ylog, xrange = [0, 3e8])
-hd = plot(H, Dens, /ylog, xrange = [0, 3e8])
-;H =    [1,   1e8, 1.1e8, 2e10] ; cm - высота над фотосферой
-;Temp = [1e4, 1e4, 2e6,   2e6] ; K - температуры на соответствующих высотах
-;Dens = 3e15/Temp ; cm^{-3} - плотности электронов там же
 
 visstep = 0.5 ; arcsec - шаг видимой сетки радиокарты
 posangle = 0 ; позиционный угол: 
@@ -39,7 +30,7 @@ ptr = reo_prepare_calc_map( $
       box, visstep $ ; GX-модель и шаг радиокарты 
     , M, base $ результат: размер и смещение радиокарты
     , posangle = posangle $  
-    , freefree = 0 $ ; no free-free considered
+    , freefree = 1 $ ; consider free-free
     , arcbox = arcbox $ ; вернет границы радиокарты в угл. секундах
     , field = field $ ; вернет полное поле на фотосфере, как мы видим его с Земли
     , dll_location = 's:\Projects\Physics104_291\ProgramD64\agsGeneralRadioEmission.dll' $
@@ -53,32 +44,16 @@ endif
 
 print, version_info
 
-Bph = sqrt(field.bx^2 + field.by^2 + field.bz^2)
-cB = contour(Bph, RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Photosphere Field', /FILL)
-
-rc = reo_calculate_map( $
-      ptr, H, Temp, Dens, freq $
-    , harmonics = [2, 3] $
-    , FluxR = FluxR $
-    , FluxL = FluxL $
-    , scanR = scanR $
-    , scanL = scanL $
-    )
-    
-cR = contour(alog10(FluxR), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map', /FILL)
-cL = contour(alog10(FluxL), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map', /FILL)
-xarc = asu_linspace(arcbox[0, 0], arcbox[1, 0], n_elements(scanR))         
-pR = plot(xarc, scanR, window_title = 'Right scan')
-pL = plot(xarc, scanL, window_title = 'Left scan')
-
 ;---------------------------------------------------------------------------------------
-; Другое построение маски, с учетом поля и излучения в континууме ----------------------
+; Построение маски с учетом поля и излучения в континууме ------------------------------
 
-model_mask = reo_get_model_mask(ptr, Bph, box.base.ic, cont = cont, used = used)
+Bph = sqrt(field.bx^2 + field.by^2 + field.bz^2)
+model_mask = reo_get_model_mask(ptr, Bph, box.base.ic)
 
+; для тени
 umbra = model_mask eq 7
 length = asu_get_fontenla2009(7, Hf, Tf, Df)
-test_calc_map_scan_fill_by_mask, Hf, Tf, Df, [1e7, 1e8, 3e9], [2e6, 3e6, 3e6], 3e15, H, Temp, Dens
+test_calc_map_scan_fill_by_mask, Hf, Tf, Df, [1e7, 1e8, 3e9], [1e6, 2e6, 2e6], 1e16, H, Temp, Dens
 
 rc = reo_calculate_map( $
       ptr, H, Temp, Dens, freq $
@@ -86,12 +61,24 @@ rc = reo_calculate_map( $
     , FluxR = FluxRu $
     , FluxL = FluxLu $
     )
-cR = contour(alog10(FluxRu), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map (2 models)', /FILL)
-cL = contour(alog10(FluxLu), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map (2 models)', /FILL)
     
+if max(FluxRu) gt 0 then begin    
+    cR = contour(alog10(FluxRu), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map (umbra)', /FILL)
+endif
+rcr = reo_convolve_map(ptr, FluxRu, freq, scanRu)
+if max(FluxLu) gt 0 then begin    
+    cL = contour(alog10(FluxLu), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map (umbra)', /FILL)
+end
+rcr = reo_convolve_map(ptr, FluxLu, freq, scanLu)
+
+xarc = asu_linspace(arcbox[0, 0], arcbox[1, 0], n_elements(scanRu))
+pR = plot(xarc, scanRu, '-k2', window_title = 'Right scan', name = 'umbra')
+pL = plot(xarc, scanLu, '-k2', window_title = 'Left scan', name = 'umbra')
+    
+; для полутени
 penumbra = model_mask eq 6
-length = asu_get_fontenla2009(7, Hf, Tf, Df)
-test_calc_map_scan_fill_by_mask, Hf, Tf, Df, [1e7, 1e8, 3e9], [2e6, 3e6, 3e6], 3e15, H, Temp, Dens
+length = asu_get_fontenla2009(6, Hf, Tf, Df)
+test_calc_map_scan_fill_by_mask, Hf, Tf, Df, [1e7, 1.5e8, 3e9], [2e6, 3e6, 3e6], 1e16, H, Temp, Dens
 
 rc = reo_calculate_map( $
       ptr, H, Temp, Dens, freq $
@@ -99,43 +86,46 @@ rc = reo_calculate_map( $
     , FluxR = FluxRp $
     , FluxL = FluxLp $
     )
-cR = contour(alog10(FluxRp), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map (2 models)', /FILL)
-cL = contour(alog10(FluxLp), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map (2 models)', /FILL)
 
 FluxR = FluxRu + FluxRp    
 FluxL = FluxLu + FluxLp
-rcr = reo_convolve_map(ptr, FluxR, freq, scanRCm)
-rcr = reo_convolve_map(ptr, FluxL, freq, scanLCm)
+if max(FluxRp) gt 0 then begin    
+    cR = contour(alog10(FluxRp), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map (penumbra)', /FILL)
+endif
+rcr = reo_convolve_map(ptr, FluxR, freq, scanRup)
+pRu = plot(xarc, scanRup, '-g2', OVERPLOT = pR, name = 'u+p')
+if max(FluxLp) gt 0 then begin    
+    cL = contour(alog10(FluxLp), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map (penumbra)', /FILL)
+endif
+rcr = reo_convolve_map(ptr, FluxL, freq, scanLup)
+pLu = plot(xarc, scanLup, '-g2', OVERPLOT = pL, name = 'u+p')
 
-cR = contour(alog10(FluxR), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map (2 models)', /FILL)
-cL = contour(alog10(FluxL), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map (2 models)', /FILL)
-xarc = asu_linspace(arcbox[0, 0], arcbox[1, 0], n_elements(scanRCm))         
-pRC = plot(xarc, scanRCm, '-:g4', OVERPLOT = pR)
-pLC = plot(xarc, scanLCm, '-:g4', OVERPLOT = pL)
-
-penumbra = (model_mask ne 6) and (model_mask ne 7) 
-length = asu_get_fontenla2009(7, Hf, Tf, Df)
-test_calc_map_scan_fill_by_mask, Hf, Tf, Df, [1e7, 1e8, 3e9], [2e6, 3e6, 3e6], 3e15, H, Temp, Dens
+; для факелов
+facula = model_mask eq 5 
+length = asu_get_fontenla2009(5, Hf, Tf, Df)
+test_calc_map_scan_fill_by_mask, Hf, Tf, Df, [1e7, 1.6e8, 3e9], [2e6, 3e6, 3e6], 1e16, H, Temp, Dens
 
 rc = reo_calculate_map( $
       ptr, H, Temp, Dens, freq $
-    , viewMask = penumbra $
+    , viewMask = facula $
     , FluxR = FluxRx $
     , FluxL = FluxLx $
     )
-cR = contour(alog10(FluxRx), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map (2 models)', /FILL)
-cL = contour(alog10(FluxLx), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map (2 models)', /FILL)
-    
+if max(FluxRx) gt 0 then begin    
+    cR = contour(alog10(FluxRx), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map (facula)', /FILL)
+endif
+if max(FluxLx) gt 0 then begin    
+    cL = contour(alog10(FluxLx), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map (facula)', /FILL)
+endif
 FluxR = FluxR + FluxRx    
 FluxL = FluxL + FluxLx
 rcr = reo_convolve_map(ptr, FluxR, freq, scanRCm)
 rcr = reo_convolve_map(ptr, FluxL, freq, scanLCm)
+pRf = plot(xarc, scanRCm, '-r2', OVERPLOT = pR, name = 'u+p+f')
+pLf = plot(xarc, scanLCm, '-r2', OVERPLOT = pL, name = 'u+p+f')
 
-cR = contour(alog10(FluxR), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Right map (2 models)', /FILL)
-cL = contour(alog10(FluxL), RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = 'Left map (2 models)', /FILL)
-xarc = asu_linspace(arcbox[0, 0], arcbox[1, 0], n_elements(scanRCm))         
-pRC = plot(xarc, scanRCm, '-:b4', OVERPLOT = pR)
-pLC = plot(xarc, scanLCm, '-:b4', OVERPLOT = pL)
+gLegR = legend(target = [pR, pRu, pRf], /AUTO_TEXT_COLOR)
+gLegL = legend(target = [pL, pLu, pLf], /AUTO_TEXT_COLOR)
 
 rc = reo_uninit(ptr)
     
