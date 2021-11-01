@@ -22,11 +22,11 @@
   ; :Author: Sergey Anfinogentov (anfinogentov@iszf.irk.ru)
   ;-
 function gx_box_create_as, file_field, file_inclination, file_azimuth, file_disambig, file_continuum,$
-  center_arcsec, size_pix, dx_km, carrington = carrington, cea = cea, top = top, sfq = sfq, no_hmi_prep = no_hmi_prep
+  center_arcsec, size_pix, dx_km, carrington = carrington, cea = cea, top = top, sfq = sfq, hmi_prep = hmi_prep
   setenv, 'WCS_RSUN=6.96d8'
   
   basemaps = prepare_basemaps_as(file_field, file_inclination, file_azimuth, file_disambig, file_continuum,$
-              center_arcsec, size_pix, dx_km, WCS = WCS, carrington = carrington, cea = cea, top = top, sfq = sfq, no_hmi_prep = no_hmi_prep)
+              center_arcsec, size_pix, dx_km, WCS = WCS, carrington = carrington, cea = cea, top = top, sfq = sfq, hmi_prep = hmi_prep)
     
 
   base={bx:basemaps.bp ,by:-basemaps.bt, bz:basemaps.br,ic:basemaps.ic}

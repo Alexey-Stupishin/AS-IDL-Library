@@ -3,7 +3,7 @@
 ;   save GX-box models, and
 ;   external call of Weighted Wiegelmann NLFF Field Reconstruction Method library
 ;   
-; v 2.0.19.810 (rev.193)
+; v 2.1.21.1019 (rev.---)
 ; 
 ; NB! Beta-version!
 ; 
@@ -35,6 +35,7 @@
 ;   
 ; Parameters optional (in):
 ;   (in)      save_pbox       (numeric)                     if not omitted and greater-than-zero, save also full-potential field  model GX-box (postfix .POT)                 
+;   (in)      save_bnd        (numeric)                     if not omitted and greater-than-zero, save also photosphere+potential field  model GX-box (postfix .BND)                 
 ;   (in)      pbox            (structure)                   set this keyword to a variable which will contain generated box structure with potential field solution
 ;                                                           if save_pbox is not omitted and greater-than-zero
 ;   (in)      aia_uv          (numeric)                     if not omitted and greater-than-zero, load and store AIA ultraviolet images in GX-box                 
@@ -90,9 +91,10 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , dx_maxsize = dx_maxsize $
                 , size_fov = size_fov $
                 , save_pbox = save_pbox $
+                , save_sst = save_sst $
+                , save_bnd = save_bnd $
                 , version_info = version_info, NLFFF_filename = NLFFF_filename $
                 , POT_filename = POT_filename, BND_filename = BND_filename $
-                , save_sst = save_sst $
                 , no_sel_check = no_sel_check $
                 , ask_NLFFF = ask_NLFFF, no_NLFFF = no_NLFFF, winclose = winclose $
                 , aia_uv = aia_uv, aia_euv = aia_euv $
@@ -101,7 +103,7 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , bmax = bmax $
                 , no_title_prefix = no_title_prefix $
                 , find_B_region = find_B_region $
-                , no_hmi_prep = no_hmi_prep $
+                , hmi_prep = hmi_prep $
                 , _extra = _extra 
 
     setenv, 'WCS_RSUN=6.96d8'
@@ -140,7 +142,7 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     print, '***** dx_km = ' + asu_compstr(dx_kmc) + ', box = ' + asu_compstr(size_pix[0]) + ' x ' + asu_compstr(size_pix[1]) + ' x ' + asu_compstr(size_pix[2])
      
     gx_box_prepare_box_as, obstime, centre, size_pix, dx_kmc, out_dir = out_dir, tmp_dir = tmp_dir $
-                      , box = box, make_pbox = save_pbox, pbox = pbox, aia_uv = aia_uv, aia_euv = aia_euv, magnetogram = magnetogram, full_Bz = full_Bz, no_hmi_prep = no_hmi_prep
+                      , box = box, make_pbox = save_pbox, pbox = pbox, aia_uv = aia_uv, aia_euv = aia_euv, magnetogram = magnetogram, full_Bz = full_Bz, hmi_prep = hmi_prep
                       
     
     windim = [1200, 700]
@@ -205,22 +207,23 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     input_coords = {x:x_arc, y:y_arc}
 
     if not keyword_set(save_sst) then save_sst = 0
+    if not keyword_set(save_bnd) then save_bnd = 0
     if not keyword_set(save_pbox) then save_pbox = 0
     
-    bndp = prefix+'_'+box.id
-    save, box, file = filepath(bndp+".sav", root_dir = out_dir)
-    if save_sst gt 0 then begin
-        fileid = bndp+sst_post
-        asu_box_create_mfodata, mfodata, box, box, aia, boxdata, fileid, input_coords=input_coords
-        BND_filename = filepath(fileid+".sav", root_dir = out_dir)
-        save, file = BND_filename, mfodata 
-        message, 'Box structure (potential+boundary) saved to ' + BND_filename,/cont
+    if save_bnd gt 0 then begin
+        bndp = prefix+'_'+box.id
+        save, box, file = filepath(bndp+".sav", root_dir = out_dir)
+        if save_sst gt 0 then begin
+            fileid = bndp+sst_post
+            asu_box_create_mfodata, mfodata, box, box, aia, boxdata, fileid, input_coords=input_coords
+            BND_filename = filepath(fileid+".sav", root_dir = out_dir)
+            save, file = BND_filename, mfodata 
+            message, 'Box structure (potential+boundary) saved to ' + BND_filename,/cont
+        endif
     endif
     if save_pbox gt 0 then begin
         potp = prefix+'_'+pbox.id
-        sbox = box
         save, file = filepath(potp+".sav", root_dir = out_dir), box
-        box = sbox
         if save_sst gt 0 then begin
             fileid = potp+sst_post
             asu_box_create_mfodata, mfodata, pbox, box, aia, boxdata, fileid, input_coords=input_coords

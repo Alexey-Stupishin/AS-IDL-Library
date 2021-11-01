@@ -28,7 +28,7 @@
   ; :Author: Sergey Anfinogentov  (anfinogentov@iszf.irk.ru)
   ;-
 function prepare_basemaps_as, file_field, file_inclination, file_azimuth, file_disambig, file_continuum,$
- center_arcsec, size_pix, dx_km, WCS = WCS, carrington = carrington, cea = cea, top = top, sfq = sfq, no_hmi_prep = no_hmi_prep
+ center_arcsec, size_pix, dx_km, WCS = WCS, carrington = carrington, cea = cea, top = top, sfq = sfq, hmi_prep = hmi_prep
  compile_opt idl2
    
    
@@ -37,11 +37,9 @@ function prepare_basemaps_as, file_field, file_inclination, file_azimuth, file_d
 
   ;-------------------------------------
   files = [file_field, file_inclination, file_azimuth, file_disambig]
-  if n_elements(no_hmi_prep) eq 0 then begin
-      hmi_prep, files, [0,1,2,3], index4, data4
-  endif else begin
-      read_sdo, files, index4, data4
-  endelse
+  ; if n_elements(hmi_prep) eq 0 then begin
+  ;    hmi_prep, files, [0,1,2,3], index4, data4
+  read_sdo, files, index4, data4
         
   azimuth  = reform(data4[*,*,2])
   disambig = reform(data4[*,*,3])
