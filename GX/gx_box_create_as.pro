@@ -21,7 +21,7 @@
   ;
   ; :Author: Sergey Anfinogentov (anfinogentov@iszf.irk.ru)
   ; :Author: Alexey G/Stupishin (agstup@yandex.ru)
-  ;-
+  ;
 function gx_box_create_as, file_field, file_inclination, file_azimuth, file_disambig, file_continuum,$
   center_arcsec, size_pix, dx_km, carrington = carrington, cea = cea, top = top, sfq = sfq, hmi_prep = hmi_prep
   setenv, 'WCS_RSUN=6.96d8'
