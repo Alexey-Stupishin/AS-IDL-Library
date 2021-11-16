@@ -98,7 +98,7 @@ endif else begin
     endif
 endelse
 
-if idx lt 0 or idx gt 6 then begin
+if idx lt 0 || idx gt 6 then begin
     message, 'Wrong Fontenla Model', /info
     return, 0
 endif

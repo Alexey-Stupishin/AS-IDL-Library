@@ -1,6 +1,6 @@
 pro jet2hmi_candidates2arrays, filename, details, frames, coords, rotcrds
 
-restore, filename
+restore, filename, /RELAXED_STRUCTURE_ASSIGNMENT
 
 details = !NULL
 cntdet = found_candidates.Count();
