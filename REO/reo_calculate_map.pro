@@ -43,8 +43,8 @@
 ;   (in)      mode, beam_c, beam_b, scan_lim                              RATAN-600 scan specific (see reo_convolve_map.pro and separate document)(**)  
 ;
 ; Parameters optional (out):
-;   (out)     FluxR           (double 2-D array)                  s.f.u.  Radiomap of the flux in the right polarization  
-;   (out)     FluxL           (double 2-D array)                  s.f.u.  Radiomap of the flux in the left polarization
+;   (out)     FluxR           (double 2-D array)         s.f.u./arcsec^2  Radiomap of the flux in the right polarization  
+;   (out)     FluxL           (double 2-D array)         s.f.u./arcsec^2  Radiomap of the flux in the left polarization
 ;   (out)     scanR           (double 1-D array)           s.f.u./arcsec  Emulated RATAN-600 scan, right polarization, specific for RATAN-600(**)
 ;   (out)     scanL           (double 1-D array)           s.f.u./arcsec  Emulated RATAN-600 scan, left polarization, specific for RATAN-600(**)
 ; 
@@ -197,7 +197,6 @@ if arg_present(fluxFF)    then vfluxFF    = dblarr(vM[0], vM[1])        else reu
 if arg_present(tauFF)     then vtauFF     = dblarr(vM[0], vM[1])        else reu_setNULL, vtauFF,       value, 35 
 if arg_present(heightsFF) then vheightsFF = dblarr(vM[0], vM[1], vnTau) else reu_setNULL, vheightsFF,   value, 36 
 if arg_present(fluxesFF)  then vfluxesFF  = dblarr(vM[0], vM[1], vnTau) else reu_setNULL, vfluxesFF,    value, 37 
-if arg_present(scanFF)    then vscanFF    = dblarr(scanLng)             else reu_setNULL, vscanFF,      value, 38
 if arg_present(scanFF)    then vscanFF    = dblarr(scanLng)             else reu_setNULL, vscanFF,      value, 38
 
 if arg_present(rc)        then vrc        = lonarr(vM[0], vM[1])        else reu_setNULL, vrc,          value, 39 

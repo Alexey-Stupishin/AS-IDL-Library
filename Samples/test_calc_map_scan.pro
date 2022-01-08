@@ -40,7 +40,10 @@ ptr = reo_prepare_calc_map( $
     , arcbox = arcbox $ ; вернет границы радиокарты в угл. секундах
     , field = field $ ; вернет полное поле на фотосфере, как мы видим его с Земли
 ;    , /model $
+;    
     , dll_location = 's:\Projects\Physics104_291\ProgramD64\agsGeneralRadioEmission.dll' $
+;    , dll_location = 's:\Projects\IDL\ASlibrary\REO\agsGeneralRadioEmission.dll' $
+     
     , version_info = version_info $ ; когда, где и в какой версии библиотеки мы работаем - для контроля
     )
 

@@ -33,7 +33,10 @@ ptr = reo_prepare_calc_map( $
     , freefree = 1 $ ; consider free-free
     , arcbox = arcbox $ ; вернет границы радиокарты в угл. секундах
     , field = field $ ; вернет полное поле на фотосфере, как мы видим его с Земли
+    
     , dll_location = 's:\Projects\Physics104_291\ProgramD64\agsGeneralRadioEmission.dll' $
+;    , dll_location = 's:\Projects\IDL\ASlibrary\REO\agsGeneralRadioEmission.dll' $
+        
     , version_info = version_info $ ; когда, где и в какой версии библиотеки мы работаем - для контроля
     )
 
@@ -47,8 +50,7 @@ print, version_info
 ;---------------------------------------------------------------------------------------
 ; Построение маски с учетом поля и излучения в континууме ------------------------------
 
-Bph = sqrt(field.bx^2 + field.by^2 + field.bz^2)
-model_mask = reo_get_model_mask(ptr, Bph, box.base.ic)
+model_mask = reo_get_model_mask(ptr, box.base.Bz, box.base.ic)
 
 ; для тени
 umbra = model_mask eq 7

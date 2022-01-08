@@ -14,7 +14,7 @@
 ; 
 ; Parameters required (in):
 ;   (in)      ptr     (ULONG64)                 Pointer to the data structure (see reo_prepare_calc_map.pro)
-;   (in)      Bph     (double 2D array)         Photosphere magnetic field, absolute value (marked up as radiomap)
+; !***********************************   (in)      Bph     (double 2D array)         Photosphere magnetic field, absolute value (marked up as radiomap)
 ;             baseIC                            Continuum emission, as in the GX-Box
 ;   
 ; Parameters optional (out):
@@ -36,16 +36,16 @@
 ;     /|\                                                         /|\      ;  
 ;--------------------------------------------------------------------------;
 ;                                                              
-function reo_get_model_mask, ptr, Bph, baseIC, cont = cont, used = used
+function reo_get_model_mask, ptr, baseBz, baseIC, cont = cont, used = used
 
-vBph = Bph
+rc = reo_get_markup_scalar(ptr, baseBz, bz, used)
 rc = reo_get_markup_scalar(ptr, baseIC, cont, used)
 idx = where(used eq 0, count)
 if count gt 0 then begin
-    vBph[idx] = 10; conditional QS Bph
+    bz[idx] = 0; conditional QS Bph
     cont[idx] = max(cont); conditional QS cont
 endif
-model_mask = decompose(vBph, cont); see Fontenla 2009. e.g. 7 - umbra, 6 - penumbra etc.
+model_mask = decompose(bz, cont); see Fontenla 2009. e.g. 7 - umbra, 6 - penumbra etc.
 
 return, model_mask
 
