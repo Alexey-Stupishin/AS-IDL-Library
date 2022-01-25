@@ -1,33 +1,9 @@
-function l_asm_bezier_markup_calc, params, dir, t, v, vp
+function asm_bezier_markup, in_polies, x, y, step, halfwidth, maxdist = maxdist
 
-vp = [poly(t, params.x_deriv), poly(t, params.y_deriv)] * dir
+if n_elements(bounds) eq 0 then bounds = step[1]
 
-return, 0
+tlim = asm_bezier_limits(x, y, in_polies.x_poly, in_polies.y_poly, maxdist = maxdist)
 
-end
-
-function l_asm_bezier_markup_bound, params, v
-
-return, 0
-
-end
-
-function asm_bezier_markup, polys, tlim, step, width
-
-funcpar = {x_deriv:asm_bezier_get_deriv(polys.x_poly), y_deriv:asm_bezier_get_deriv(polys.y_poly)}
-boundpar = 0
-h = 0d
-t = tlim[0]
-lng = long(floor((tlim[1] - tlim[0])/step[0] + 1))
-v = [poly(tlim[0], polys.x_poly), poly(tlim[0], polys.y_poly)]
-data = dblarr(2, lng)
-
-data[*, 0] = v
-for k = 1, lng-1 do begin
-    status = asm_RKF45('l_asm_bezier_markup_calc', funcpar, 'l_asm_bezier_markup_bound', boundpar, v, t, step[0], h)
-    data[*, k] = v
-end
-
-return, data
+return, asm_bezier_markup_eqv(in_polies, tlim, step, halfwidth, x = x, y = y, maxdist = maxdist)
 
 end

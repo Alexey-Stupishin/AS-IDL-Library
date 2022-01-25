@@ -1,4 +1,4 @@
-pro asu_neldermead, func, criteria, bound, context, x, xsol, iter, report = report
+pro asm_neldermead, func, criteria, bound, context, x, xsol, iter, report = report
 
 reflex = 1
 expand = 2
@@ -13,10 +13,12 @@ for k = 0, nsimp-1 do begin
     f[k] = call_function(func, x[k, *], context)
 endfor
 
+smach = machar(/double)
+
 iter = 0L
-while ~call_function(criteria, x, f) do begin
+while ~call_function(criteria, x, f, context) do begin
     iter++
-    fL = 1d300
+    fL = smach.xmax
     fG = 0
     fH = 0
     kH = -1

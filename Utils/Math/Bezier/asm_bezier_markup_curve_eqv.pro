@@ -13,7 +13,7 @@ function asm_bezier_markup_curve_eqv, polys, tlim, step, eps = eps, vdiv = vdiv,
 
 COMMON asm_bezier_markup_eqv_common, funcpar
 
-if n_elements(eps) eq 0 then eps = 1d-3
+if n_elements(eps) eq 0 then eps = 1d-5
 if n_elements(vdiv) eq 0 then vdiv = 2d
 if n_elements(vmult) eq 0 then vmult = 1.5d
 
