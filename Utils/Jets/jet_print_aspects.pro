@@ -1,6 +1,6 @@
 pro jet_print_aspects, cands
 
-openw, U, 'c:\temp\aspects.csv', /get_lun
+openw, U, 'c:\temp\aspects2.csv', /get_lun
 
 for k = 0, cands.Count()-1 do begin
     c = cands[k]

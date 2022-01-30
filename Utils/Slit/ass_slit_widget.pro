@@ -302,7 +302,7 @@ case eventval of
         
         step = [1, 1]
         halfwidth = 3
-        data = asm_bezier_markup(result, x, y, step, halfwidth, maxdist = max([maxdist*3d, step[1]]))
+        data = asm_bezier_markup(result, x, y, step, halfwidth, maxdist = max([maxdist*1.5d, step[1]]))
         
         sz = size(data.x_grid)
         xy = dblarr(2, sz[2])
@@ -332,6 +332,10 @@ case eventval of
     end
 
     'SAVE' : begin
+;        asw_control, 'FROMFILETEXT', GET_VALUE = fromID
+;        file = dialog_pickfile(DEFAULT_EXTENSION = 'fits', DIALOG_PARENT = fromID, FILTER = ['*.fits'], GET_PATH = path, PATH = global['path'])
+;        if file ne '' then begin
+            
         save, filename = 'c:\temp\slitproj.sav', global
     end
 
@@ -373,6 +377,7 @@ global['approx'] = !NULL
 global['fromfile'] = ''
 global['tofile'] = ''
 global['path'] = ''
+global['workpath'] = ''
 global['currpos'] = ''
 global['select'] = 0
 winsize = [800, 800]

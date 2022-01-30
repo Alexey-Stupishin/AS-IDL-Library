@@ -1,4 +1,4 @@
-pro asu_selcopy, root, dest, exts, pattern = pattern
+pro asu_selcopy, root, dest, exts, pattern = pattern, remove_pattern = remove_pattern
 
 sources = file_search(filepath('*', root_dir = root))
 if isa(sources, /scalar) && sources eq '' then return
@@ -8,8 +8,11 @@ foreach source, sources, i do begin
     if f_inf.directory then begin 
         pos = strpos(source, path_sep(), /REVERSE_SEARCH)
         nextlev = strmid(source, pos+1)
-        newdest = dest + path_sep() + nextlev
-        asu_selcopy, source, newdest, exts, pattern = pattern
+        newdest = dest
+        if n_elements(pattern) eq 0 || n_elements(remove_pattern) eq 0 || ~remove_pattern || nextlev ne pattern then begin
+            newdest += path_sep() + nextlev
+        endif
+        asu_selcopy, source, newdest, exts, pattern = pattern, remove_pattern = remove_pattern
     endif else begin
         if n_elements(pattern) ne 0 then begin
             expr = stregex(source, '.*(' + pattern + ').*', /subexpr,/extract)
