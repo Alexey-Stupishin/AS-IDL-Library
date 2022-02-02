@@ -45,7 +45,7 @@ return, 0
 
 end
 
-function asm_bezier_find_opt_solution, nroots, troots, dists
+function asm_bezier_find_opt_solution, nroots, troots, dists, tstack
 
 s = 0
 

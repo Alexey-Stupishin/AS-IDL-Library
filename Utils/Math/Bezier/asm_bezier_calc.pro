@@ -32,7 +32,7 @@ pro asm_bezier_calc_body, x, context, r, nroots, troots, dists
     endfor
 end
 
-function asm_bezier_calc, x, context, dists = dists
+function asm_bezier_calc, x, context, troots = troots, dists = dists, tstack = tstack
 
     r = dblarr(6)
     r[1] = -x[1]*x[1] -x[5]*x[5]
@@ -50,7 +50,7 @@ function asm_bezier_calc, x, context, dists = dists
     dists = dblarr(ndata)
     tpars = dblarr(ndata)
     asm_bezier_calc_body, x, context, r, nroots, troots, dists
-    s = asm_bezier_find_opt_solution(nroots, troots, dists)
+    s = asm_bezier_find_opt_solution(nroots, troots, dists, tstack)
     
     return, s
 end

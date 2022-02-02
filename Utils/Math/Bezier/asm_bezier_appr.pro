@@ -10,7 +10,7 @@ function asm_bezier_crit, x, f, context
     return, sum eq 0
 end
     
-function asm_bezier_appr, x00, y00, order, result, iter, tolerance = tolerance, init = init, dinit = dinit, simpseed = simpseed
+function asm_bezier_appr, x00, y00, order, result, iter, tolerance = tolerance, init = init, dinit = dinit, simpseed = simpseed, tlims = tlims
 
 if n_elements(dinit) eq 0 then dinit = 0.01d
 if n_elements(tolerance) eq 0 then tolerance = 1d-5
@@ -78,7 +78,15 @@ endif else begin
     solution = simpseed
 endelse
 
-resid = asm_bezier_calc(solution, context, dists = dists)
+resid = asm_bezier_calc(solution, context, troots = troots, dists = dists, tstack = tstack)
+
+s = machar(/double)
+tlims = [s.xmax, -s.xmax]
+for k = 0, n_elements(tstack)-1 do begin
+    t = troots[tstack[k], k]
+    tlims[0] = tlims[0] < t
+    tlims[1] = tlims[1] > t
+endfor    
 
 solution[0] += mean(x00)
 solution[4] += mean(y00)

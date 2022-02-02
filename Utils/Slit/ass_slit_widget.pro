@@ -31,7 +31,58 @@ endelse
 end
 
 ;----------------------------------------------------------------------------------
-pro ass_slit_widget_show, mode = mode
+pro ass_slit_widget_set_win, ctrl, wsize
+compile_opt idl2
+
+common G_ASS_SLIT_WIDGET, global
+
+asw_control, ctrl, GET_VALUE = drawID
+WSET, drawID
+winsize = global[wsize]
+base = dblarr(winsize[0], winsize[1])
+tvplot, base, indgen(winsize[0]), indgen(winsize[1]), /fit_window, xmargin = [0, 0], ymargin = [0, 0]
+
+end
+
+;----------------------------------------------------------------------------------
+pro ass_slit_widget_show_slit
+compile_opt idl2
+
+common G_ASS_SLIT_WIDGET, global
+
+if global['straight'] eq !NULL then return
+
+str = global['straight']
+sz = size(str)
+
+p0 = (sz[1]+1)/2
+from = p0-global['slitwidth']+1
+to   = p0+global['slitwidth']-1
+
+if from eq to then begin
+    td = total(str[from:to, *, *], 1)
+endif else begin
+    if global['slitmode'] eq 'MODEMEAN' then begin
+        td = mean(str[from:to, *, *], dimension = 1)
+    endif else begin
+        td = median(str[from:to, *, *], dimension = 1)
+    endelse        
+endelse    
+
+asw_control, 'SLIT', GET_VALUE = drawID
+WSET, drawID
+;aia_lct_silent,wave = 171,/load
+;tvscl, td
+implot, transpose(td, [1, 0]), /fit_window, xmargin = [0, 0], ymargin = [0, 0]
+
+; get image position
+; find x-pos on slit pict
+; draw vert line/ color?
+
+end
+
+;----------------------------------------------------------------------------------
+pro ass_slit_widget_show_image, mode = mode
 compile_opt idl2
 
 common G_ASS_SLIT_WIDGET, global
@@ -144,6 +195,24 @@ endif
 end
 
 ;----------------------------------------------------------------------------------
+pro ass_slit_widget_clear_appr
+compile_opt idl2
+
+common G_ASS_SLIT_WIDGET, global
+
+global['approx'] = !NULL
+global['markup'] = !NULL
+global['grids'] = !NULL
+global['straight'] = !NULL
+asw_control, 'SLIT', GET_VALUE = drawID
+WSET, drawID
+erase
+ass_slit_widget_set_win, 'IMAGE', 'winsize'
+ass_slit_widget_show_image
+
+end
+
+;----------------------------------------------------------------------------------
 pro ass_slit_widget_buttons_event, event
 compile_opt idl2
 
@@ -187,7 +256,7 @@ case eventval of
                         else: begin
                         end        
                     endcase    
-                    ass_slit_widget_show
+                    ass_slit_widget_show_image
                 end
 
                 1: begin
@@ -202,7 +271,7 @@ case eventval of
                         global['xy_lb_dat'] = xy_lb_dat
                         global['xy_rt_dat'] = xy_rt_dat
                         asw_control, 'SELWIN', SET_BUTTON = 1
-                        ass_slit_widget_show, mode = 'MAKESELECT'
+                        ass_slit_widget_show_image, mode = 'MAKESELECT'
                     end    
                     global['select'] = 0
                 end
@@ -212,7 +281,7 @@ case eventval of
             endcase  
         endelse            
         if event.type eq 2 then begin
-            ass_slit_widget_show
+            ass_slit_widget_show_image
             device, decomposed = 1
             rcolor = 250
             xr = global['xr']
@@ -221,7 +290,7 @@ case eventval of
             oplot, [event.x, event.x], [yr, event.y], color = rcolor
             oplot, [xr, event.x], [yr, yr], color = rcolor
             oplot, [xr, event.x], [event.y, event.y], color = rcolor
-            print, string(xr) + '-' + string(event.x) + ', ' + string(yr) + '-' + string(event.y)
+            ;print, string(xr) + '-' + string(event.x) + ', ' + string(yr) + '-' + string(event.y)
         endif    
     end
         
@@ -230,30 +299,34 @@ case eventval of
         
         asw_control, 'SLIDER', GET_VALUE = pos
         global['currpos'] = pos-1
-        ass_slit_widget_show
+        ass_slit_widget_show_image
     end
         
     'ACTSIZE' : begin
-        ass_slit_widget_show, mode = 'ACTSIZE' 
+        ass_slit_widget_set_win, 'IMAGE', 'winsize'
+        ass_slit_widget_show_image, mode = 'ACTSIZE' 
     end
     'FITWIN' : begin
-        ass_slit_widget_show, mode = 'FITWIN'
+        ass_slit_widget_set_win, 'IMAGE', 'winsize'
+        ass_slit_widget_show_image, mode = 'FITWIN'
     end
     'SELWIN' : begin
-        ass_slit_widget_show, mode = 'SELWIN'
+        ass_slit_widget_set_win, 'IMAGE', 'winsize'
+        ass_slit_widget_show_image, mode = 'SELWIN'
     end
         
     'PROCEED' : begin
+        WIDGET_CONTROL, /HOURGLASS
         global['data_list'] = asu_get_file_sequence_data(global['path'], global['fromfile'], global['tofile'], ind = ind, err = err)
         case err of
-            1: result = DIALOG_MESSAGE('Please select both first and last files!', title = 'Curve Slit Error', /ERROR)
-            2: result = DIALOG_MESSAGE('Not enough files found!', title = 'Curve Slit Error', /ERROR)
+            1: result = DIALOG_MESSAGE('Please select both first and last files!', title = 'SlitZilla Error', /ERROR)
+            2: result = DIALOG_MESSAGE('Not enough files found!', title = 'SlitZilla Error', /ERROR)
             else: begin
                 global['currpos'] = 0
                 global['byte_list'] = !NULL
                 global['slit_list'] = !NULL
                 asw_control, 'FITWIN', SET_BUTTON = 1
-                ass_slit_widget_show, mode = 'FITWIN'
+                ass_slit_widget_show_image, mode = 'FITWIN'
                 sz = size(global['data_list'])
                 asw_control, 'SLIDER', SET_SLIDER_MIN = 1
                 asw_control, 'SLIDER', SET_SLIDER_MAX = sz[3]
@@ -287,7 +360,16 @@ case eventval of
     end
 
     'FIT' : begin
-        if global['points'].Count() lt 9 then return
+        order = global['fit_order'] + 1
+        limpts = 2
+        case order of
+            1: limpts = 2
+            2: limpts = 7
+            3: limpts = 9
+        endcase
+        if global['points'].Count() lt limpts then return
+
+        WIDGET_CONTROL, /HOURGLASS
         
         np = global['points'].Count()
         x = dblarr(np) 
@@ -298,48 +380,77 @@ case eventval of
         endfor    
         
         order = global['fit_order'] + 1
-        maxdist = asm_bezier_appr(x, y, order, result, iter, simpseed = simpseed)
+        maxdist = asm_bezier_appr(x, y, order, result, iter, simpseed = simpseed, tlims = tlims)
         
-        step = [1, 1]
-        halfwidth = 3
-        data = asm_bezier_markup(result, x, y, step, halfwidth, maxdist = max([maxdist*1.5d, step[1]]))
-        
-        sz = size(data.x_grid)
-        xy = dblarr(2, sz[2])
-        xy[0, *] = data.x_grid[3, *]
-        xy[1, *] = data.y_grid[3, *]
+        np = 1000
+        tset = asu_linspace(tlims[0], tlims[1], np)
+        xy = dblarr(2, np)
+        for k = 0, np-1 do begin
+            xy[0, k] = poly(tset[k], result.x_poly)
+            xy[1, k] = poly(tset[k], result.y_poly)
+        endfor
         global['approx'] = xy
         
-        ass_slit_widget_show
+        step1 = 1d
+        markup = asm_bezier_markup_curve_eqv(result, tlims, step1)
+        global['markup'] = markup
         
-        ;save, filename = 'c:\temp\bezier.sav', result, x, y, iter, simpseed, data    
-             
-        bminx = dblarr(order+1)
-        bmaxx = dblarr(order+1)
-        bminy = dblarr(order+1)
-        bmaxy = dblarr(order+1)
+        step2 = 1d
+        hwidth = global['maxslitwidth']
+        grids = asm_bezier_markup_normals(result, markup[2, *], step2, hwidth) ; returns {x_grid:x_grid, y_grid:y_grid}
+        global['grids'] = grids
+        
+        straight = ass_slit_data2grid(global['data_list'], grids)
+        global['straight'] = straight
+        
+        ass_slit_widget_show_image
+        ass_slit_widget_set_win, 'SLIT', 'slitsize'
+        ass_slit_widget_show_slit
     end
 
+    'MODEMEAN' : begin
+        global['slitmode'] = eventval
+        ass_slit_widget_show_slit
+    end     
+
+    'MODEMED' : begin
+        global['slitmode'] = eventval
+        ass_slit_widget_show_slit 
+    end     
+
+    'SLITWIDTH' : begin
+        asw_control, 'SLITWIDTH', GET_VALUE = pos
+        global['slitwidth'] = pos
+        ass_slit_widget_show_slit
+    end
+         
     'CLEAR' : begin
         global['points'] = list()
-        global['approx'] = !NULL
-        ass_slit_widget_show
+        asw_control, 'IMAGE', GET_VALUE = drawID
+        WSET, drawID
+        erase
+        ass_slit_widget_clear_appr
+        ass_slit_widget_show_slit
     end
 
     'CLEARAPPR' : begin
-        global['approx'] = !NULL
-        ass_slit_widget_show
+        ass_slit_widget_clear_appr
+        ass_slit_widget_show_slit
     end
 
     'SAVE' : begin
 ;        asw_control, 'FROMFILETEXT', GET_VALUE = fromID
 ;        file = dialog_pickfile(DEFAULT_EXTENSION = 'fits', DIALOG_PARENT = fromID, FILTER = ['*.fits'], GET_PATH = path, PATH = global['path'])
 ;        if file ne '' then begin
-            
-        save, filename = 'c:\temp\slitproj.sav', global
+        
+        if global['data_list'] ne !NULL then begin
+            WIDGET_CONTROL, /HOURGLASS
+            save, filename = 'c:\temp\slitproj.sav', global
+        endif    
     end
 
     'LAST' : begin
+        WIDGET_CONTROL, /HOURGLASS
         restore, 'c:\temp\slitproj.sav'
         asw_control, 'FROMFILETEXT', SET_VALUE = global['fromfile']
         asw_control, 'TOFILETEXT', SET_VALUE = global['tofile']
@@ -349,7 +460,12 @@ case eventval of
         asw_control, 'SLIDER', SET_SLIDER_MIN = 1
         asw_control, 'SLIDER', SET_SLIDER_MAX = sz[3]
         asw_control, 'SLIDER', SET_VALUE = global['currpos'] + 1
-        ass_slit_widget_show
+        
+        asw_control, 'SLITWIDTH', SET_VALUE = global['slitwidth']
+        asw_control, global['slitmode'], SET_BUTTON = 1
+        
+        ass_slit_widget_show_image
+        ass_slit_widget_show_slit
     end
 endcase
 end
@@ -362,6 +478,10 @@ common G_ASW_WIDGET, asw_widget
 
 asw_widget = hash()
 global = hash()
+global['fromfile'] = ''
+global['tofile'] = ''
+global['path'] = ''
+global['workpath'] = ''
 global['data_list'] = !NULL
 global['slit_list'] = !NULL
 global['byte_list'] = !NULL
@@ -371,37 +491,43 @@ global['dat_range'] = lonarr(2, 2)
 global['win_range'] = lonarr(2, 2)
 global['xy_lb_dat'] = !NULL
 global['xy_rt_dat'] = !NULL
+global['currpos'] = 0
+global['select'] = 0
+
 global['points'] = list()
 global['fit_order'] = 0
 global['approx'] = !NULL
-global['fromfile'] = ''
-global['tofile'] = ''
-global['path'] = ''
-global['workpath'] = ''
-global['currpos'] = ''
-global['select'] = 0
+global['markup'] = !NULL
+global['grids'] = !NULL
+global['straight'] = !NULL
+global['slitwidth'] = 1
+global['slitmode'] = 'MODEMEAN'
+
+global['maxslitwidth'] = 100
 winsize = [800, 800]
 global['winsize'] = winsize
+slitsize = [800, 400]
+global['slitsize'] = slitsize
 
 global['path'] = 'G:\BIGData\UData\Jets\Devl_20211231\Jets\20100620_110400_20100620_120400_813_-683_500_500\aia_data\171'
 
-base = WIDGET_BASE(TITLE = 'SlitZilla', XSIZE = 1200, /column)
+base = WIDGET_BASE(TITLE = 'SlitZilla', XSIZE = 1800, /column)
 asw_widget['widbase'] = base
 
 filecol = WIDGET_BASE(base, /column)
     fromrow = WIDGET_BASE(filecol, /row)
         fromtext = WIDGET_LABEL(fromrow, VALUE = 'From: ', XSIZE = 40)
-        fromfiletext = WIDGET_TEXT(fromrow, UNAME = 'FROMFILETEXT', VALUE = '', XSIZE = 120, YSIZE = 1, /FRAME)
+        fromfiletext = WIDGET_TEXT(fromrow, UNAME = 'FROMFILETEXT', VALUE = '', XSIZE = 80, YSIZE = 1, /FRAME)
         frombutton = WIDGET_BUTTON(fromrow, VALUE = '...', UVALUE = 'FILEFROM', SCR_XSIZE = 30)
     torow = WIDGET_BASE(filecol, /row)
         totext = WIDGET_LABEL(torow, VALUE = 'To: ', XSIZE = 40)
-        tofiletext = WIDGET_TEXT(torow, UNAME = 'TOFILETEXT', VALUE = '', XSIZE = 120, YSIZE = 1, /FRAME)
+        tofiletext = WIDGET_TEXT(torow, UNAME = 'TOFILETEXT', VALUE = '', XSIZE = 80, YSIZE = 1, /FRAME)
         frombutton = WIDGET_BUTTON(torow, VALUE = '...', UVALUE = 'FILETO', SCR_XSIZE = 30)
 
 mainrow = WIDGET_BASE(base, /row)
     showimage = WIDGET_DRAW(mainrow, GRAPHICS_LEVEL = 0, UNAME = 'IMAGE', UVALUE = 'IMAGE', XSIZE = winsize[0], YSIZE = winsize[1], /BUTTON_EVENTS)
     ctrlcol = WIDGET_BASE(mainrow, /column)
-        procbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Proceed Files', UVALUE = 'PROCEED', XSIZE = 80)
+        procbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Proceed Files', UVALUE = 'PROCEED', XSIZE = 100)
         winfitrow = WIDGET_BASE(ctrlcol, /column, /Exclusive)
             size1 = WIDGET_BUTTON(winfitrow, VALUE = 'Fit to Window', UNAME = 'FITWIN', UVALUE = 'FITWIN', XSIZE = 80)
             size2 = WIDGET_BUTTON(winfitrow, VALUE = 'Actual Size', UNAME = 'ACTSIZE', UVALUE = 'ACTSIZE', XSIZE = 80)
@@ -409,11 +535,18 @@ mainrow = WIDGET_BASE(base, /row)
             WIDGET_CONTROL, size1, SET_BUTTON = 1
             global['drawmode'] = 'FITWIN'
         orderbutton = WIDGET_DROPLIST(ctrlcol, VALUE = ['Linear', '2nd Order', '3nd Order'], UNAME = 'ORDER', UVALUE = 'ORDER', XSIZE = 80)
-        fitbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Fit', UVALUE = 'FIT', XSIZE = 80)
+        fitbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Fit', UVALUE = 'FIT', XSIZE = 100)
         clearbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Clear', UVALUE = 'CLEAR', XSIZE = 80)
         clearapprbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Clear Appr.', UVALUE = 'CLEARAPPR', XSIZE = 80)
         savebutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Save', UVALUE = 'SAVE', XSIZE = 80)
         lastbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Last', UVALUE = 'LAST', XSIZE = 80)
+    slitcol = WIDGET_BASE(mainrow, /column)
+        slitimage = WIDGET_DRAW(slitcol, GRAPHICS_LEVEL = 0, UNAME = 'SLIT', UVALUE = 'SLIT', XSIZE = slitsize[0], YSIZE = slitsize[1], /BUTTON_EVENTS)
+        moderow = WIDGET_BASE(slitcol, /row, /Exclusive)
+            modemean = WIDGET_BUTTON(moderow, VALUE = 'Mean', UNAME = 'MODEMEAN', UVALUE = 'MODEMEAN', XSIZE = 80)
+            modemed = WIDGET_BUTTON(moderow, VALUE = 'Median', UNAME = 'MODEMED', UVALUE = 'MODEMED', XSIZE = 80)
+            WIDGET_CONTROL, modemean, SET_BUTTON = 1
+        slitwidth = WIDGET_SLIDER(slitcol, VALUE = 0, UNAME = 'SLITWIDTH', UVALUE = 'SLITWIDTH', XSIZE = slitsize[0])
 
 sliderrow = WIDGET_BASE(base, /row)
     slider = WIDGET_SLIDER(sliderrow, VALUE = 0, UNAME = 'SLIDER', UVALUE = 'SLIDER', XSIZE = winsize[0])
@@ -421,10 +554,15 @@ sliderrow = WIDGET_BASE(base, /row)
 WIDGET_CONTROL, base, /REALIZE
 XMANAGER, 'ass_slit_widget_buttons', base, GROUP_LEADER = GROUP, /NO_BLOCK
 
+WIDGET_CONTROL, slitwidth, SET_SLIDER_MIN = 1
+WIDGET_CONTROL, slitwidth, SET_SLIDER_MAX = global['maxslitwidth']
+
 WIDGET_CONTROL, showimage, GET_VALUE = drawID
 WSET, drawID
 base = dblarr(winsize[0], winsize[1])
 tvplot, base, indgen(winsize[0]), indgen(winsize[1]), /fit_window, xmargin = [0, 0], ymargin = [0, 0]
 ;oplot, [0, winsize[0]-1], [0, winsize[1]-1]
+
+ass_slit_widget_set_win, 'SLIT', 'slitsize'
 
 end
