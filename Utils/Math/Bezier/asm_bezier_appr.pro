@@ -75,6 +75,7 @@ if order gt 1 then begin
     
     asm_neldermead, 'asm_bezier_calc', 'asm_bezier_crit', 'asm_bezier_bound', context, simp, solution, iter
 endif else begin
+    iter = 0
     solution = simpseed
 endelse
 
