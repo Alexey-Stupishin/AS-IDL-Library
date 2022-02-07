@@ -715,35 +715,41 @@ case eventval of
 
         ass_slit_widget_clear_appr
         
-        np = global['points'].Count()
-        x = dblarr(np) 
-        y = dblarr(np) 
-        for k = 0, np-1 do begin
-            x[k] = (global['points'])[k].x 
-            y[k] = (global['points'])[k].y 
-        endfor    
+        iter = ass_slit_widget_get_appr(global['points'], global['fit_order'], norm_poly, reper_pts)
         
-        order = global['fit_order'] + 1
-        maxdist = asm_bezier_appr(x, y, order, result, iter, simpseed = simpseed, tlims = tlims)
+;        np = global['points'].Count()
+;        x = dblarr(np) 
+;        y = dblarr(np) 
+;        for k = 0, np-1 do begin
+;            x[k] = (global['points'])[k].x 
+;            y[k] = (global['points'])[k].y 
+;        endfor    
+;        
+;        order = global['fit_order'] + 1
+;        maxdist = asm_bezier_appr(x, y, order, result, iter, simpseed = simpseed, tlims = tlims)
+        global['norm_poly'] = norm_poly
         
         message, 'Number of iteration = ' + asu_compstr(iter), /info
         
         np = 1000
-        tset = asu_linspace(tlims[0], tlims[1], np)
+        ;tset = asu_linspace(tlims[0], tlims[1], np)
+        tset = asu_linspace(0d, 1d, np)
         xy = dblarr(2, np)
         for k = 0, np-1 do begin
-            xy[0, k] = poly(tset[k], result.x_poly)
-            xy[1, k] = poly(tset[k], result.y_poly)
+;            xy[0, k] = poly(tset[k], norm_poly.x_poly)
+;            xy[1, k] = poly(tset[k], norm_poly.y_poly)
+            xy[0, k] = asm_bezier_poly_pts(tset[k], reper_pts.x_pts)
+            xy[1, k] = asm_bezier_poly_pts(tset[k], reper_pts.y_pts)
         endfor
         global['approx'] = xy
         
         step1 = 1d
-        markup = asm_bezier_markup_curve_eqv(result, tlims, step1)
+        markup = asm_bezier_markup_curve_eqv(norm_poly, [0, 1], step1)
         global['markup'] = markup
         
         step2 = 1d
         hwidth = global['maxslitwidth']
-        grids = asm_bezier_markup_normals(result, markup[2, *], step2, hwidth) ; returns {x_grid:x_grid, y_grid:y_grid}
+        grids = asm_bezier_markup_normals(norm_poly, markup[2, *], step2, hwidth) ; returns {x_grid:x_grid, y_grid:y_grid}
         global['grids'] = grids
         
         straight = ass_slit_data2grid(global['data_list'], grids)
@@ -754,6 +760,9 @@ case eventval of
         ass_slit_widget_set_win, 'SLIT', 'slitsize'
         ass_slit_widget_get_timedist
         ass_slit_widget_show_slit
+    end
+
+    'EDITAPPR' : begin
     end
 
     'MODEMEAN' : begin
@@ -905,6 +914,7 @@ global['select'] = 0
 
 global['points'] = list()
 global['fit_order'] = 0
+global['norm_poly'] = !NULL
 global['approx'] = !NULL
 global['markup'] = !NULL
 global['grids'] = !NULL
@@ -972,14 +982,18 @@ mainrow = WIDGET_BASE(base, /row)
             size3 = WIDGET_BUTTON(winfitrow, VALUE = 'Selection', UNAME = 'SELWIN', UVALUE = 'SELWIN', XSIZE = 80)
             WIDGET_CONTROL, size1, SET_BUTTON = 1
             global['drawmode'] = 'FITWIN'
+        selinforow = WIDGET_BASE(ctrlcol, /column)
+            dummy = WIDGET_LABEL(selinforow, VALUE = '     (Ctrl + Left Mouse)', XSIZE = 100)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
         orderbutton = WIDGET_DROPLIST(ctrlcol, VALUE = ['Linear', '2nd Order', '3rd Order'], UNAME = 'ORDER', UVALUE = 'ORDER', XSIZE = 80)
         fitbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Fit', UVALUE = 'FIT', XSIZE = 100)
+        editapprrow = WIDGET_BASE(ctrlcol, /column, /Nonexclusive)
+            editapprbutton = WIDGET_BUTTON(editapprrow, VALUE = 'Edit Approx. ...', UVALUE = 'EDITAPPR', XSIZE = 100)
         clearbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Clear Slit', UVALUE = 'CLEAR', XSIZE = 80)
-        clearapprbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Clear Appr.', UVALUE = 'CLEARAPPR', XSIZE = 80)
+        clearapprbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Clear Approx.', UVALUE = 'CLEARAPPR', XSIZE = 80)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
         exportbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Export T-D ...', UVALUE = 'EXPORT', XSIZE = 80)
-        expsavbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Export to SAV...', UVALUE = 'EXPSAV', XSIZE = 80)
+        expsavbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'T-D to SAV...', UVALUE = 'EXPSAV', XSIZE = 80)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
         exportimage = WIDGET_BUTTON(ctrlcol, VALUE = 'Export Image ...', UVALUE = 'EXPIMAGE', XSIZE = 80)
     slitcol = WIDGET_BASE(mainrow, /column)

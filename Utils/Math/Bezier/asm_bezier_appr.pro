@@ -94,7 +94,9 @@ solution[4] += mean(y00)
 simpseed[0] += mean(x00)
 simpseed[4] += mean(y00)
 
-result = {x_poly:solution[0:order], y_poly:solution[4:4+order]}
+;result = {x_poly:solution[0:order], y_poly:solution[4:4+order]}
+result = asm_bezier_normalize(solution, tlims)
+tlims = [0, 1]
 
 return, max(dists)
 
