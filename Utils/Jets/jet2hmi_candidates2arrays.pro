@@ -8,12 +8,15 @@ if cntdet eq 0 then return
 
 cntfrm = 0;
 cntcrd = 0;
-foreach cand, found_candidates, i do begin
-    cntfrm += cand.Count()
-    foreach frame, cand, j do begin
+for i = 0, found_candidates.Count()-1 do begin
+    cand = found_candidates[i]
+    frames = cand.frames
+    for j = 0, frames.Count()-1 do begin
+        frame = frames[j]
+        cntfrm++
         cntcrd += n_elements(frame.x)
-    endforeach  
-endforeach  
+    endfor  
+endfor  
 
 details = replicate({N:0L, FramePtr:0L, NFrames:0L, MaxCard:0L, MaxCardFrame:0L $
                    , TotAsp:0d, MaxAsp:0d, maxBasp:0d}, cntdet)
@@ -25,14 +28,17 @@ rotcrds = lonarr(2, cntcrd)
 
 framePtr = 0
 coordPtr = 0
-foreach cand, found_candidates, i do begin
+for i = 0, found_candidates.Count()-1 do begin
+    cand = found_candidates[i]
+    cframes = cand.frames
     details[i].N = i + 1
     details[i].FramePtr = framePtr
-    details[i].NFrames = cand.Count()
-    details[i].TotAsp = cand[0].totasp
+    details[i].NFrames = cframes.Count()
+    details[i].TotAsp = cand[0].total_asp
     maxasp = 0d
     maxbasp = 0d
-    foreach frame, cand, j do begin
+    for j = 0, cframes.Count()-1 do begin
+        frame = cframes[j]
         f = framePtr + j
         p = frame.pos
         card = n_elements(frame.x)
@@ -46,7 +52,7 @@ foreach cand, found_candidates, i do begin
         frames[f].Baspect = frame.baspect
         maxbsp = max([maxbasp, frame.baspect])
         frames[f].FitsN = p
-        frames[f].beta = frame.vbeta
+        frames[f].beta = frame.beta
         frames[f].CDELT1 = ind_seq[p].CDELT1
         frames[f].CDELT2 = ind_seq[p].CDELT2
         frames[f].CRPIX1 = ind_seq[p].CRPIX1
@@ -65,11 +71,11 @@ foreach cand, found_candidates, i do begin
         coordPtr = to + 1
          
         frames[f].CoordPtr = from
-    endforeach  
+    endfor  
     details[i].MaxAsp = maxasp
     details[i].MaxBasp = maxbasp
     
     framePtr += details[i].NFrames
-endforeach  
+endfor  
 
 end
