@@ -1,22 +1,3 @@
-;;----------------------------------------------------------------------------------
-;function ass_slit_widget_in_scope, xy, xycorr = xycorr
-; anytim()
-;compile_opt idl2
-;
-;common G_ASS_SLIT_WIDGET, global
-;
-;xycorr = xy
-;
-;if global['data_list'] eq !NULL then return, 0
-;
-;sz = size(global['data_list'])
-;xycorr[0] = 0 > xy[0] < (sz[1]-1)
-;xycorr[1] = 0 > xy[1] < (sz[2]-1)
-;
-;return, xycorr[0] eq xy[0] && xycorr[1] eq xy[1]
-;
-;end
-
 ;----------------------------------------------------------------------------------
 function ass_slit_widget_in_scope, xy, xycorr = xycorr
 compile_opt idl2
@@ -48,20 +29,6 @@ endif else begin
 endelse    
     
 end
-
-;;----------------------------------------------------------------------------------
-;pro ass_slit_widget_set_win, ctrl, wsize
-;compile_opt idl2
-;
-;common G_ASS_SLIT_WIDGET, global
-;
-;asw_control, ctrl, GET_VALUE = drawID
-;WSET, drawID
-;winsize = global[wsize]
-;base = dblarr(winsize[0], winsize[1])
-;tvplot, base, indgen(winsize[0]), indgen(winsize[1]), /fit_window, xmargin = [0, 0], ymargin = [0, 0], /nodata, xmajor = 0, xminor = 0, ymajor = 0, yminor = 0
-;
-;end
 
 ;----------------------------------------------------------------------------------
 pro ass_slit_widget_get_timedist
@@ -191,7 +158,6 @@ ass_slit_widget_slit_range, dt, total_km ; min, Mm
 asw_control, 'SLIT', GET_VALUE = drawID
 WSET, drawID
 ;!p.background = 'FFFFFF'x
-;tvscl, td
 device, decomposed = 0
 loadct, 0, /silent
 
@@ -200,7 +166,6 @@ x_arg = asu_linspace(0, xrange[1], sz[1])
 yrange = [0, total_km]
 y_arg = asu_linspace(0, yrange[1], sz[2])
 tvplot, td0, x_arg, y_arg, xrange = xrange, yrange = yrange, xmargin = [10, 1], ymargin = [5, 1], xtitle = 'Time, min', ytitle = 'Distance, Mm'
-;implot, transpose(global['timedistshow'], [1, 0]), /fit_window, xmargin = [0, 0], ymargin = [0, 0], xmajor = 0, xminor = 0, ymajor = 0, yminor = 0
 
 p = global['currpos']/5d
 
@@ -227,16 +192,12 @@ oplot, [p, p], [0, yrange[1]], color = 'FF0000'x, thick = 1.5
 slist = global['speed_list']
 for k = 0, slist.Count()-1 do begin
     crds = slist[k]
-;    crd0 = ass_slit_widget_slit_convert(crds.first)
-;    crd1 = ass_slit_widget_slit_convert(crds.second)
     crd0 = crds.first
     crd1 = crds.second
     oplot, [crd0[0], crd1[0]], [crd0[1], crd1[1]], color = '00FF00'x, thick = 1.5
     oplot, [crd0[0]], [crd0[1]], psym = 2, symsize = 1.5, thick = 1.5, color = '00FF00'x
     oplot, [crd1[0]], [crd1[1]], psym = 2, symsize = 1.5, thick = 1.5, color = '00FF00'x
     
-;    duration = (crd1[0] - crd0[0]) * 12d ; seconds in 1 hor pixel
-;    pos_km = (crd1[1] - crd0[1]) * ind0.cdelt1 * 6.96d5/ind0.rsun_obs; km in 1 vert pixel  
     duration = (crd1[0] - crd0[0]) * 60d ; seconds in 1 hor pixel
     pos_km = (crd1[1] - crd0[1]) * 1d3; km in 1 vert pixel  
     speed = round( pos_km / duration / 10d) * 10
@@ -372,15 +333,14 @@ plot, indgen(winsize[0]), indgen(winsize[1]), xmargin = [0, 0], ymargin = [0, 0]
 ;wait, 0.1
 
 hideall = widget_info(asw_getctrl('HIDEALL'), /BUTTON_SET)
+hidemark = widget_info(asw_getctrl('HIDEAPPR'), /BUTTON_SET)
+editappr = widget_info(asw_getctrl('EDITAPPR'), /BUTTON_SET)
 
-if hideall then return
+if hideall && ~editappr then return
 
 device, decomposed = 1
 
-hidemark = widget_info(asw_getctrl('HIDEAPPR'), /BUTTON_SET)
-
-
-if ~hidemark && global['points'].Count() gt 0 then begin
+if ~hidemark && ~editappr && global['points'].Count() gt 0 then begin
     for k = 0, global['points'].Count()-1 do begin
         x = (global['points'])[k].x 
         y = (global['points'])[k].y 
@@ -398,7 +358,7 @@ if global['approx'] ne !NULL then begin
     oplot, xy[0, *], xy[1, *], thick = 1.5, color = 'FF00FF'x
 endif
 
-if global['appredit'] then begin
+if global['appredit'] && global['reper_pts'] ne !NULL then begin
     xy0 = global['reper_pts']
     xy = ass_slit_widget_convert(xy0[*, 0], mode = 'dat2win')
     oplot, [xy[0]], [xy[1]], psym = 6, symsize = 2, thick = 1.5, color = 'FF0000'x
@@ -426,10 +386,11 @@ global['straight'] = !NULL
 global['speed_first_pt'] = !NULL
 global['speed_list'] = list()
 global['timedist'] = !NULL
+global['reper_pts'] = !NULL
 asw_control, 'SLIT', GET_VALUE = drawID
+asw_control, 'EDITAPPR', SET_BUTTON = 0
 WSET, drawID
 erase
-;ass_slit_widget_set_win, 'IMAGE', 'winsize'
 ass_slit_widget_show_image
 
 end
@@ -500,7 +461,7 @@ global['appredit'] = 0
 ass_slit_widget_set_ctrl
 asw_control, 'HIDEAPPR', SET_BUTTON = 0
 asw_control, 'HIDEALL', SET_BUTTON = 0
-;asw_control, 'EDITAPPR', SET_BUTTON = 0
+asw_control, 'EDITAPPR', SET_BUTTON = 0
 
 end
 
@@ -607,11 +568,12 @@ if global['proj_name'] ne '' then asw_control, 'SLITZILLA', BASE_SET_TITLE = 'Sl
 asw_control, 'FROMFILETEXT', SET_VALUE = global['fromfile']
 asw_control, 'TOFILETEXT', SET_VALUE = global['tofile']
 asw_control, global['drawmode'], SET_BUTTON = 1
-asw_control, 'ORDER', SET_DROPLIST_SELECT = global['fit_order']
+asw_control, 'ORDER', SET_DROPLIST_SELECT = ass_slit_widget_fit_orders(idx = global['fit_order'], mode = 'index')
 sz = size(global['data_list'])
 asw_control, 'SLIDER', SET_SLIDER_MIN = 1
 asw_control, 'SLIDER', SET_SLIDER_MAX = sz[3]
 asw_control, 'SLIDER', SET_VALUE = global['currpos'] + 1
+asw_control, 'FRATE', SET_VALUE = round(global['framerate'])
 
 ind = global['data_ind', global['currpos']]
 asw_control, 'FRAMEDATE', SET_VALUE = asu_extract_time(ind.date_obs, out_style = 'asu_time_std')
@@ -619,12 +581,12 @@ asw_control, 'FRAMEDATE', SET_VALUE = asu_extract_time(ind.date_obs, out_style =
 asw_control, 'SLITWIDTH', SET_VALUE = global['slitwidth']
 asw_control, global['slitmode'], SET_BUTTON = 1
 
+asw_control, 'EDITAPPR', SET_BUTTON = 0
+
 asw_control, 'SLITCONTR', SET_VALUE = global['slitcontr']
 asw_control, 'SLITBRIGHT', SET_VALUE = global['slitbright']
 
-;ass_slit_widget_set_win, 'IMAGE', 'winsize'
 ass_slit_widget_show_image
-;ass_slit_widget_set_win, 'SLIT', 'slitsize'
 ass_slit_widget_get_timedist
 ass_slit_widget_show_slit
 
@@ -732,9 +694,36 @@ case eventval of
         asw_control, 'HIDEAPPR', SET_BUTTON = 0
         asw_control, 'HIDEALL', SET_BUTTON = 0
         if global['appredit'] then begin
-            if event.type eq 0 then begin ; left mouse, capture point
-                xy = ass_slit_widget_convert([event.x, event.y], mode = 'win2dat')
-            endif
+            case event.type of
+                0: begin ; capture point
+                    xy = ass_slit_widget_convert([event.x, event.y], mode = 'win2dat')
+                    dists = dblarr(4)
+                    for k = 0, 3 do begin
+                        dists[k] = (xy[0] - global['reper_pts', 0, k])^2 + (xy[1] - global['reper_pts', 1, k])^2 
+                    endfor
+                    dm = min(dists, im)
+                    if dm lt 400 then begin
+                        global['pt_to_drag'] = im
+                        WIDGET_CONTROL, event.id, DRAW_MOTION_EVENTS = 1
+                    endif
+                end
+                
+                1: begin
+                    WIDGET_CONTROL, event.id, DRAW_MOTION_EVENTS = 0
+                    xy = ass_slit_widget_convert([event.x, event.y], mode = 'win2dat')
+                    global['pt_to_drag'] = -1
+                    global['approx'] = asm_bezier_create_line(global['reper_pts'], points = 1000) 
+                    ass_slit_widget_update_td
+                end
+                
+                2: begin
+                    xy = ass_slit_widget_convert([event.x, event.y], mode = 'win2dat')
+                    global['reper_pts', 0, global['pt_to_drag']] = xy[0]
+                    global['reper_pts', 1, global['pt_to_drag']] = xy[1]
+                    global['approx'] = asm_bezier_create_line(global['reper_pts'], points = 100) 
+                    ass_slit_widget_show_image
+                end
+            endcase    
             return
         endif    
         if event.type eq 0 and event.modifiers eq 2 then begin ; start selection
@@ -810,21 +799,17 @@ case eventval of
         global['currpos'] = pos-1
         ind = global['data_ind', global['currpos']]
         asw_control, 'FRAMEDATE', SET_VALUE = ind.date_obs
-        ass_slit_widget_show_slit
-        ;ass_slit_widget_set_win, 'IMAGE', 'winsize'
         ass_slit_widget_show_image
+        ass_slit_widget_show_slit
     end
         
     'ACTSIZE' : begin
-        ;ass_slit_widget_set_win, 'IMAGE', 'winsize'
         ass_slit_widget_show_image, mode = 'ACTSIZE' 
     end
     'FITWIN' : begin
-        ;ass_slit_widget_set_win, 'IMAGE', 'winsize'
         ass_slit_widget_show_image, mode = 'FITWIN'
     end
     'SELWIN' : begin
-        ;ass_slit_widget_set_win, 'IMAGE', 'winsize'
         ass_slit_widget_show_image, mode = 'SELWIN'
     end
         
@@ -876,34 +861,33 @@ case eventval of
     end
 
     'ORDER' : begin
-        global['fit_order'] = widget_info(asw_getctrl('ORDER'), /DROPLIST_SELECT)
+        fit_order = widget_info(asw_getctrl('ORDER'), /DROPLIST_SELECT)
+        global['fit_order'] = ass_slit_widget_fit_orders(idx = fit_order, mode = 'fittype')
     end
 
     'FIT' : begin
-        order = global['fit_order'] + 1
-        limpts = 2
-        case order of
-            1: limpts = 2
-            2: limpts = 7
-            3: limpts = 9
-        endcase
+        fittype = global['fit_order']
+        limpts = ass_slit_widget_fit_orders(idx = fittype, mode = 'limit')
         if global['points'].Count() lt limpts then begin
-            result = DIALOG_MESSAGE('Number of points for selected approximation shoul be no less than ' + asu_compstr(limpts), title = 'SlitZilla Error', /ERROR)
+            result = DIALOG_MESSAGE('Number of points for selected approximation shoul be no less than ' + asu_compstr(limpts) + '.', title = 'SlitZilla Error', /ERROR)
             return
         endif
             
         WIDGET_CONTROL, /HOURGLASS
 
-        ass_slit_widget_clear_appr
+        t0 = systime(/seconds)
+        iter = ass_slit_widget_get_appr(global['points'], fittype, norm_poly, reper_pts, err = err)
+        if err eq 1 then begin
+            result = DIALOG_MESSAGE('Too many fitting iterations! Please try another markup.', title = 'SlitZilla Error', /ERROR)
+            return
+        endif    
         
-        iter = ass_slit_widget_get_appr(global['points'], global['fit_order'], norm_poly, reper_pts)
-        
-        global['reper_pts'] = reper_pts
-        
+        ; asu_sec2hms(systime(/seconds)-t0, /issecs)        
         message, 'Number of iteration = ' + asu_compstr(iter), /info
 
+        ass_slit_widget_clear_appr
+        global['reper_pts'] = reper_pts
         global['approx'] = asm_bezier_create_line(reper_pts, points = 1000) 
-
         ass_slit_widget_update_td
     end
 
@@ -1038,6 +1022,11 @@ case eventval of
         ass_slit_widget_show_slit
     end
     
+    'FRATE' : begin
+        asw_control, 'FRATE', GET_VALUE = rate
+        global['framerate'] = rate
+    end
+    
     'START' : begin
         if global['data_list'] eq !NULL then return
         if global['animation'] then return
@@ -1058,6 +1047,7 @@ case eventval of
         asw_control, 'FRAMEDATE', SET_VALUE = ind.date_obs
         ass_slit_widget_show_image
         ass_slit_widget_show_slit
+        
         WIDGET_CONTROL, event.id, TIMER = 1d/global['framerate']
     end
     
@@ -1071,7 +1061,9 @@ common G_ASS_SLIT_WIDGET, global
 
 if ~global.hasKey('slitcontr') then global['slitcontr'] = 0
 if ~global.hasKey('slitbright') then global['slitbright'] = 100
-if ~global.hasKey('framerate') then global['framerate'] = 5d
+if ~global.hasKey('framerate') then begin
+    global['framerate'] = 5d
+endif    
 if ~global.hasKey('animation') then global['animation'] = 0
 if ~global.hasKey('xmargin') then global['xmargin'] = [10, 1]
 if ~global.hasKey('ymargin') then global['ymargin'] = [5, 1]
@@ -1082,7 +1074,11 @@ if ~global.hasKey('reper_pts') then begin
         asm_bezier_norm_vs_points, global['norm_poly'], reper_pts, 0
     endif
     global['reper_pts'] = reper_pts
+    global['pt_to_drag'] = -1
 endif
+
+if isa(global['fit_order'], /number) then global['fit_order'] = ass_slit_widget_fit_orders(idx = 0, mode = 'fittype')
+
 end
 
 ;----------------------------------------------------------------------------------
@@ -1113,7 +1109,7 @@ global['currpos'] = 0
 global['select'] = 0
 
 global['points'] = list()
-global['fit_order'] = 0
+global['fit_order'] = 'linear'
 global['norm_poly'] = !NULL
 global['approx'] = !NULL
 global['markup'] = !NULL
@@ -1173,6 +1169,9 @@ mainrow = WIDGET_BASE(base, /row)
             framedate = WIDGET_TEXT(framerow, UNAME = 'FRAMEDATE', VALUE = '', XSIZE = 30, YSIZE = 1, /FRAME)
             startbutton = WIDGET_BUTTON(framerow, VALUE = 'Start', UVALUE = 'START', XSIZE = 80)
             stopbutton = WIDGET_BUTTON(framerow, VALUE = 'Stop', UVALUE = 'STOP', XSIZE = 80)
+            dummy = WIDGET_LABEL(framerow, VALUE = '    fps:', XSIZE = 30)
+            rate = WIDGET_SLIDER(framerow, VALUE = round(global['framerate']), MINIMUM = 1, MAXIMUM = 20, UNAME = 'FRATE', UVALUE = 'FRATE', XSIZE = 90)
+            
     ctrlcol = WIDGET_BASE(mainrow, /column, /align_left)
         procbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Proceed Files', UVALUE = 'PROCEED', XSIZE = 100)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
@@ -1190,10 +1189,10 @@ mainrow = WIDGET_BASE(base, /row)
         ;selinforow = WIDGET_BASE(ctrlcol, /column)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = '     (Ctrl + Left Mouse)', XSIZE = 100)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
-        orderbutton = WIDGET_DROPLIST(ctrlcol, VALUE = ['Linear', '2nd Order', '3rd Order'], UNAME = 'ORDER', UVALUE = 'ORDER', XSIZE = 80)
+        orderbutton = WIDGET_DROPLIST(ctrlcol, VALUE = ass_slit_widget_fit_orders(), UNAME = 'ORDER', UVALUE = 'ORDER', XSIZE = 80)
         fitbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Fit', UVALUE = 'FIT', XSIZE = 100)
-;        editapprrow = WIDGET_BASE(ctrlcol, /column, /Nonexclusive)
-;            editapprcheck = WIDGET_BUTTON(editapprrow, VALUE = 'Edit Approx. ...', UNAME = 'EDITAPPR', UVALUE = 'EDITAPPR', XSIZE = 100)
+        editapprrow = WIDGET_BASE(ctrlcol, /column, /Nonexclusive)
+            editapprcheck = WIDGET_BUTTON(editapprrow, VALUE = 'Edit Approx. ...', UNAME = 'EDITAPPR', UVALUE = 'EDITAPPR', XSIZE = 100)
         hiderow = WIDGET_BASE(ctrlcol, /column, /Nonexclusive)
             hidecheck = WIDGET_BUTTON(hiderow, VALUE = 'Hide Markup', UNAME = 'HIDEAPPR', UVALUE = 'HIDEAPPR', XSIZE = 100)
         hideallrow = WIDGET_BASE(ctrlcol, /column, /Nonexclusive)
@@ -1202,6 +1201,7 @@ mainrow = WIDGET_BASE(base, /row)
         clearapprbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Clear Approx.', UVALUE = 'CLEARAPPR', XSIZE = 80)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
         exportimage = WIDGET_BUTTON(ctrlcol, VALUE = 'Export Image ...', UVALUE = 'EXPIMAGE', XSIZE = 80)
+        
     slitcol = WIDGET_BASE(mainrow, /column, /base_align_left) ;xsize = slitsize[0])
         tdcoords = WIDGET_LABEL(slitcol, VALUE = '', XSIZE = slitsize[0], UNAME = 'TDCOORDS', UVALUE = 'TDCOORDS', /align_center)
         slitimage = WIDGET_DRAW(slitcol, GRAPHICS_LEVEL = 0, UNAME = 'SLIT', UVALUE = 'SLIT', XSIZE = slitsize[0], YSIZE = slitsize[1], /BUTTON_EVENTS)

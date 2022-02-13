@@ -1,9 +1,11 @@
-pro asm_neldermead, func, criteria, bound, context, x, xsol, iter, report = report
+function asm_neldermead, func, criteria, bound, context, x, xsol, iter, report = report, maxiter = maxiter
 
 reflex = 1
 expand = 2
 contract = 0.5
 shrink = 0.5
+
+xsol = !NULL
 
 ; initial simplex x(n+1, n), f(n+1, 1)
 sz = size(x)
@@ -17,6 +19,10 @@ smach = machar(/double)
 
 iter = 0L
 while ~call_function(criteria, x, f, context) do begin
+    if n_elements(maxiter) gt 0 && iter ge maxiter then begin
+        err = 1
+        return, 1
+    endif
     iter++
     fL = smach.xmax
     fG = 0
@@ -86,5 +92,6 @@ while ~call_function(criteria, x, f, context) do begin
 endwhile
 
 xsol = xL
+return, 0
 
 end
