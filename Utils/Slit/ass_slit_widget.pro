@@ -167,7 +167,7 @@ yrange = [0, total_km]
 y_arg = asu_linspace(0, yrange[1], sz[2])
 tvplot, td0, x_arg, y_arg, xrange = xrange, yrange = yrange, xmargin = [10, 1], ymargin = [5, 1], xtitle = 'Time, min', ytitle = 'Distance, Mm'
 
-p = global['currpos']/5d
+p = global['currpos']/60d * global['cadence']
 
 ;loadct, 13, /silent
 device, decomposed = 1
@@ -199,8 +199,13 @@ for k = 0, slist.Count()-1 do begin
     oplot, [crd1[0]], [crd1[1]], psym = 2, symsize = 1.5, thick = 1.5, color = '00FF00'x
     
     duration = (crd1[0] - crd0[0]) * 60d ; seconds in 1 hor pixel
-    pos_km = (crd1[1] - crd0[1]) * 1d3; km in 1 vert pixel  
-    speed = round( pos_km / duration / 10d) * 10
+    pos_km = (crd1[1] - crd0[1]) * 1d3; km in 1 vert pixel
+    speed = pos_km / duration
+    if speed lt 100 then begin
+        speed = round(speed)
+    endif else begin
+        speed = round(speed / 10d) * 10
+    endelse          
     sstr = strcompress(string(abs(speed), format = '(%"%5d")'), /remove_all) + ' km/s'
 
     align = speed gt 0 ? 1.0 : 0.0
@@ -822,12 +827,13 @@ case eventval of
             1: result = DIALOG_MESSAGE('Please select both first and last files!', title = 'SlitZilla Error', /ERROR)
             2: result = DIALOG_MESSAGE('Not enough files found!', title = 'SlitZilla Error', /ERROR)
             else: begin
+                sz = size(global['data_list'])
+                global['cadence'] = (anytim(ind[sz[3]-1].date_obs) - anytim(ind[0].date_obs)) / (sz[3]-1)
                 global['currpos'] = 0
                 global['byte_list'] = !NULL
                 global['slit_list'] = !NULL
                 asw_control, 'FITWIN', SET_BUTTON = 1
                 ass_slit_widget_show_image, mode = 'FITWIN'
-                sz = size(global['data_list'])
                 asw_control, 'SLIDER', SET_SLIDER_MIN = 1
                 asw_control, 'SLIDER', SET_SLIDER_MAX = sz[3]
                 asw_control, 'SLIDER', SET_VALUE = global['currpos'] + 1
@@ -1076,6 +1082,8 @@ if ~global.hasKey('reper_pts') then begin
     global['reper_pts'] = reper_pts
     global['pt_to_drag'] = -1
 endif
+
+if ~global.hasKey('cadence') then global['cadence'] = 12d
 
 if isa(global['fit_order'], /number) then global['fit_order'] = ass_slit_widget_fit_orders(idx = 0, mode = 'fittype')
 
