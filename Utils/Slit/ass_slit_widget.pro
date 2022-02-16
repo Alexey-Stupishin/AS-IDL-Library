@@ -691,7 +691,7 @@ case eventval of
     
     'IMAGE' : begin
         if global['data_list'] eq !NULL then return
-;        sname = TAG_NAMES(event, /STRUCTURE_NAME)
+        sname = TAG_NAMES(event, /STRUCTURE_NAME)
 ;        case sname of
 ;            'WIDGET_DRAW': print, 'Draw, Type=' + string(event.type) + ' Press=' + string(event.press*1L) + ' Release=' + string(event.release*1L) + ' x=' + string(event.x) + ' y=' + string(event.y) $
 ;                                + ' Clicks=' + string(event.clicks) + ' Mod=' + string(event.modifiers) + ' Key=' + string(event.key)
@@ -708,6 +708,7 @@ case eventval of
                     endfor
                     dm = min(dists, im)
                     if dm lt 400 then begin
+                        ;print, 'Capture point: ' + string(im) + ' xy = [' + string(event.x) + ',' + string(event.y) + '], d = ' + string(sqrt(dm))
                         global['pt_to_drag'] = im
                         WIDGET_CONTROL, event.id, DRAW_MOTION_EVENTS = 1
                     endif
@@ -718,14 +719,17 @@ case eventval of
                     xy = ass_slit_widget_convert([event.x, event.y], mode = 'win2dat')
                     global['pt_to_drag'] = -1
                     global['approx'] = asm_bezier_create_line(global['reper_pts'], points = 1000) 
+                    ;print, 'Finish capture: xy = [' + string(event.x) + ',' + string(event.y) + ']'
                     ass_slit_widget_update_td
                 end
                 
                 2: begin
+                    if global['pt_to_drag'] lt 0 then return
                     xy = ass_slit_widget_convert([event.x, event.y], mode = 'win2dat')
                     global['reper_pts', 0, global['pt_to_drag']] = xy[0]
                     global['reper_pts', 1, global['pt_to_drag']] = xy[1]
                     global['approx'] = asm_bezier_create_line(global['reper_pts'], points = 100) 
+                    ;print, 'Drag capture: xy = [' + string(event.x) + ',' + string(event.y) + ']'
                     ass_slit_widget_show_image
                 end
             endcase    
