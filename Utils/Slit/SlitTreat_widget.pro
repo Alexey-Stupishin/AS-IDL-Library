@@ -88,7 +88,7 @@ global['timedist'] = showslit^contr
 end
 
 ;----------------------------------------------------------------------------------
-pro ass_slit_widget_slit_range, dt, total_km ; min, Mm  
+pro ass_slit_widget_slit_range, dt_min, total_Mm ; min, Mm  
 compile_opt idl2
 
 common G_ASS_SLIT_WIDGET, global
@@ -98,9 +98,9 @@ ind = global['data_ind']
 ind0 = ind[0]
 ind1 = ind[n_elements(ind)-1]
 dt = anytim(ind1.date_obs) - anytim(ind0.date_obs)
-dt /= 60d
+dt_min = dt/60d
 total_km = sz[2] * ind0.cdelt1 * 6.96d5/ind0.rsun_obs
-total_km *= 1d-3
+total_Mm = total_km * 1d-3
 
 end
 
@@ -119,19 +119,35 @@ ymargpix = global['ymargin'] * !d.y_ch_size
 xplotpix = slitsize[0] - xmargpix[0] - xmargpix[1] 
 yplotpix = slitsize[1] - ymargpix[0] - ymargpix[1] 
 
-ass_slit_widget_slit_range, dt, total_km ; min, Mm
+ass_slit_widget_slit_range, dt_min, total_Mm ; min, Mm
 
 out = dblarr(2)
 if n_elements(mode) gt 0 && mode eq 'win2dat' then begin
-    out[0] = double(xy[0]-xmargpix[0])/double(xplotpix)*dt
-    out[1] = double(xy[1]-ymargpix[0])/double(yplotpix)*total_km
+    out[0] = double(xy[0]-xmargpix[0])/double(xplotpix)*dt_min
+    out[1] = double(xy[1]-ymargpix[0])/double(yplotpix)*total_Mm
 endif else begin
-    out[0] = double(xy[0])/dt*double(xplotpix) + xmargpix[0] 
-    out[1] = double(xy[1])/total_km*double(yplotpix) + ymargpix[0] 
+    out[0] = double(xy[0])/dt_min*double(xplotpix) + xmargpix[0] 
+    out[1] = double(xy[1])/total_Mm*double(yplotpix) + ymargpix[0] 
 endelse    
 
 return, out
 
+end
+
+;----------------------------------------------------------------------------------
+function ass_slit_widget_get_speed, crd0, crd1
+
+duration = (crd1[0] - crd0[0]) * 60d ; seconds in 1 hor pixel
+pos_km = (crd1[1] - crd0[1]) * 1d3; km in 1 vert pixel
+speed = pos_km / duration
+if speed lt 100 then begin
+    speed = round(speed)
+endif else begin
+    speed = round(speed / 10d) * 10
+endelse
+
+return, speed
+          
 end
 
 ;----------------------------------------------------------------------------------
@@ -153,7 +169,7 @@ pos = global['slitcontr']
 td0 = transpose(global['timedist'], [1, 0])
 sz = size(td0)
 
-ass_slit_widget_slit_range, dt, total_km ; min, Mm
+ass_slit_widget_slit_range, dt_min, total_Mm ; min, Mm
 
 asw_control, 'SLIT', GET_VALUE = drawID
 WSET, drawID
@@ -161,15 +177,14 @@ WSET, drawID
 device, decomposed = 0
 loadct, 0, /silent
 
-xrange = [0, dt]
+xrange = [0, dt_min]
 x_arg = asu_linspace(0, xrange[1], sz[1])
-yrange = [0, total_km]
+yrange = [0, total_Mm]
 y_arg = asu_linspace(0, yrange[1], sz[2])
 tvplot, td0, x_arg, y_arg, xrange = xrange, yrange = yrange, xmargin = [10, 1], ymargin = [5, 1], xtitle = 'Time, min', ytitle = 'Distance, Mm'
 
 p = global['currpos']/60d * global['cadence']
 
-;loadct, 13, /silent
 device, decomposed = 1
 oplot, [p, p], [0, yrange[1]], color = 'FF0000'x, thick = 1.5
 
@@ -198,14 +213,7 @@ for k = 0, slist.Count()-1 do begin
     oplot, [crd0[0]], [crd0[1]], psym = 2, symsize = 1.5, thick = 1.5, color = '00FF00'x
     oplot, [crd1[0]], [crd1[1]], psym = 2, symsize = 1.5, thick = 1.5, color = '00FF00'x
     
-    duration = (crd1[0] - crd0[0]) * 60d ; seconds in 1 hor pixel
-    pos_km = (crd1[1] - crd0[1]) * 1d3; km in 1 vert pixel
-    speed = pos_km / duration
-    if speed lt 100 then begin
-        speed = round(speed)
-    endif else begin
-        speed = round(speed / 10d) * 10
-    endelse          
+    speed = ass_slit_widget_get_speed(crd0, crd1)
     sstr = strcompress(string(abs(speed), format = '(%"%5d")'), /remove_all) + ' km/s'
 
     align = speed gt 0 ? 1.0 : 0.0
@@ -494,20 +502,42 @@ last = global['data_ind', -1]
 xy = global['approx']
 szd = size(global['data_list'])
 
-from_crd = dblarr(2)
-from_crd[0] = first.xcen + first.cdelt1*(xy[0,0] - (szd[1]-1d)/2d)
-from_crd[1] = first.ycen + first.cdelt2*(xy[1,0] - (szd[2]-1d)/2d)
-to_crd = dblarr(2)
-to_crd[0] = last.xcen + last.cdelt1*(xy[0,-1] - (szd[1]-1d)/2d)
-to_crd[1] = last.ycen + last.cdelt2*(xy[1,-1] - (szd[2]-1d)/2d)
+slit_crd_from = dblarr(2)
+slit_crd_from[0] = first.xcen + first.cdelt1*(xy[0,0] - (szd[1]-1d)/2d)
+slit_crd_from[1] = first.ycen + first.cdelt2*(xy[1,0] - (szd[2]-1d)/2d)
+slit_crd_to = dblarr(2)
+slit_crd_to[0] = last.xcen + last.cdelt1*(xy[0,-1] - (szd[1]-1d)/2d)
+slit_crd_to[1] = last.ycen + last.cdelt2*(xy[1,-1] - (szd[2]-1d)/2d)
 
-from_time = first.date_obs
-to_time = last.date_obs
+slit_time_from = first.date_obs
+slit_time_to = last.date_obs
 
 half_width = global['slitwidth']
 mode = global['slitmode']
 
-save, filename = file, timedist, from_crd, to_crd, from_time, to_time, half_width, mode
+sz = size(timedist)
+ass_slit_widget_slit_range, dt_min, total_Mm
+time_step = dt_min/(sz[2]-1)*60d
+dist_step = total_Mm/(sz[1]-1)*1d3
+
+jets = !NULL
+slist = global['speed_list']
+if slist.Count() gt 0 then begin
+    jet = {speed_time_from:0d, speed_dist_from:0d, speed_time_to:0d, speed_dist_to:0d, speed:0d}
+    jets = replicate(jet, slist.Count())
+    for k = 0, slist.Count()-1 do begin
+        crds = slist[k]
+        crd0 = crds.first
+        crd1 = crds.second
+        jets[k].speed = ass_slit_widget_get_speed(crd0, crd1)
+        jets[k].speed_time_from = crd0[0]*60d
+        jets[k].speed_dist_from = crd0[1]*1d3
+        jets[k].speed_time_to = crd1[0]*60d
+        jets[k].speed_dist_to = crd1[1]*1d3
+    end
+endif
+
+save, filename = file, timedist, slit_crd_from, slit_crd_to, slit_time_from, slit_time_to, dist_step, time_step, half_width, mode, jets
 
 pref['expsav_path'] = path
 save, filename = pref['pref_path'], pref
@@ -568,7 +598,7 @@ common G_ASS_SLIT_WIDGET, global
 common G_ASS_SLIT_WIDGET_PREF, pref
 common G_ASW_WIDGET, asw_widget
 
-if global['proj_name'] ne '' then asw_control, 'SLITZILLA', BASE_SET_TITLE = 'SlitZilla - ' + global['proj_name']
+if global['proj_name'] ne '' then asw_control, 'SLITTREAT', BASE_SET_TITLE = 'SlitTreat - ' + global['proj_name']
 
 asw_control, 'FROMFILETEXT', SET_VALUE = global['fromfile']
 asw_control, 'TOFILETEXT', SET_VALUE = global['tofile']
@@ -604,7 +634,7 @@ compile_opt idl2
 common G_ASS_SLIT_WIDGET, global
 
 if global['data_list'] ne !NULL && global['modified'] then begin
-    result = DIALOG_MESSAGE('All results will be lost! Exit anyway?', title = 'SlitZilla', /QUESTION)
+    result = DIALOG_MESSAGE('All results will be lost! Exit anyway?', title = 'SlitTreat', /QUESTION)
     return, result eq 'Yes' ? 0 : 1
 endif else begin
     return, 0
@@ -828,8 +858,8 @@ case eventval of
         global['data_list'] = asu_get_file_sequence_data(pref['path'], global['fromfile'], global['tofile'], ind = ind, err = err)
         global['data_ind'] = ind 
         case err of
-            1: result = DIALOG_MESSAGE('Please select both first and last files!', title = 'SlitZilla Error', /ERROR)
-            2: result = DIALOG_MESSAGE('Not enough files found!', title = 'SlitZilla Error', /ERROR)
+            1: result = DIALOG_MESSAGE('Please select both first and last files!', title = 'SlitTreat Error', /ERROR)
+            2: result = DIALOG_MESSAGE('Not enough files found!', title = 'SlitTreat Error', /ERROR)
             else: begin
                 sz = size(global['data_list'])
                 global['cadence'] = (anytim(ind[sz[3]-1].date_obs) - anytim(ind[0].date_obs)) / (sz[3]-1)
@@ -879,7 +909,7 @@ case eventval of
         fittype = global['fit_order']
         limpts = ass_slit_widget_fit_orders(idx = fittype, mode = 'limit')
         if global['points'].Count() lt limpts then begin
-            result = DIALOG_MESSAGE('Number of points for selected approximation shoul be no less than ' + asu_compstr(limpts) + '.', title = 'SlitZilla Error', /ERROR)
+            result = DIALOG_MESSAGE('Number of points for selected approximation should be no less than ' + asu_compstr(limpts) + '.', title = 'SlitTreat Error', /ERROR)
             return
         endif
             
@@ -888,7 +918,7 @@ case eventval of
         t0 = systime(/seconds)
         iter = ass_slit_widget_get_appr(global['points'], fittype, norm_poly, reper_pts, err = err)
         if err eq 1 then begin
-            result = DIALOG_MESSAGE('Too many fitting iterations! Please try another markup.', title = 'SlitZilla Error', /ERROR)
+            result = DIALOG_MESSAGE('Too many fitting iterations! Please try another markup.', title = 'SlitTreat Error', /ERROR)
             return
         endif    
         
@@ -967,7 +997,7 @@ case eventval of
 
     'SAVEAS' : begin
         if global['data_list'] eq !NULL then begin
-            result = DIALOG_MESSAGE('Nothing to save!', title = 'SlitZilla Error', /ERROR)
+            result = DIALOG_MESSAGE('Nothing to save!', title = 'SlitTreat Error', /ERROR)
             return
         endif    
         ass_slit_widget_save_as
@@ -975,7 +1005,7 @@ case eventval of
 
     'SAVE' : begin
         if global['data_list'] eq !NULL then begin
-            result = DIALOG_MESSAGE('Nothing to save!', title = 'SlitZilla Error', /ERROR)
+            result = DIALOG_MESSAGE('Nothing to save!', title = 'SlitTreat Error', /ERROR)
             return
         endif
             
@@ -992,7 +1022,7 @@ case eventval of
 
     'EXPORT' : begin
         if global['straight'] eq !NULL then begin
-            result = DIALOG_MESSAGE('Nothing to export!', title = 'SlitZilla Error', /ERROR)
+            result = DIALOG_MESSAGE('Nothing to export!', title = 'SlitTreat Error', /ERROR)
             return
         endif    
         
@@ -1002,7 +1032,7 @@ case eventval of
 
     'EXPSAV' : begin
         if global['straight'] eq !NULL then begin
-            result = DIALOG_MESSAGE('Nothing to export!', title = 'SlitZilla Error', /ERROR)
+            result = DIALOG_MESSAGE('Nothing to export!', title = 'SlitTreat Error', /ERROR)
             return
         endif    
         
@@ -1012,7 +1042,7 @@ case eventval of
     
     'EXPIMAGE' : begin
         if global['data_list'] eq !NULL then begin
-            result = DIALOG_MESSAGE('Nothing to export!', title = 'SlitZilla Error', /ERROR)
+            result = DIALOG_MESSAGE('Nothing to export!', title = 'SlitTreat Error', /ERROR)
             return
         endif    
         
@@ -1094,7 +1124,7 @@ if isa(global['fit_order'], /number) then global['fit_order'] = ass_slit_widget_
 end
 
 ;----------------------------------------------------------------------------------
-pro ass_slit_widget
+pro SlitTreat_widget
 
 common G_ASS_SLIT_WIDGET, global
 common G_ASS_SLIT_WIDGET_PREF, pref
@@ -1151,15 +1181,15 @@ pref['proj_file'] = ''
 pref['export_path'] = ''
 pref['expsav_path'] = ''
 pref['pref_path'] = ''
-dirpath = file_dirname((ROUTINE_INFO('ass_slit_widget', /source)).path, /mark)
+dirpath = file_dirname((ROUTINE_INFO('SlitTreat_widget', /source)).path, /mark)
 if n_elements(dirpath) gt 0 then begin
-    pref['pref_path'] = dirpath + 'slitzilla.pref'
+    pref['pref_path'] = dirpath + 'slittreat.pref'
     if file_test(pref['pref_path']) then begin
         restore, pref['pref_path']
     endif    
 endif    
 
-base = WIDGET_BASE(TITLE = 'SlitZilla', UNAME = 'SLITZILLA', /column, /TLB_KILL_REQUEST_EVENTS)
+base = WIDGET_BASE(TITLE = 'SlitTreat', UNAME = 'SLITTREAT', /column, /TLB_KILL_REQUEST_EVENTS)
 asw_widget['widbase'] = base
 
 filecol = WIDGET_BASE(base, /column)
