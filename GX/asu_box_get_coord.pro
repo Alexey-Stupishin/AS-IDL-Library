@@ -30,7 +30,8 @@ wcs_convert_from_coord, wcs_box, crd_box, "HG", lon,lat
 dx = box.dr[0]
 dy = box.dr[1]
 rsun = map.rsun
-dkm = dx/rsun*wcs_rsun()/1000
+;dkm = dx/rsun*wcs_rsun()/1000
+dkm = dx/1000 * wcs_rsun()
 
 boxdata = {x_box:x_box,y_box:y_box, x_cen:x_cen,y_cen:y_cen, lat_cen:latitude, lon_cen:longitude, vcos:dircos, lon_hg:lon,lat_hg:lat, dx:dx,dy:dy,dkm:dkm, rsun:rsun}
 

@@ -74,7 +74,6 @@ function reo_calculate_map_atm, ptr, freq $
                           , depthR = depthR, FluxR = FluxR, tauR = tauR, heightsR = heightsR, fluxesR = fluxesR, sR = sR $
                           , depthL = depthL, FluxL = FluxL, tauL = tauL, heightsL = heightsL, fluxesL = fluxesL, sL = sL $
                           , scanR = scanR, scanL = scanL $
-                          , depthFF = depthFF, FluxFF = FluxFF, tauFF = tauFF, heightsFF = heightsFF, fluxesFF = fluxesFF, scanFF = scanFF $
                           , rc = rc $        
                           , _extra = _extra
 
@@ -101,7 +100,7 @@ vposR = -1L
 vposL = -1L
 vscanlimpos = 0L
 
-value = bytarr(36)
+value = bytarr(30)
 value[2:3] = 1 ; freq, nHarm
 value[5] = 1 ; nTau
 value[7] = 1 ; NULL Mask
@@ -177,13 +176,6 @@ if arg_present(sL)        then vsL        = lonarr(vM[0], vM[1], vnTau) else reu
 if arg_present(scanR)     then vscanR     = dblarr(scanLng)             else reu_setNULL, vscanR,       value, 27
 if arg_present(scanL)     then vscanL     = dblarr(scanLng)             else reu_setNULL, vscanL,       value, 28
 
-if arg_present(depthFF)   then vdepthFF   = lonarr(vM[0], vM[1])        else reu_setNULL, vdepthFF,     value, 29 
-if arg_present(fluxFF)    then vfluxFF    = dblarr(vM[0], vM[1])        else reu_setNULL, vfluxFF,      value, 30 
-if arg_present(tauFF)     then vtauFF     = dblarr(vM[0], vM[1])        else reu_setNULL, vtauFF,       value, 31 
-if arg_present(heightsFF) then vheightsFF = dblarr(vM[0], vM[1], vnTau) else reu_setNULL, vheightsFF,   value, 32 
-if arg_present(fluxesFF)  then vfluxesFF  = dblarr(vM[0], vM[1], vnTau) else reu_setNULL, vfluxesFF,    value, 33 
-if arg_present(scanFF)    then vscanFF    = dblarr(scanLng)             else reu_setNULL, vscanFF,      value, 34
-
 if arg_present(rc)        then vrc        = lonarr(vM[0], vM[1])        else reu_setNULL, vrc,          value, 35 
 
 returnCode = CALL_EXTERNAL(  dll_location, 'reoCalculateMapByAtm', vptr, parameterMap $     ; 0-1
@@ -193,7 +185,6 @@ returnCode = CALL_EXTERNAL(  dll_location, 'reoCalculateMapByAtm', vptr, paramet
                            , vdepthR, vFluxR, vtauR, vheightsR, vfluxesR, vsR $             ; 15-20
                            , vdepthL, vFluxL, vtauL, vheightsL, vfluxesL, vsL $             ; 21-26
                            , vscanR, vscanL $                                               ; 27-28
-                           , vdepthFF, vFluxFF, vtauFF, vheightsFF, vfluxesFF, vscanFF $    ; 29-34
                            , vrc $                                                          ; 35        
                            , VALUE = value, /CDECL)
 
@@ -210,12 +201,6 @@ if isa(vtauL,      /ARRAY) then tauL =      transpose(vtauL, [1, 0])
 if isa(vheightsL,  /ARRAY) then heightsL =  transpose(vheightsL, [1, 0, 2])
 if isa(vfluxesL,   /ARRAY) then fluxesL =   transpose(vfluxesL, [1, 0, 2])
 if isa(vsL,        /ARRAY) then sL =        transpose(vsL, [1, 0, 2])
-
-if isa(vdepthFF,   /ARRAY) then depthFF =   transpose(vdepthFF, [1, 0])
-if isa(vfluxFF,    /ARRAY) then fluxFF =    transpose(vfluxFF, [1, 0])
-if isa(vtauFF,     /ARRAY) then tauFF =     transpose(vtauFF, [1, 0])
-if isa(vheightsFF, /ARRAY) then heightsFF = transpose(vheightsFF, [1, 0, 2])
-if isa(vfluxesFF,  /ARRAY) then fluxesFF =  transpose(vfluxesFF, [1, 0, 2])
 
 if isa(vscanR,     /ARRAY) then scanR = vscanR
 if isa(vscanL,     /ARRAY) then scanL = vscanL
