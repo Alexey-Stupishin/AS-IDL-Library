@@ -277,12 +277,15 @@ case eventval of
     end
         
     'ACTSIZE' : begin
+        if event.select eq 0 then return
         ass_slit_widget_show_image, mode = 'ACTSIZE' 
     end
     'FITWIN' : begin
+        if event.select eq 0 then return
         ass_slit_widget_show_image, mode = 'FITWIN'
     end
     'SELWIN' : begin
+        if event.select eq 0 then return
         ass_slit_widget_show_image, mode = 'SELWIN'
     end
         

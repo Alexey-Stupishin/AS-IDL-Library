@@ -188,8 +188,8 @@ xy_to = xy[*, sz[2]-1]
 ind = global['data_ind']
 ind0 = ind[0]
 ind1 = ind[n_elements(ind)-1]
-xy0 = round((xy_from - ([ind0.naxis1, ind0.naxis2]-1d)*0.5d)*[ind0.cdelt1, ind0.cdelt2] + [ind0.xcen, ind0.ycen])
-xy1 = round((xy_to - ([ind0.naxis1, ind0.naxis2]-1d)*0.5d)*[ind0.cdelt1, ind0.cdelt2] + [ind0.xcen, ind0.ycen])
+xy0 = round(xy_from)
+xy1 = round(xy_to)
 
 asw_control, 'TDFROM', SET_VALUE = asu_extract_time(ind0.date_obs, out_style = 'asu_time_std')
 asw_control, 'TDTO', SET_VALUE = asu_extract_time(ind1.date_obs, out_style = 'asu_time_std')
@@ -218,15 +218,12 @@ if file eq '' then return
 first = global['data_ind', 0]
 last = global['data_ind', -1]
 
-xy = global['approx']
 szd = size(global['data_list'])
 
-slit_crd_from = dblarr(2)
-slit_crd_from[0] = first.xcen + first.cdelt1*(xy[0,0] - (szd[1]-1d)/2d)
-slit_crd_from[1] = first.ycen + first.cdelt2*(xy[1,0] - (szd[2]-1d)/2d)
-slit_crd_to = dblarr(2)
-slit_crd_to[0] = last.xcen + last.cdelt1*(xy[0,-1] - (szd[1]-1d)/2d)
-slit_crd_to[1] = last.ycen + last.cdelt2*(xy[1,-1] - (szd[2]-1d)/2d)
+xy = global['approx']
+sz = size(xy)
+slit_crd_from = xy[*, 0]
+slit_crd_to = xy[*, sz[2]-1]
 
 slit_time_from = first.date_obs
 slit_time_to = last.date_obs
