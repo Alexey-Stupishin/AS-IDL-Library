@@ -89,7 +89,7 @@ returnCode = CALL_EXTERNAL(dll_location, 'reoGetVisParams', vptr, vM)
 
 vfreq = double(freq)
 vharm = [2L, 3L, 4L]
-vtau = 25d
+vtau = [1d, 25d]
 
 vMask = 0L
 
