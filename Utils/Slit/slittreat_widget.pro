@@ -49,18 +49,20 @@ endif else begin
         pref['proj_path'] = path
         pref['proj_file'] = file
         save, filename = pref['pref_path'], pref
-    endif    
+    endif
 endelse
 
 if file eq '' then return
 
-restore, file
+restore, file, /RELAXED_STRUCTURE_ASSIGNMENT
 
 ass_slit_widget_add_keys
 
 global['modified'] = 0
 global['animation'] = 0
 global['appredit'] = 0
+global['byte_list'] = !NULL
+global['byte_info'] = !NULL
 ass_slit_widget_set_ctrl
 asw_control, 'HIDEAPPR', SET_BUTTON = 0
 asw_control, 'HIDEALL', SET_BUTTON = 0
@@ -699,34 +701,34 @@ mainrow = WIDGET_BASE(base, /row)
             rate = WIDGET_SLIDER(framerow, VALUE = round(global['framerate']), MINIMUM = 1, MAXIMUM = 20, UNAME = 'FRATE', UVALUE = 'FRATE', XSIZE = 90)
             
     ctrlcol = WIDGET_BASE(mainrow, /column, /align_left)
-        procbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Proceed Files', UVALUE = 'PROCEED', XSIZE = 100)
+        procbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Proceed Files', UVALUE = 'PROCEED', XSIZE = 120)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
-        saveasbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Save As ...', UVALUE = 'SAVEAS', XSIZE = 80)
-        savebutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Save', UVALUE = 'SAVE', XSIZE = 80)
-        loadbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Load ...', UVALUE = 'LOAD', XSIZE = 80)
-        lastbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Last', UVALUE = 'LAST', XSIZE = 80)
+        saveasbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Save As ...', UVALUE = 'SAVEAS', XSIZE = 120)
+        savebutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Save', UVALUE = 'SAVE', XSIZE = 120)
+        loadbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Load ...', UVALUE = 'LOAD', XSIZE = 120)
+        lastbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Last', UVALUE = 'LAST', XSIZE = 120)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
         winfitrow = WIDGET_BASE(ctrlcol, /column, /Exclusive)
-            size1 = WIDGET_BUTTON(winfitrow, VALUE = 'Fit to Window', UNAME = 'FITWIN', UVALUE = 'FITWIN', XSIZE = 80)
-            size2 = WIDGET_BUTTON(winfitrow, VALUE = 'Actual Size', UNAME = 'ACTSIZE', UVALUE = 'ACTSIZE', XSIZE = 80)
-            size3 = WIDGET_BUTTON(winfitrow, VALUE = 'Selection', UNAME = 'SELWIN', UVALUE = 'SELWIN', XSIZE = 80)
+            size1 = WIDGET_BUTTON(winfitrow, VALUE = 'Fit to Window', UNAME = 'FITWIN', UVALUE = 'FITWIN', XSIZE = 120)
+            size2 = WIDGET_BUTTON(winfitrow, VALUE = 'Actual Size', UNAME = 'ACTSIZE', UVALUE = 'ACTSIZE', XSIZE = 120)
+            size3 = WIDGET_BUTTON(winfitrow, VALUE = 'Selection', UNAME = 'SELWIN', UVALUE = 'SELWIN', XSIZE = 120)
             WIDGET_CONTROL, size1, SET_BUTTON = 1
             global['drawmode'] = 'FITWIN'
         ;selinforow = WIDGET_BASE(ctrlcol, /column)
-        dummy = WIDGET_LABEL(ctrlcol, VALUE = '     (Ctrl + Left Mouse)', XSIZE = 100)
+        dummy = WIDGET_LABEL(ctrlcol, VALUE = '    (Ctrl+LeftMouse)', XSIZE = 120)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
-        orderbutton = WIDGET_DROPLIST(ctrlcol, VALUE = ass_slit_widget_fit_orders(), UNAME = 'ORDER', UVALUE = 'ORDER', XSIZE = 80)
-        fitbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Fit', UVALUE = 'FIT', XSIZE = 100)
+        orderbutton = WIDGET_DROPLIST(ctrlcol, VALUE = ass_slit_widget_fit_orders(), UNAME = 'ORDER', UVALUE = 'ORDER', XSIZE = 120)
+        fitbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Fit', UVALUE = 'FIT', XSIZE = 120)
         editapprrow = WIDGET_BASE(ctrlcol, /column, /Nonexclusive)
-            editapprcheck = WIDGET_BUTTON(editapprrow, VALUE = 'Edit Approx. ...', UNAME = 'EDITAPPR', UVALUE = 'EDITAPPR', XSIZE = 100)
+            editapprcheck = WIDGET_BUTTON(editapprrow, VALUE = 'Edit Approx. ...', UNAME = 'EDITAPPR', UVALUE = 'EDITAPPR', XSIZE = 120)
         hiderow = WIDGET_BASE(ctrlcol, /column, /Nonexclusive)
-            hidecheck = WIDGET_BUTTON(hiderow, VALUE = 'Hide Markup', UNAME = 'HIDEAPPR', UVALUE = 'HIDEAPPR', XSIZE = 100)
+            hidecheck = WIDGET_BUTTON(hiderow, VALUE = 'Hide Markup', UNAME = 'HIDEAPPR', UVALUE = 'HIDEAPPR', XSIZE = 120)
         hideallrow = WIDGET_BASE(ctrlcol, /column, /Nonexclusive)
-            hideallcheck = WIDGET_BUTTON(hideallrow, VALUE = 'Hide All', UNAME = 'HIDEALL', UVALUE = 'HIDEALL', XSIZE = 100)
-        clearbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Clear Slit', UVALUE = 'CLEAR', XSIZE = 80)
-        clearapprbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Clear Approx.', UVALUE = 'CLEARAPPR', XSIZE = 80)
+            hideallcheck = WIDGET_BUTTON(hideallrow, VALUE = 'Hide All', UNAME = 'HIDEALL', UVALUE = 'HIDEALL', XSIZE = 120)
+        clearbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Clear Slit', UVALUE = 'CLEAR', XSIZE = 120)
+        clearapprbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Clear Approx.', UVALUE = 'CLEARAPPR', XSIZE = 120)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
-        exportimage = WIDGET_BUTTON(ctrlcol, VALUE = 'Export Image ...', UVALUE = 'EXPIMAGE', XSIZE = 80)
+        exportimage = WIDGET_BUTTON(ctrlcol, VALUE = 'Export Image ...', UVALUE = 'EXPIMAGE', XSIZE = 120)
         
     slitcol = WIDGET_BASE(mainrow, /column, /base_align_left) ;xsize = slitsize[0])
         tdcoords = WIDGET_LABEL(slitcol, VALUE = '', XSIZE = slitsize[0], UNAME = 'TDCOORDS', UVALUE = 'TDCOORDS', /align_center)
@@ -747,8 +749,8 @@ mainrow = WIDGET_BASE(base, /row)
             slitbright = WIDGET_SLIDER(BCrow, VALUE = 100, UNAME = 'SLITBRIGHT', UVALUE = 'SLITBRIGHT', XSIZE = slitsize[0]/2, title = 'Time-Distance Upper Threshold')
         dummy = WIDGET_LABEL(slitcol, VALUE = ' ', XSIZE = 40)
         dummy = WIDGET_LABEL(slitcol, VALUE = ' ', XSIZE = 40)
-        exportbutton = WIDGET_BUTTON(slitcol, VALUE = 'Export T-D ...', UVALUE = 'EXPORT', XSIZE = 80)
-        expsavbutton = WIDGET_BUTTON(slitcol, VALUE = 'T-D to SAV...', UVALUE = 'EXPSAV', XSIZE = 80)
+        exportbutton = WIDGET_BUTTON(slitcol, VALUE = 'Export T-D ...', UVALUE = 'EXPORT', XSIZE = 110)
+        expsavbutton = WIDGET_BUTTON(slitcol, VALUE = 'T-D to SAV...', UVALUE = 'EXPSAV', XSIZE = 110)
 
 WIDGET_CONTROL, base, /REALIZE
 XMANAGER, 'ass_slit_widget_buttons', base, GROUP_LEADER = GROUP, /NO_BLOCK

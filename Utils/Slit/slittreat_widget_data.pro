@@ -130,11 +130,12 @@ ymargpix = global['ymargimg'] * !d.y_ch_size
 picsize = [winsize[0] - xmargpix[0] - xmargpix[1], winsize[1] - ymargpix[0] - ymargpix[1]]
 ind0 = global['data_ind', 0]
 
+if global['byte_info'] eq !NULL then global['byte_info'] = lonarr(sz[3])
+if global['byte_list'] eq !NULL then global['byte_list'] = dblarr(picsize[0], picsize[1], sz[3])
+
 if global['byte_list'] eq !NULL || (n_elements(mode) gt 0 && (mode eq 'MAKESELECT' || global['drawmode'] ne mode)) then begin
     if n_elements(mode) gt 0 && mode eq 'MAKESELECT' then mode = 'SELWIN'
     global['drawmode'] = mode
-    global['byte_info'] = lonarr(sz[3])
-    global['byte_list'] = dblarr(picsize[0], picsize[1], sz[3])
     case mode of
         'ACTSIZE': begin
             corn = long((picsize-sz[1:2])/2d)
