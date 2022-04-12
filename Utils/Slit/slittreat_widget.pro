@@ -671,7 +671,7 @@ dirpath = file_dirname((ROUTINE_INFO('SlitTreat_widget', /source)).path, /mark)
 if n_elements(dirpath) gt 0 then begin
     pref['pref_path'] = dirpath + 'slittreat.pref'
     if file_test(pref['pref_path']) then begin
-        restore, pref['pref_path']
+        restore, pref['pref_path'], /RELAXED_STRUCTURE_ASSIGNMENT
     endif    
 endif    
 
