@@ -85,7 +85,8 @@ ptr = reo_prepare_calc_map(global['gxbox'], visstep, M, base, posangle = posangl
 
 local['reo_ptr'] = ptr
 
-rc = reo_set_atmosphere_mask(local['reo_ptr'], H, temp, dens, Lmask, masksN, local['b_mask'])
+; NB! check params
+;;;; rc = reo_set_atmosphere_mask(local['reo_ptr'], H, temp, dens, Lmask, masksN, local['b_mask'])
 
 FluxRW = dblarr(M[0], M[1], n_elements(freqs))
 FluxLW = dblarr(M[0], M[1], n_elements(freqs))

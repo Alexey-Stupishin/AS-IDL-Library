@@ -176,7 +176,7 @@ if arg_present(sL)        then vsL        = lonarr(vM[0], vM[1], vnTau) else reu
 if arg_present(scanR)     then vscanR     = dblarr(scanLng)             else reu_setNULL, vscanR,       value, 27
 if arg_present(scanL)     then vscanL     = dblarr(scanLng)             else reu_setNULL, vscanL,       value, 28
 
-if arg_present(rc)        then vrc        = lonarr(vM[0], vM[1])        else reu_setNULL, vrc,          value, 35 
+if arg_present(rc)        then vrc        = lonarr(vM[0], vM[1])        else reu_setNULL, vrc,          value, 29 
 
 returnCode = CALL_EXTERNAL(  dll_location, 'reoCalculateMapByAtm', vptr, parameterMap $     ; 0-1
                            , vfreq, vnHarm, vharm, vnTau, vtau $                            ; 2-6
@@ -185,7 +185,7 @@ returnCode = CALL_EXTERNAL(  dll_location, 'reoCalculateMapByAtm', vptr, paramet
                            , vdepthR, vFluxR, vtauR, vheightsR, vfluxesR, vsR $             ; 15-20
                            , vdepthL, vFluxL, vtauL, vheightsL, vfluxesL, vsL $             ; 21-26
                            , vscanR, vscanL $                                               ; 27-28
-                           , vrc $                                                          ; 35        
+                           , vrc $                                                          ; 29        
                            , VALUE = value, /CDECL)
 
 if isa(vdepthR,    /ARRAY) then depthR =    transpose(vdepthR, [1, 0])

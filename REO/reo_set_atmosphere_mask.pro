@@ -40,18 +40,19 @@ function reo_set_atmosphere_mask, ptr $
                           , H, T, D, Lmask $
                           , masksN, mask $
                           , _extra = _extra
+compile_opt idl2
 
 dll_location = getenv('reo_dll_location')
 
 vptr = ulong64(ptr)
 
 sz = size(H)
-maxH = long(sz[2])
-nmasks = long(sz[1])
+maxH = long(sz[1])
+nmasks = long(sz[2])
 vLmask = long(Lmask)
-vH = double(transpose(H, [1, 0]))
-vT = double(transpose(T, [1, 0]))
-vD = double(transpose(D, [1, 0]))
+vH = double(H)
+vT = double(T)
+vD = double(D)
 sz = size(mask)
 N = lonarr(2)
 N[0] = sz[1]
