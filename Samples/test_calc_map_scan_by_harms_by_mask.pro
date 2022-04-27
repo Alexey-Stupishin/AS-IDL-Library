@@ -19,15 +19,21 @@ compile_opt idl2
 resolve_routine,'asu_atm_add_profile',/compile_full_file, /either
 
 dirpath = file_dirname((ROUTINE_INFO('test_calc_map_scan_by_harms_by_mask', /source)).path, /mark)
-;filename = dirpath + '12470_hmi.M_720s.20151216_085809.W85N12CR.CEA.NAS(_1000).sav'
+
 filename = dirpath + '12470_hmi.M_720s.20151218_094609.W85N13CR.CEA.NAS_(1000).sav'
 restore, filename ; GX-box
-
-visstep = 0.5d ; arcsec - шаг видимой сетки радиокарты
 posangle = asu_ratan_position_angle_by_date(-10, box.index.date_obs) ; позиционный угол
+model_mask = decompose(box.base.bz, box.base.ic) ; see Fontenla 2009. e.g. 7 - umbra, 6 - penumbra etc.
+model = 0
+
+;test_calc_map_load_model, 's:\Projects\IDL\BigSamples\mod_dipole_30_largeFOV2.sav', 1.1d, 950d, 0, 0.43d, 0.045d, box, model_mask, model
+;test_calc_map_load_model, 's:\Projects\IDL\BigSamples\mod_dipole_30_largeFOV2.sav', 1.0d, 950d, 0, 1.1d, 1.1d, box, model_mask, model
+
+visstep = 0.3d ; arcsec - шаг видимой сетки радиокарты
 freqs = asu_linspace(4, 18, 53)*1d9 ; Hz - частоты
 
 ptr = reo_prepare_calc_map(box, visstep, M, base, posangle = posangle, arcbox = arcbox, field = field, version_info = version_info $
+                         , model = model $
                          , freefree = 0 $
                           ) 
 
@@ -37,22 +43,24 @@ if ptr eq 0 then begin ; Чтобы акулы не укусили:
 endif
 
 print, version_info
-model_mask = decompose(box.base.bz, box.base.ic) ; see Fontenla 2009. e.g. 7 - umbra, 6 - penumbra etc.
 
-H =    [1,   2d8,   2.3d8, 3.0d8, 5.0d9]
-Temp = [1d4, 1d4,   1.0d6, 1.2d6, 2.5d6]
-Dens = 1d16/Temp
+;H =    [1,   2d8,   2.3d8, 3.0d8, 5.0d9]
+;Temp = [1d4, 1d4,   1.0d6, 1.2d6, 2.5d6]
+;Dens = 1d16/Temp
+H =    [  1, 1e8, 1.2e8, 2e10]
+Temp = [4e3, 4e3, 2e6,   2e6]
+Dens = 3d15/Temp
 mask_set = asu_atm_init_profile(H, Temp, Dens)
 
-HP =    [1,   1.5d8, 1.8d8, 2.5d8, 5.0d9]
-TempP = [1d4,   1d4, 0.8d6, 1.0d6, 2.0d6]
-DensP = 1d16/TempP
-mask_set = asu_atm_add_profile(mask_set, 6, HP, TempP, DensP)
-
-HU =    [1,   1.0d8, 1.3d8, 2.0d8, 5.0d9]
-TempU = [1d4,   1d4, 0.7d6, 0.9d6, 2.0d6]
-DensU = 1d16/TempU
-mask_set = asu_atm_add_profile(mask_set, 7, HU, TempU, DensU)
+;HP =    [1,   1.5d8, 1.8d8, 2.5d8, 5.0d9]
+;TempP = [1d4,   1d4, 0.8d6, 1.0d6, 2.0d6]
+;DensP = 1d16/TempP
+;mask_set = asu_atm_add_profile(mask_set, 6, HP, TempP, DensP)
+;
+;HU =    [1,   1.0d8, 1.3d8, 2.0d8, 5.0d9]
+;TempU = [1d4,   1d4, 0.7d6, 0.9d6, 2.0d6]
+;DensU = 1d16/TempU
+;mask_set = asu_atm_add_profile(mask_set, 7, HU, TempU, DensU)
 
 rc = reo_set_atmosphere_mask_set(ptr, mask_set, model_mask)
 
