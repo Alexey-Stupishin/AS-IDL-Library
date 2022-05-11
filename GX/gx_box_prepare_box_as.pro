@@ -34,7 +34,8 @@ pro gx_box_prepare_box_as, time, centre, size_pix, dx_km, out_dir = out_dir, tmp
                   aia_euv = aia_euv, aia_uv = aia_uv, top = top, cea = cea,$
                   carrington = carrington, sfq = sfq, make_pbox = make_pbox,$
                   HMI_time_window = HMI_time_window, AIA_time_window = AIA_time_window,$
-                  box = box, pbox = pbox, hmi_files = hmi_files, magnetogram = magnetogram, full_Bz = full_Bz, hmi_prep = hmi_prep
+                  box = box, pbox = pbox, hmi_files = hmi_files, hmi_dir = hmi_dir, $
+                  magnetogram = magnetogram, full_Bz = full_Bz, hmi_prep = hmi_prep
   if not keyword_set(out_dir) then cd, current = out_dir
   if not file_test(out_dir) then file_mkdir, out_dir
   if not keyword_set(tmp_dir) then tmp_dir = filepath('jsoc_cache',root = GETENV('IDL_TMPDIR'))
@@ -42,10 +43,14 @@ pro gx_box_prepare_box_as, time, centre, size_pix, dx_km, out_dir = out_dir, tmp
   if not keyword_set(dx_km) then dx_km = 1000d
   if not keyword_Set(size_pix) then size_pix = [128,128,64]
   
-  if not keyword_set(hmi_files) then begin
+  if not keyword_set(hmi_files) && not keyword_set(hmi_dir) then begin
     files = gx_box_download_hmi_data(time, tmp_dir, time_window = HMI_time_window)
   endif else begin
-    files = hmi_files
+    if keyword_set(hmi_files) then begin
+        files = hmi_files
+     endif else begin ; hmi_dir
+        files = gx_box_prepare_by_cache_dir(time, hmi_dir)
+     endelse      
   endelse
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
