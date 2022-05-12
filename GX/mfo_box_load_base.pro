@@ -1,6 +1,7 @@
 pro mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , dx_maxsize = dx_maxsize, dx_kmc = dx_kmc, centre = centre $
                 , box = box, save_pbox = save_pbox, pbox = pbox $
+                , hmi_files = hmi_files, hmi_dir = hmi_dir $
                 , aia_uv = aia_uv, aia_euv = aia_euv $
                 , magnetogram = magnetogram, full_Bz = full_Bz, hmi_prep = hmi_prep
 
@@ -39,6 +40,9 @@ pro mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     print, '***** dx_km = ' + asu_compstr(dx_kmc) + ', box = ' + asu_compstr(size_pix[0]) + ' x ' + asu_compstr(size_pix[1]) + ' x ' + asu_compstr(size_pix[2])
      
     gx_box_prepare_box_as, obstime, centre, size_pix, dx_kmc, out_dir = out_dir, tmp_dir = tmp_dir $
-                      , box = box, make_pbox = save_pbox, pbox = pbox, aia_uv = aia_uv, aia_euv = aia_euv, magnetogram = magnetogram, full_Bz = full_Bz, hmi_prep = hmi_prep
+                         , box = box, make_pbox = save_pbox, pbox = pbox $
+                         , hmi_files = hmi_files, hmi_dir = hmi_dir $
+                         , aia_uv = aia_uv, aia_euv = aia_euv $
+                         , magnetogram = magnetogram, full_Bz = full_Bz, hmi_prep = hmi_prep
 
 end

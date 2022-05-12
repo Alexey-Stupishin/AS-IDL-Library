@@ -1,44 +1,49 @@
-pro l_work_mfo_box_load_by_cache_call, t, ar, xx, yy, pict_dir, km
-    dll_location = 's:\Projects\Physics104_291\ProgramD64\WWNLFFFReconstruction.dll'
-    mfo_box_load, t, ar, xx, yy $
-                , km, 'd:\UData\SDOBoxes', 'd:\UCache\HMI', pict_dir = pict_dir, /winclose, /save_sst, /no_sel_check, aia_euv = [171], dll_location = dll_location
-;                , km, 'd:\UData\SDOBoxes', 'd:\UCache\HMI', pict_dir = pict_dir, /winclose, /no_NLFFF, /no_sel_check, aia_euv = [171], dll_location = dll_location
+pro l_work_mfo_box_load_by_cache_call, t, xx, yy, km, get_from, write_to
+    dll_location = 's:\Projects\Physics\ProgramD64\WWNLFFFReconstruction.dll'
+    mfo_box_load, t, '', xx, yy $
+                , km, write_to, '' $
+                , hmi_dir = get_from $
+                , /no_sel_check, /save_pbox $
+                , dll_location = dll_location
 end
 
 pro work_mfo_box_load_by_cache
 
-src = 'hale_find'
-wdir = 's:\University\Work\NewIterations\IsolatedNormal2011-2021work'
-listfilename = wdir + path_sep() + src + '.csv'
-repfile = wdir + path_sep() + src + '_report.txt'
+hmi_main = 'g:\BIGData\UCache\HMI'
+res_main = 's:\University\Work\Jets\conf4hmi4savRes' 
+conf_dir = 's:\University\Work\Jets\conf4hmi4sav'
 
-dlat = 0 ; 50
-dlon = 0 ; 150
-mode = 1;
+now = systime()
+while (((pos = strpos(now, ' '))) ne -1) do strput, now, '_', pos
+while (((pos = strpos(now, ':'))) ne -1) do strput, now, '_', pos
 
-res = read_ascii(listfilename, template = mfo_box_load_template(mode))
+openw, U, res_main + path_sep() + 'report_' + now + '.txt', /GET_LUN
 
-openw, U, repfile, /GET_LUN
-
-for k = 0, n_elements(res.AR)-1 do begin
+configs = file_search(filepath('config*.json', root_dir = conf_dir))
+for k = 0, n_elements(configs)-1 do begin
     CATCH, err_status
     if err_status ne 0 then begin
-        printf, U, title + '  -> Error! ' + !ERROR_STATE.MSG
+        printf, U, write_to + '  -> Error! ' + !ERROR_STATE.MSG
         flush, U
         CATCH, /CANCEL
         continue
     endif
 
-    km = 1000
-    if mode ne 0 then begin
-        km = res.km[k]
-    endif
+    write_to = 'prepare'
     
-    horz = [res.yfrom[k]-dlon, res.yto[k]+dlon]
-    vert = [res.xfrom[k]-dlat, res.xto[k]+dlat]
-    title = res.date[k] + ' ' + res.time[k] + ' ' + asu_compstr(res.AR[k]) + ' ' + asu_compstr(horz[0]) + ' ' + asu_compstr(horz[1]) + ' ' + asu_compstr(vert[0]) + ' ' + asu_compstr(vert[1]) + ' '
-    l_work_mfo_box_load_by_cache_call, res.date[k] + ' ' + res.time[k], asu_compstr(res.AR[k]), horz, vert, wdir, km
-    printf, U, title + '  -> Successfully'
+    km = 1000
+    config_data = asu_read_json_config(configs[k])
+    time_start = config_data["TIME_START"] 
+    get_from = hmi_main + path_sep() + strmid(time_start, 0, 10)
+    write_to = res_main + path_sep() + strmid(time_start, 0, 10)
+    file_mkdir, write_to
+    szx = config_data["WIDTH_PIX"]*0.57  
+    szy = config_data["HEIGHT_PIX"]*0.57
+    xx = config_data["X_CENTER"] + [-1, 1]*szx/2d
+    yy = config_data["Y_CENTER"] + [-1, 1]*szy/2d
+
+    l_work_mfo_box_load_by_cache_call, time_start, xx, yy, km, get_from, write_to
+    printf, U, write_to + '  -> Successfully'
     flush, U
     
 endfor

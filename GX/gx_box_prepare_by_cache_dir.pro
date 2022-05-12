@@ -3,7 +3,7 @@ function gx_box_prepare_by_cache_dir, time, hmi_dir
 hmi_files = !NULL
 
 ds = [       'hmi.B_720s','hmi.B_720s','hmi.B_720s',  'hmi.B_720s','hmi.M_720s',   'hmi.Ic_noLimbDark_720s']
-needFiles = ['field',     'azimuth',   'inclination', 'disambig',  'magnrtogram',  'continuum']
+needFiles = ['field',     'azimuth',   'inclination', 'disambig',  'magnetogram',  'continuum']
 
 ; find all 'field's
 t = anytim(time)
@@ -18,12 +18,14 @@ dmin = min(deltas, im)
 if dmin gt 2880 then return, !NULL
 
 hmi_files = {field:'', inclination:'', azimuth:'', disambig:'', magnetogram:'', continuum:''}
-tt = asu_extract_time(field_files[k], out_style = 'asu_time_short')
+tt = asu_extract_time(field_files[im], out_style = 'asu_time_short')
 for i = 0, n_elements(ds)-1 do begin
-    hmi_files.(i) = ds[i] + '.' + tt + '_TAI.' + needFiles[i] + '.fits' 
+    hmi_files.(i) = hmi_dir + path_sep() + ds[i] + '.' + tt + '_TAI.' + needFiles[i] + '.fits' 
 endfor
 
 ; AIA ?
+
+return, hmi_files
 
 end
     

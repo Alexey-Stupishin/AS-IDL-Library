@@ -36,14 +36,14 @@ pro gx_box_prepare_box_as, time, centre, size_pix, dx_km, out_dir = out_dir, tmp
                   HMI_time_window = HMI_time_window, AIA_time_window = AIA_time_window,$
                   box = box, pbox = pbox, hmi_files = hmi_files, hmi_dir = hmi_dir, $
                   magnetogram = magnetogram, full_Bz = full_Bz, hmi_prep = hmi_prep
-  if not keyword_set(out_dir) then cd, current = out_dir
-  if not file_test(out_dir) then file_mkdir, out_dir
-  if not keyword_set(tmp_dir) then tmp_dir = filepath('jsoc_cache',root = GETENV('IDL_TMPDIR'))
-  if not file_test(tmp_dir) then file_mkdir, tmp_dir
-  if not keyword_set(dx_km) then dx_km = 1000d
-  if not keyword_Set(size_pix) then size_pix = [128,128,64]
+  if ~keyword_set(out_dir) then cd, current = out_dir
+  if ~file_test(out_dir) then file_mkdir, out_dir
+  if ~keyword_set(tmp_dir) then tmp_dir = filepath('jsoc_cache',root = GETENV('IDL_TMPDIR'))
+  if ~file_test(tmp_dir) then file_mkdir, tmp_dir
+  if ~keyword_set(dx_km) then dx_km = 1000d
+  if ~keyword_Set(size_pix) then size_pix = [128,128,64]
   
-  if not keyword_set(hmi_files) && not keyword_set(hmi_dir) then begin
+  if ~keyword_set(hmi_files) && ~keyword_set(hmi_dir) then begin
     files = gx_box_download_hmi_data(time, tmp_dir, time_window = HMI_time_window)
   endif else begin
     if keyword_set(hmi_files) then begin
@@ -53,6 +53,7 @@ pro gx_box_prepare_box_as, time, centre, size_pix, dx_km, out_dir = out_dir, tmp
      endelse      
   endelse
 
+  if files eq !NULL then return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;files.field = "f:\BIGData\UCache\2013-11-19_corr\hmi.B_720s.20131119_090000_TAI.field.cor.fits"
 ;files.inclination = "f:\BIGData\UCache\2013-11-19_corr\hmi.B_720s.20131119_090000_TAI.inclination.cor.fits"
