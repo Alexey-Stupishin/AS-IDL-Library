@@ -44,7 +44,7 @@ pro gx_box_prepare_box_as, time, centre, size_pix, dx_km, out_dir = out_dir, tmp
   if ~keyword_Set(size_pix) then size_pix = [128,128,64]
   
   if ~keyword_set(hmi_files) && ~keyword_set(hmi_dir) then begin
-    files = gx_box_download_hmi_data(time, tmp_dir, time_window = HMI_time_window)
+    files = gx_box_download_hmi_data_as(time, tmp_dir, time_window = HMI_time_window)
   endif else begin
     if keyword_set(hmi_files) then begin
         files = hmi_files

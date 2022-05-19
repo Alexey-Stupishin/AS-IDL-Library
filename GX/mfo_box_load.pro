@@ -101,7 +101,7 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , aia_uv = aia_uv, aia_euv = aia_euv $
                 , pict_dir = pict_dir, pict_win = pict_win, sun_graph = sun_graph, ph_graph = ph_graph $
                 , x_mag = x_mag, y_mag = y_mag, full_Bz = full_Bz $
-                , bmax = bmax $
+                , bmax = bmax, blim = blim $
                 , no_title_prefix = no_title_prefix $
                 , find_B_region = find_B_region $
                 , hmi_prep = hmi_prep $
@@ -120,6 +120,9 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     
     bb = sqrt(box.bx^2+box.by^2+box.bz^2)
     bmax = max(bb[*,*,0])
+    if n_elements(blim) gt 0 && bmax lt blim then begin
+        message, 'Small field'    
+    endif
     title = anytim(obstime, out_style = 'ECS') + ', [' + asu_compstr(fix(centre[0])) + ', ' + asu_compstr(fix(centre[1])) + '], Bmax = ' + asu_compstr(fix(bmax))
     if n_elements(no_title_prefix) eq 0 || no_title_prefix eq 0 then title += ' <' + prefix +'>'
     pict_win = window(dimensions = windim, WINDOW_TITLE = title)
@@ -149,8 +152,8 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     yax.tickdir = 1
     
     if keyword_set(pict_dir) && pict_dir ne '' then begin
-        outfile = pict_dir + path_sep() + asu_str2filename(anytim(obstime, out_style = 'ECS') $
-                + '_' + asu_compstr(fix(centre[0])) + '_' + asu_compstr(fix(centre[1]))) + '_' + asu_compstr(fix(bm)) + '.png'
+        outfile = pict_dir + path_sep() + asu_str2filename(anytim(obstime, out_style = 'ECS')) $
+                + '_' + asu_compstr(fix(centre[0])) + '_' + asu_compstr(fix(centre[1])) + '_' + asu_compstr(fix(bmax)) + '.png'
         pict_win.Save, outfile, width = windim[0], height = windim[1], bit_depth = 2
     endif
     if keyword_set(winclose)then begin
