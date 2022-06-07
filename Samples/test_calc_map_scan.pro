@@ -12,6 +12,7 @@ filename = dirpath + '12470_hmi.M_720s.20151218_125809.W86N13CR.CEA.NAS_1000.sav
 ;filename = getenv('mfo_NLFFF_filename')
 ;     либо задать путь к файлу явно
 ;filename = 'c:\temp\mod_dipole.sav'
+filename = 'g:\BIGData\UData\SDOBoxes\12470_hmi.M_720s.20151218_125809.W86N13CR.CEA.NAS.sav'
  
 restore, filename ; GX-box
 
@@ -41,7 +42,7 @@ ptr = reo_prepare_calc_map( $
     , field = field $ ; вернет полное поле на фотосфере, как мы видим его с Земли
 ;    , /model $
 ;    
-    , dll_location = 's:\Projects\Physics104_291\ProgramD64\agsGeneralRadioEmission.dll' $
+;    , dll_location = 's:\Projects\Physics104_291\ProgramD64\agsGeneralRadioEmission.dll' $
 ;    , dll_location = 's:\Projects\IDL\ASlibrary\REO\agsGeneralRadioEmission.dll' $
      
     , version_info = version_info $ ; когда, где и в какой версии библиотеки мы работаем - для контроля
@@ -117,6 +118,7 @@ pLCEx = plot(xarc, scanLCEx, '--g2', OVERPLOT = pL)
 
 ;---------------------------------------------------------------------------------------
 ; используем маску для работы с разными моделями ---------------------------------------
+; NB! Этот раздел отчасти устарел, лучше работать с маской по континууму ---------------
 B_threshold = 1800 ; порог 1800 Гаусс
 
 ;  выделяем поле больше порога

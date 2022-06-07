@@ -107,6 +107,9 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , hmi_prep = hmi_prep $
                 , _extra = _extra 
                 
+version_info = ''
+NLFFF_filename = ''
+
 ; ----- BASE -----
 mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , dx_maxsize = dx_maxsize, dx_kmc = dx_kmc, centre = centre $
@@ -219,8 +222,6 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     endif
           
 ; ----- NLFFF+SAVE -----
-    
-    NLFFF_filename = ''
     if not keyword_set(dll_location) then begin
         pro2searchDLL = 'gx_box_make_nlfff_wwas_field'
         resolve_routine, pro2searchDLL, /compile_full_file, /either
@@ -232,7 +233,6 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     message, 'Performing NLFFF extrapolation (can take some minutes, or tens of minutes) ...', /cont
     t0 = systime(/seconds)
       
-    version_info = ''
     return_code = gx_box_make_nlfff_wwas_field(dll_location, box, version_info = version_info, _extra = _extra)
       
     message, strcompress(string(systime(/seconds)-t0,format="('NLFFF extraplolation performed in ',g0,' seconds')")), /cont
