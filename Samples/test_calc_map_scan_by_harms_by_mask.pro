@@ -115,25 +115,25 @@ cnt = 0
 xrange = [min(freqs)*0.95, max(freqs)*1.05]
 asu_plt_winplot, cnt, 'Right spectra', winsize
 yrange = [0, max(total(maxR, 1))*1.05]
-plot, freqs, total(maxR, 1), xrange = xrange, yrange = yrange, xstyle = 1, xtitle = 'Position, arcsec', ytitle = 'Flux, s.f.u./arcsec', thick = 2
+plot, freqs, total(maxR, 1), xrange = xrange, yrange = yrange, xstyle = 1, xtitle = 'Frequency, Hz', ytitle = 'Flux, s.f.u./arcsec', thick = 2
 for hind = 0, nharms-1 do begin
     oplot, freqs, maxR[hind, *], color = colors[hind], thick = 2
 endfor    
 asu_plt_winplot, cnt, 'Right spectra, Total', winsize
 yrange = [0, max(total(totR, 1))*1.05]
-plot, freqs, total(totR, 1), xrange = xrange, yrange = yrange, xstyle = 1, xtitle = 'Position, arcsec', ytitle = 'Flux, s.f.u.', thick = 2
+plot, freqs, total(totR, 1), xrange = xrange, yrange = yrange, xstyle = 1, xtitle = 'Frequency, Hz', ytitle = 'Flux, s.f.u.', thick = 2
 for hind = 0, nharms-1 do begin
     oplot, freqs, totR[hind, *], color = colors[hind], thick = 2
 endfor    
 asu_plt_winplot, cnt, 'Left spectra', winsize
 yrange = [0, max(total(maxL, 1))*1.05]
-plot, freqs, total(maxL, 1), xrange = xrange, yrange = yrange, xstyle = 1, xtitle = 'Position, arcsec', ytitle = 'Flux, s.f.u./arcsec', thick = 2
+plot, freqs, total(maxL, 1), xrange = xrange, yrange = yrange, xstyle = 1, xtitle = 'Frequency, Hz', ytitle = 'Flux, s.f.u./arcsec', thick = 2
 for hind = 0, nharms-1 do begin
     oplot, freqs, maxL[hind, *], color = colors[hind], thick = 2
 endfor    
 asu_plt_winplot, cnt, 'Left spectra, Total', winsize
 yrange = [0, max(total(totL, 1))*1.05]
-plot, freqs, total(totL, 1), xrange = xrange, yrange = yrange, xstyle = 1, xtitle = 'Position, arcsec', ytitle = 'Flux, s.f.u.', thick = 2
+plot, freqs, total(totL, 1), xrange = xrange, yrange = yrange, xstyle = 1, xtitle = 'Frequency, Hz', ytitle = 'Flux, s.f.u.', thick = 2
 for hind = 0, nharms-1 do begin
     oplot, freqs, totL[hind, *], color = colors[hind], thick = 2
 endfor    

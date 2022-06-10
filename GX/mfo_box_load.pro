@@ -223,9 +223,11 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
           
 ; ----- NLFFF+SAVE -----
     if not keyword_set(dll_location) then begin
-        pro2searchDLL = 'gx_box_make_nlfff_wwas_field'
-        resolve_routine, pro2searchDLL, /compile_full_file, /either
-        dirpath = file_dirname((ROUTINE_INFO(pro2searchDLL, /source, /functions)).path, /mark)
+        ;pro2search = 'gx_box_make_nlfff_wwas_field'
+        ;resolve_routine, pro2search, /compile_full_file, /either
+        ;dirpath = file_dirname((ROUTINE_INFO(pro2search, /source, /functions)).path, /mark)
+        pro2search = 'mfo_box_load'
+        dirpath = file_dirname((ROUTINE_INFO(pro2search, /source)).path, /mark)
         dll_location = dirpath + 'WWNLFFFReconstruction.dll'
     endif
     if not keyword_set(version) then version = 1

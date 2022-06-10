@@ -7,12 +7,13 @@ pro test_calc_map_profile
 ;---------------------------------------------------------------------------------------
 ; загрузка GX-box ----------------------------------------------------------------------
 ;     пример из поставляемого пакета:
-dirpath = file_dirname((ROUTINE_INFO('test_calc_map_profile', /source)).path, /mark)
-filename = dirpath + '12470_hmi.M_720s.20151216_085809.W85N12CR.CEA.NAS(_1000).sav' 
+;dirpath = file_dirname((ROUTINE_INFO('test_calc_map_profile', /source)).path, /mark)
+;filename = dirpath + '12470_hmi.M_720s.20151216_085809.W85N12CR.CEA.NAS(_1000).sav' 
 ;     либо использовать путь, сохраненный в примере test_mfo_box_load:
 ;filename = getenv('mfo_NLFFF_filename')
 ;     либо задать путь к файлу явно
 ;filename = 'c:\temp\mod_dipole.sav'
+filename = 'g:\BIGData\UData\SDOBoxes\12470_hmi.M_720s.20151218_125809.W86N13CR.CEA.NAS.sav' 
  
 restore, filename ; GX-box
 
@@ -157,7 +158,7 @@ asu_plt_winplot, cnt, 'cos(angle)', winsize
 yrange = [min(cosB), max(cosB)]
 yrange[0] *= yrange[0] lt 0 ? 1.05 : 0.95 
 yrange[0] = -1 > yrange[0] < 1 
-yrange[1] *= yrange[1] lt 0 ? 1.05 : 0.95 
+yrange[1] *= yrange[1] gt 0 ? 1.05 : 0.95 
 yrange[1] = -1 > yrange[1] < 1 
 plot, [0], xrange = [0, max(hB)*1.05], yrange = yrange, xtitle = 'Height, cm', ytitle = 'cos(angle), -'
 oplot, hB, cosB, thick = 2
