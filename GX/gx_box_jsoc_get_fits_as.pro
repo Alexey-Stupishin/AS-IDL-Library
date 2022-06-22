@@ -132,15 +132,23 @@ function gx_box_jsoc_get_fits_as, t1, t2, ds, segment, cache_dir, wave = wave
 
 query = gx_box_jsoc_make_query_as(t1, t2, ds, segment, wave = wave)
 ssw_jsoc_time2data, t1, t2, index, urls, /urls_only, ds=ds, segment = segment, wave = wave, count = count
+if n_elements(index) eq 0 then begin
+    s = 'can not get urls/index for ds ="' + ds + '"'
+    if n_elements(wave) gt 0 then s += ' and wave = ' + strcompress(wave)
+    message, s, /info
+    message, 'execution terminated', /info
+    return , ''
+endif
   
 local_file = gx_box_jsoc_try_cache_as(cache_dir, query, index, ds, segment, wave = wave)
   
 if local_file ne '' then return, local_file
   
 if n_elements(urls) eq 0 then begin
-    s = 'can not download data for ds ="' + ds
-    if n_elements(wave) gt 0 then s += '" and wave = ' + strcompress(wave)
+    s = 'can not download data for ds ="' + ds + '"'
+    if n_elements(wave) gt 0 then s += ' and wave = ' + strcompress(wave)
     message, s, /info
+    message, 'execution terminated', /info
     return , ''
 endif
   

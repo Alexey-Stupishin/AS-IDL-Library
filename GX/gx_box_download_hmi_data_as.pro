@@ -27,7 +27,9 @@ compile_opt idl2
   files = {field:'',inclination:'',azimuth:'',disambig:'',magnetogram:'',continuum:''}
   
   for i = 0, n_elements(ds)-1 do begin
-    files.(i) = gx_box_jsoc_get_fits_as(t1, t2, ds[i], segment[i], tmp_dir)
+    get_file = gx_box_jsoc_get_fits_as(t1, t2, ds[i], segment[i], tmp_dir)
+    if strlen(get_file) eq 0 then return, !NULL
+    files.(i) = get_file
   endfor
   
  return, files

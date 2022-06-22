@@ -53,7 +53,9 @@ pro gx_box_prepare_box_as, time, centre, size_pix, dx_km, out_dir = out_dir, tmp
      endelse      
   endelse
 
+  box = !NULL
   if files eq !NULL then return
+  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;files.field = "f:\BIGData\UCache\2013-11-19_corr\hmi.B_720s.20131119_090000_TAI.field.cor.fits"
 ;files.inclination = "f:\BIGData\UCache\2013-11-19_corr\hmi.B_720s.20131119_090000_TAI.inclination.cor.fits"

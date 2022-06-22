@@ -1,18 +1,20 @@
-function asu_atm_init_profile, H, Temp, Dens
+function asu_atm_init_profile, H, Temp, Dens, fixrange = fixrange
 compile_opt idl2
 
+if n_elements(fixrange) eq 0 then fixrange = []
 set = hash()
-set['base'] = {H:H, T:Temp, D:Dens}
+set['base'] = {H:H, T:Temp, D:Dens, fixed:fixrange}
 
 return, set
 
 end
 
 ;--------------------------------------------------------------------
-function asu_atm_add_profile, set, mask_n, H, Temp, Dens
+function asu_atm_add_profile, set, mask_n, H, Temp, Dens, fixrange = fixrange
 compile_opt idl2
 
-set[mask_n] = {H:H, T:Temp, D:Dens}
+if n_elements(fixrange) eq 0 then fixrange = []
+set[mask_n] = {H:H, T:Temp, D:Dens, fixed:fixrange}
 
 return, set
 
