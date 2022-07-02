@@ -128,18 +128,21 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     if n_elements(blim) gt 0 && bmax lt blim then begin
         message, 'Small field'    
     endif
-    title = anytim(obstime, out_style = 'ECS') + ', [' + asu_compstr(fix(centre[0])) + ', ' + asu_compstr(fix(centre[1])) + '], Bmax = ' + asu_compstr(fix(bmax))
+    showtime = anytim(obstime, out_style = 'ECS')
+    parser = stregex(showtime, '([0-9/]+ [0-9][0-9]:[0-9][0-9]).*',/subexpr,/extract,/fold_case)
+    title = 'AR Top View, ' + parser[1] + ', [' + asu_compstr(fix(centre[0])) + ', ' + asu_compstr(fix(centre[1])) + '], Bmax = ' + asu_compstr(fix(bmax))
     if n_elements(no_title_prefix) eq 0 || no_title_prefix eq 0 then title += ' <' + prefix +'>'
     pict_win = window(dimensions = windim, WINDOW_TITLE = title)
     ;ph_graph = contour(box.bz[*,*,0], RGB_TABLE = 0, N_LEVELS=10, ASPECT_RATIO=1.0, LAYOUT=[2,1,1], /FILL, TITLE = title, /CURRENT)
     
+    vtitle = 'Pixels (' + strtrim(string(fix(dx_kmc)), 2) + ' km)'
     sz = size(box.bx)
     x = indgen(sz[1])*box.index.cdelt1
     y = indgen(sz[2])*box.index.cdelt2
     ph_graph = image(box.bz[*,*,0], RGB_TABLE = 0, ASPECT_RATIO=1.0, LAYOUT=[2,1,1], TITLE = title, /CURRENT)
-    xax = axis('X', LOCATION=[x[0],y[0]], target = ph_graph)
+    xax = axis('X', LOCATION=[x[0],y[0]], target = ph_graph, TITLE = vtitle)
     xax.tickdir = 1
-    yax = axis('Y', LOCATION=[x[0],y[0]], target = ph_graph)
+    yax = axis('Y', LOCATION=[x[0],y[0]], target = ph_graph, TITLE = vtitle)
     yax.tickdir = 1
     
     mdata = magnetogram.data
@@ -150,10 +153,10 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     y_mag = (indgen(size_fov[2])-size_fov[2]/2d)*magnetogram.dy + magnetogram.yc
     ;sun_graph = contour(mdata, x, y, RGB_TABLE = 0, N_LEVELS=10, ASPECT_RATIO=1.0, LAYOUT=[2,1,2], /FILL, /CURRENT)
     
-    sun_graph = image(mdata, x_mag, y_mag, RGB_TABLE = 0, ASPECT_RATIO=1.0, LAYOUT=[2,1,2], /CURRENT)
-    xax = axis('X', LOCATION=[x_mag[0],y_mag[0]], target = sun_graph)
+    sun_graph = image(mdata, x_mag, y_mag, RGB_TABLE = 0, ASPECT_RATIO=1.0, LAYOUT=[2,1,2], TITLE = 'Earth View', /CURRENT)
+    xax = axis('X', LOCATION=[x_mag[0],y_mag[0]], target = sun_graph, TITLE = 'arcsec')
     xax.tickdir = 1
-    yax = axis('Y', LOCATION=[x_mag[0],y_mag[0]], target = sun_graph)
+    yax = axis('Y', LOCATION=[x_mag[0],y_mag[0]], target = sun_graph, TITLE = 'arcsec')
     yax.tickdir = 1
     
     if keyword_set(pict_dir) && pict_dir ne '' then begin
