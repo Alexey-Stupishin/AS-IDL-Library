@@ -1,7 +1,7 @@
 function asu_atm_init_profile, H, Temp, Dens, fixrange = fixrange
 compile_opt idl2
 
-if n_elements(fixrange) eq 0 then fixrange = []
+if n_elements(fixrange) eq 0 then fixrange = 0
 set = hash()
 set['base'] = {H:H, T:Temp, D:Dens, fixed:fixrange}
 

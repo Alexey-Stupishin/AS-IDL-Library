@@ -6,9 +6,7 @@ function reo_set_field, ptr, fieldX, fieldY, fieldZ, vcos, step, visstep $
 
 dll_location = getenv('reo_dll_location')
 
-if not keyword_set(posangle) then begin
-    posangle = 0
-endif
+if ~keyword_set(posangle) then posangle = 0
 
 vptr = ulong64(ptr)
 vfieldX = double(transpose(fieldY, [1, 0, 2]))
@@ -29,7 +27,7 @@ vposangle = double(posangle)
 value = bytarr(14)
 value[13] = 1
 
-if not keyword_set(setFOV) then setFOV = 0L else setFOV = 1L
+if ~keyword_set(setFOV) then setFOV = 0L else setFOV = 1L
 
 returnCode = CALL_EXTERNAL(dll_location, 'reoSetField', vptr, vfieldX, vfieldY, vfieldZ, $
                            vM, vM, vvcos, vstep, vbaseP, vvisstep, vposangle, Mout, base, setFOV, VALUE = value)
