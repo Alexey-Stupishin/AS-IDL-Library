@@ -2,7 +2,6 @@ function asu_get_dipole_model, req_depth, req_Bph, filename = filename, maxB = m
 
 if n_elements(filename) eq 0 then begin
     dirpath = file_dirname((ROUTINE_INFO('asu_get_dipole_model', /source, /functions)).path, /mark)
-    ;filename = dirpath + 'dipole_1Mm_1G_1arc_largeFOV.sav'
     filename = dirpath + 'dipole_1Mm_1G_500km_largeFOV.sav'
 endif 
 restore, filename
