@@ -46,9 +46,10 @@ endif
 
 print, version_info
 
-Height =    [  1, 1e8, 1.2e8, 2e10]
-Temperature = [4e3, 4e3, 2e6,   2e6]
-Density = 1d16/Temperature
+restore, 'd:\SSW\packages\my_packages\detsad\harmoniks\11312_p1_r1.sav'
+;Height =    [  1, 1e8, 1.2e8, 2e10]
+;Temperature = [4e3, 4e3, 2e6,   2e6]
+;Density = 1d16/Temperature
 
 taus = [1, 100]
 harmonics = [2, 3, 4]
@@ -72,7 +73,7 @@ for frind = 0, nfreqs-1 do begin
         ; радиокарты только тех пикселей, где опт. толщина достигает 1 на h-гармонике
         ; (функция описана в нвчале файла)
         resR = reo_map_scan_part_by_harms_get_s(allharms[hind], FluxR, shR[*, *, 0])
-        resL = reo_map_scan_part_by_harms_get_s(allharms[hind], FluxL, shR[*, *, 0])
+        resL = reo_map_scan_part_by_harms_get_s(allharms[hind], FluxL, shL[*, *, 0])
         ; Cканы    
         rcr = reo_convolve_map(ptr, resR, freqs[frind], scanR)
         rcr = reo_convolve_map(ptr, resL, freqs[frind], scanL)
