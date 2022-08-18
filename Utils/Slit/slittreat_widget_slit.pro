@@ -127,19 +127,24 @@ compile_opt idl2
 common G_ASS_SLIT_WIDGET, global
 
 asw_control, 'SLIT', GET_VALUE = drawID
-WSET, drawID
-;!p.background = 'FFFFFF'x
-device, decomposed = 0
-loadct, 0, /silent
+asw_control, 'FLUX', GET_VALUE = fluxID
 
 if global['timedist'] eq !NULL then begin
     asw_control, 'TDFROM', SET_VALUE = ''
     asw_control, 'TDTO', SET_VALUE = ''
     asw_control, 'TDLNG', SET_VALUE = ''
     asw_control, 'TDCOORDS', SET_VALUE = ''
+    WSET, drawID
+    erase
+    WSET, fluxID
     erase
     return
 endif
+
+WSET, drawID
+!p.background = '000000'x
+device, decomposed = 0
+loadct, 0, /silent
 
 pos = global['slitcontr']
 
@@ -194,6 +199,23 @@ xy1 = round(xy_to)
 asw_control, 'TDFROM', SET_VALUE = asu_extract_time(ind0.date_obs, out_style = 'asu_time_std')
 asw_control, 'TDTO', SET_VALUE = asu_extract_time(ind1.date_obs, out_style = 'asu_time_std')
 asw_control, 'TDCOORDS', SET_VALUE = string(xy0[0], xy0[1], xy1[0], xy1[1], FORMAT = '(%"(%d\x22, %d\x22)   -   (%d\x22, %d\x22)")') 
+
+WSET, fluxID
+!p.background = '000000'x
+device, decomposed = 1
+
+str = global['straight']
+sz = size(str)
+p0 = (sz[1]-1)/2
+from = p0-global['slitwidth']+1
+to   = p0+global['slitwidth']-1
+slit = str[from:to, *, *]
+flux_p = total(slit, 1)
+flux = total(flux_p, 1)
+;flux = total(td0, 2)
+flux = flux/flux[0]
+plot, x_arg, flux, xrange = xrange, xstyle = 1, xmargin = global['xmargin'], ymargin = global['ymargin'], thick = 1, color = 'FFFFFF'x, xtitle = 'Time, min', ytitle = 'Rel. Flux, -'
+oplot, [p, p], [0, yrange[1]], color = 'FF0000'x, thick = 1.5
 
 end
 
@@ -275,6 +297,28 @@ if file eq '' then return
 WIDGET_CONTROL, /HOURGLASS
 
 asw_control, 'SLIT', GET_VALUE = drawID
+WSET, drawID
+write_png, file, tvrd(true=1)
+pref['export_path'] = path
+save, filename = pref['pref_path'], pref
+
+end
+
+;----------------------------------------------------------------------------------
+pro ass_slit_widget_export_flux
+compile_opt idl2
+
+common G_ASS_SLIT_WIDGET, global
+common G_ASS_SLIT_WIDGET_PREF, pref
+common G_ASW_WIDGET, asw_widget
+
+fname = 'Flux-' + global['proj_name']
+file = dialog_pickfile(DEFAULT_EXTENSION = 'png', FILTER = ['*.png'], GET_PATH = path, PATH = pref['export_path'], file = fname, /write, /OVERWRITE_PROMPT)
+if file eq '' then return
+
+WIDGET_CONTROL, /HOURGLASS
+
+asw_control, 'FLUX', GET_VALUE = drawID
 WSET, drawID
 write_png, file, tvrd(true=1)
 pref['export_path'] = path

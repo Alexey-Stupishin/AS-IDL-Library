@@ -307,8 +307,10 @@ case eventval of
                 ass_slit_widget_store_arc_range, ind[0]
                 global['byte_list'] = !NULL
                 global['slit_list'] = !NULL
-                asw_control, 'FITWIN', SET_BUTTON = 1
-                ass_slit_widget_show_image, mode = 'FITWIN'
+;                asw_control, 'FITWIN', SET_BUTTON = 1
+;                ass_slit_widget_show_image, mode = 'FITWIN'
+                asw_control, 'ACTSIZE', SET_BUTTON = 1
+                ass_slit_widget_show_image, mode = 'ACTSIZE'
                 asw_control, 'SLIDER', SET_SLIDER_MIN = 1
                 asw_control, 'SLIDER', SET_SLIDER_MAX = sz[3]
                 asw_control, 'SLIDER', SET_VALUE = global['currpos'] + 1
@@ -557,6 +559,16 @@ case eventval of
         ass_slit_widget_export
     end
 
+    'EXPFLUX' : begin
+        if global['straight'] eq !NULL then begin
+            result = DIALOG_MESSAGE('Nothing to export!', title = 'SlitTreat Error', /ERROR)
+            return
+        endif    
+        
+        WIDGET_CONTROL, /HOURGLASS
+        ass_slit_widget_export_flux
+    end
+
     'EXPSAV' : begin
         if global['straight'] eq !NULL then begin
             result = DIALOG_MESSAGE('Nothing to export!', title = 'SlitTreat Error', /ERROR)
@@ -658,7 +670,7 @@ global['modified'] = 0
 global['maxslitwidth'] = 100
 winsize = [800, 800]
 global['winsize'] = winsize
-slitsize = [800, 400]
+slitsize = [800, 350]
 global['slitsize'] = slitsize
 
 pref['path'] = ''
@@ -729,8 +741,14 @@ mainrow = WIDGET_BASE(base, /row)
         clearapprbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Clear Approx.', UVALUE = 'CLEARAPPR', XSIZE = 120)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
         exportimage = WIDGET_BUTTON(ctrlcol, VALUE = 'Export Image ...', UVALUE = 'EXPIMAGE', XSIZE = 120)
+        exportflux = WIDGET_BUTTON(ctrlcol, VALUE = 'Export Flux ...', UVALUE = 'EXPFLUX', XSIZE = 110)
+        exportbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Export T-D ...', UVALUE = 'EXPORT', XSIZE = 110)
+        dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
+        expsavbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'T-D to SAV...', UVALUE = 'EXPSAV', XSIZE = 110)
         
     slitcol = WIDGET_BASE(mainrow, /column, /base_align_left) ;xsize = slitsize[0])
+        fluxhead = WIDGET_LABEL(slitcol, VALUE = 'Flux Dynamics', XSIZE = slitsize[0], UNAME = 'FLUXTEXT', UVALUE = 'FLUXTEXT', /align_center)
+        fluximage = WIDGET_DRAW(slitcol, GRAPHICS_LEVEL = 0, UNAME = 'FLUX', UVALUE = 'FLUX', XSIZE = slitsize[0], YSIZE = slitsize[1], /BUTTON_EVENTS)
         tdcoords = WIDGET_LABEL(slitcol, VALUE = '', XSIZE = slitsize[0], UNAME = 'TDCOORDS', UVALUE = 'TDCOORDS', /align_center)
         slitimage = WIDGET_DRAW(slitcol, GRAPHICS_LEVEL = 0, UNAME = 'SLIT', UVALUE = 'SLIT', XSIZE = slitsize[0], YSIZE = slitsize[1], /BUTTON_EVENTS)
         markrow = WIDGET_BASE(slitcol, /row)
@@ -747,10 +765,6 @@ mainrow = WIDGET_BASE(base, /row)
         BCrow = WIDGET_BASE(slitcol, /row)
             slitcontr = WIDGET_SLIDER(BCrow, VALUE = 0, UNAME = 'SLITCONTR', UVALUE = 'SLITCONTR', XSIZE = slitsize[0]/2, title = 'Time-Distance Contrast')
             slitbright = WIDGET_SLIDER(BCrow, VALUE = 100, UNAME = 'SLITBRIGHT', UVALUE = 'SLITBRIGHT', XSIZE = slitsize[0]/2, title = 'Time-Distance Upper Threshold')
-        dummy = WIDGET_LABEL(slitcol, VALUE = ' ', XSIZE = 40)
-        dummy = WIDGET_LABEL(slitcol, VALUE = ' ', XSIZE = 40)
-        exportbutton = WIDGET_BUTTON(slitcol, VALUE = 'Export T-D ...', UVALUE = 'EXPORT', XSIZE = 110)
-        expsavbutton = WIDGET_BUTTON(slitcol, VALUE = 'T-D to SAV...', UVALUE = 'EXPSAV', XSIZE = 110)
 
 WIDGET_CONTROL, base, /REALIZE
 XMANAGER, 'ass_slit_widget_buttons', base, GROUP_LEADER = GROUP, /NO_BLOCK
