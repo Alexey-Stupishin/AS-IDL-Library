@@ -84,7 +84,7 @@ if global['proj_name'] ne '' then asw_control, 'SLITTREAT', BASE_SET_TITLE = 'Sl
 
 asw_control, 'FROMFILETEXT', SET_VALUE = global['fromfile']
 asw_control, 'TOFILETEXT', SET_VALUE = global['tofile']
-asw_control, global['drawmode'], SET_BUTTON = 1
+asw_control, global['drawmode'], SET_BUTTON = 2
 asw_control, 'ORDER', SET_DROPLIST_SELECT = ass_slit_widget_fit_orders(idx = global['fit_order'], mode = 'index')
 sz = size(global['data_list'])
 asw_control, 'SLIDER', SET_SLIDER_MIN = 1
@@ -99,6 +99,7 @@ asw_control, 'SLITWIDTH', SET_VALUE = global['slitwidth']
 asw_control, global['slitmode'], SET_BUTTON = 1
 
 asw_control, 'EDITAPPR', SET_BUTTON = 0
+asw_control, 'ACTTIME', SET_BUTTON = 0
 
 asw_control, 'SLITCONTR', SET_VALUE = global['slitcontr']
 asw_control, 'SLITBRIGHT', SET_VALUE = global['slitbright']
@@ -278,13 +279,13 @@ case eventval of
         ass_slit_widget_show_slit
     end
         
-    'ACTSIZE' : begin
-        if event.select eq 0 then return
-        ass_slit_widget_show_image, mode = 'ACTSIZE' 
-    end
     'FITWIN' : begin
         if event.select eq 0 then return
         ass_slit_widget_show_image, mode = 'FITWIN'
+    end
+    'ACTSIZE' : begin
+        if event.select eq 0 then return
+        ass_slit_widget_show_image, mode = 'ACTSIZE' 
     end
     'SELWIN' : begin
         if event.select eq 0 then return
@@ -295,20 +296,19 @@ case eventval of
         ;if ass_slit_widget_need_save() then return 
         WIDGET_CONTROL, /HOURGLASS
         ass_slit_widget_cleanup
-        global['data_list'] = asu_get_file_sequence_data(pref['path'], global['fromfile'], global['tofile'], ind = ind, err = err)
+        global['data_list'] = asu_get_file_sequence_data(pref['path'], global['fromfile'], global['tofile'], ind = ind, err = err, cadence = cadence, jd_list = jd_list)
         global['data_ind'] = ind 
         case err of
             1: result = DIALOG_MESSAGE('Please select both first and last files!', title = 'SlitTreat Error', /ERROR)
             2: result = DIALOG_MESSAGE('Not enough files found!', title = 'SlitTreat Error', /ERROR)
             else: begin
                 sz = size(global['data_list'])
-                global['cadence'] = (anytim(ind[sz[3]-1].date_obs) - anytim(ind[0].date_obs)) / (sz[3]-1)
+                global['cadence'] = cadence
+                global['jd_list'] = jd_list
                 global['currpos'] = 0
                 ass_slit_widget_store_arc_range, ind[0]
                 global['byte_list'] = !NULL
                 global['slit_list'] = !NULL
-;                asw_control, 'FITWIN', SET_BUTTON = 1
-;                ass_slit_widget_show_image, mode = 'FITWIN'
                 asw_control, 'ACTSIZE', SET_BUTTON = 1
                 ass_slit_widget_show_image, mode = 'ACTSIZE'
                 asw_control, 'SLIDER', SET_SLIDER_MIN = 1
@@ -382,6 +382,10 @@ case eventval of
     'EDITAPPR' : begin
         global['appredit'] = widget_info(asw_getctrl('EDITAPPR'), /BUTTON_SET)
         ass_slit_widget_show_image
+    end
+    
+    'ACTTIME' : begin
+        ass_slit_widget_show_slit
     end
 
     'CLEAR' : begin
@@ -471,6 +475,10 @@ case eventval of
     end
 
     ;------ slit
+    'ACTTIME' : begin
+        ass_slit_widget_show_slit
+    end
+
     'SLIT' : begin
         if global['straight'] eq !NULL then return
         if global['data_ind'] eq !NULL then return
@@ -587,6 +595,10 @@ pro ass_slit_widget_add_keys
 
 common G_ASS_SLIT_WIDGET, global
 
+if global['data_ind'] ne !NULL && ~global.hasKey('jd_list') then begin
+    global['jd_list'] = asu_get_sequence_juldates(global['data_ind'])
+endif
+
 end
 
 ;----------------------------------------------------------------------------------
@@ -597,6 +609,7 @@ common G_ASS_SLIT_WIDGET_PREF, pref
 
 global['data_list'] = !NULL
 global['data_ind'] = !NULL 
+global['data_jd'] = !NULL 
 global['slit_list'] = !NULL
 global['byte_list'] = !NULL
 global['byte_info'] = !NULL
@@ -690,18 +703,26 @@ endif
 base = WIDGET_BASE(TITLE = 'SlitTreat', UNAME = 'SLITTREAT', /column, /TLB_KILL_REQUEST_EVENTS)
 asw_widget['widbase'] = base
 
-filecol = WIDGET_BASE(base, /column)
-    fromrow = WIDGET_BASE(filecol, /row)
-        dummy = WIDGET_LABEL(fromrow, VALUE = 'From: ', XSIZE = 40)
-        fromfiletext = WIDGET_TEXT(fromrow, UNAME = 'FROMFILETEXT', VALUE = '', XSIZE = 120, YSIZE = 1, /FRAME)
-        frombutton = WIDGET_BUTTON(fromrow, VALUE = '...', UVALUE = 'FILEFROM', SCR_XSIZE = 30)
-    torow = WIDGET_BASE(filecol, /row)
-        dummy = WIDGET_LABEL(torow, VALUE = 'To: ', XSIZE = 40)
-        tofiletext = WIDGET_TEXT(torow, UNAME = 'TOFILETEXT', VALUE = '', XSIZE = 120, YSIZE = 1, /FRAME)
-        frombutton = WIDGET_BUTTON(torow, VALUE = '...', UVALUE = 'FILETO', SCR_XSIZE = 30)
+;filecol = WIDGET_BASE(base, /column)
+;    fromrow = WIDGET_BASE(filecol, /row)
+;        dummy = WIDGET_LABEL(fromrow, VALUE = 'From: ', XSIZE = 40)
+;        fromfiletext = WIDGET_TEXT(fromrow, UNAME = 'FROMFILETEXT', VALUE = '', XSIZE = 120, YSIZE = 1, /FRAME)
+;        frombutton = WIDGET_BUTTON(fromrow, VALUE = '...', UVALUE = 'FILEFROM', SCR_XSIZE = 30)
+;    torow = WIDGET_BASE(filecol, /row)
+;        dummy = WIDGET_LABEL(torow, VALUE = 'To: ', XSIZE = 40)
+;        tofiletext = WIDGET_TEXT(torow, UNAME = 'TOFILETEXT', VALUE = '', XSIZE = 120, YSIZE = 1, /FRAME)
+;        frombutton = WIDGET_BUTTON(torow, VALUE = '...', UVALUE = 'FILETO', SCR_XSIZE = 30)
 
 mainrow = WIDGET_BASE(base, /row)
     imagecol = WIDGET_BASE(mainrow, /column)
+        fromrow = WIDGET_BASE(imagecol, /row)
+            dummy = WIDGET_LABEL(fromrow, VALUE = 'From: ', XSIZE = 40)
+            fromfiletext = WIDGET_TEXT(fromrow, UNAME = 'FROMFILETEXT', VALUE = '', XSIZE = 120, YSIZE = 1, /FRAME)
+            frombutton = WIDGET_BUTTON(fromrow, VALUE = '...', UVALUE = 'FILEFROM', SCR_XSIZE = 30)
+        torow = WIDGET_BASE(imagecol, /row)
+            dummy = WIDGET_LABEL(torow, VALUE = 'To: ', XSIZE = 40)
+            tofiletext = WIDGET_TEXT(torow, UNAME = 'TOFILETEXT', VALUE = '', XSIZE = 120, YSIZE = 1, /FRAME)
+            frombutton = WIDGET_BUTTON(torow, VALUE = '...', UVALUE = 'FILETO', SCR_XSIZE = 30)
         showimage = WIDGET_DRAW(imagecol, GRAPHICS_LEVEL = 0, UNAME = 'IMAGE', UVALUE = 'IMAGE', XSIZE = winsize[0], YSIZE = winsize[1], /BUTTON_EVENTS)
         slider = WIDGET_SLIDER(imagecol, VALUE = 0, UNAME = 'SLIDER', UVALUE = 'SLIDER', XSIZE = winsize[0])
         framerow = WIDGET_BASE(imagecol, /row)
@@ -713,6 +734,10 @@ mainrow = WIDGET_BASE(base, /row)
             rate = WIDGET_SLIDER(framerow, VALUE = round(global['framerate']), MINIMUM = 1, MAXIMUM = 20, UNAME = 'FRATE', UVALUE = 'FRATE', XSIZE = 90)
             
     ctrlcol = WIDGET_BASE(mainrow, /column, /align_left)
+        dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
+        dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
+        dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
+        dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
         procbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Proceed Files', UVALUE = 'PROCEED', XSIZE = 120)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
         saveasbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Save As ...', UVALUE = 'SAVEAS', XSIZE = 120)
@@ -747,7 +772,7 @@ mainrow = WIDGET_BASE(base, /row)
         expsavbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'T-D to SAV...', UVALUE = 'EXPSAV', XSIZE = 110)
         
     slitcol = WIDGET_BASE(mainrow, /column, /base_align_left) ;xsize = slitsize[0])
-        fluxhead = WIDGET_LABEL(slitcol, VALUE = 'Flux Dynamics', XSIZE = slitsize[0], UNAME = 'FLUXTEXT', UVALUE = 'FLUXTEXT', /align_center)
+        ;fluxhead = WIDGET_LABEL(slitcol, VALUE = 'Flux Dynamics', XSIZE = slitsize[0], UNAME = 'FLUXTEXT', UVALUE = 'FLUXTEXT', /align_center)
         fluximage = WIDGET_DRAW(slitcol, GRAPHICS_LEVEL = 0, UNAME = 'FLUX', UVALUE = 'FLUX', XSIZE = slitsize[0], YSIZE = slitsize[1], /BUTTON_EVENTS)
         tdcoords = WIDGET_LABEL(slitcol, VALUE = '', XSIZE = slitsize[0], UNAME = 'TDCOORDS', UVALUE = 'TDCOORDS', /align_center)
         slitimage = WIDGET_DRAW(slitcol, GRAPHICS_LEVEL = 0, UNAME = 'SLIT', UVALUE = 'SLIT', XSIZE = slitsize[0], YSIZE = slitsize[1], /BUTTON_EVENTS)
@@ -755,6 +780,9 @@ mainrow = WIDGET_BASE(base, /row)
             tdfrom = WIDGET_LABEL(markrow, VALUE = '', XSIZE = 120, UNAME = 'TDFROM', UVALUE = 'TDFROM')
             tdlength = WIDGET_LABEL(markrow, VALUE = '', XSIZE = slitsize[0] - 240, /align_center, UNAME = 'TDLNG', UVALUE = 'TDLNG')
             tdto = WIDGET_LABEL(markrow, VALUE = '', XSIZE = 120, /align_right, UNAME = 'TDTO', UVALUE = 'TDTO')
+        acttimerow = WIDGET_BASE(slitcol, /row, /align_right)
+            acttimercol = WIDGET_BASE(acttimerow, /column, /Nonexclusive, /align_right)
+                acttimecheck = WIDGET_BUTTON(acttimercol, VALUE = 'Absolute Time', UNAME = 'ACTTIME', UVALUE = 'ACTTIME', /align_right) ;, XSIZE = 120)
         moderow = WIDGET_BASE(slitcol, /row, /Exclusive)
             modemean = WIDGET_BUTTON(moderow, VALUE = 'Mean', UNAME = 'MODEMEAN', UVALUE = 'MODEMEAN', XSIZE = 80)
             modemed = WIDGET_BUTTON(moderow, VALUE = 'Median', UNAME = 'MODEMED', UVALUE = 'MODEMED', XSIZE = 80)

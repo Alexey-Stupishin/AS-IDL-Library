@@ -1,4 +1,4 @@
-function asu_get_file_sequence_data, path, fromfile, tofile, ind = ind, err = err
+function asu_get_file_sequence_data, path, fromfile, tofile, ind = ind, err = err, cadence = cadence, jd_list = jd_list
 
 flist = asu_get_file_sequence(path, fromfile, tofile, err = err)
 ind = !NULL
@@ -37,6 +37,8 @@ dlim = minmax(sigrange(data_full))
 data_full = data_full > dlim[0] < dlim[1]
 
 data_full = comprange(data_full, 2, /global)
+cadence = (anytim(ind[sz[3]-1].date_obs) - anytim(ind[0].date_obs)) / (sz[3]-1)
+jd_list = asu_get_sequence_juldates(ind)
 
 ;mlim = max(abs(dlim))
 ;data_full[0,0,*] = -mlim

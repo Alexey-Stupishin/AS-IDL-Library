@@ -153,13 +153,27 @@ sz = size(td0)
 
 ass_slit_widget_slit_range, dt_min, total_Mm ; min, Mm
 
-xrange = [0, dt_min]
-x_arg = asu_linspace(0, xrange[1], sz[1])
 yrange = [0, total_Mm]
 y_arg = asu_linspace(0, yrange[1], sz[2])
-tvplot, td0, x_arg, y_arg, xrange = xrange, yrange = yrange, xmargin = global['xmargin'], ymargin = global['ymargin'], xtitle = 'Time, min', ytitle = 'Distance, Mm'
 
+acttime = widget_info(asw_getctrl('ACTTIME'), /BUTTON_SET)
 p = global['currpos']/60d * global['cadence']
+
+if acttime then begin
+    x_arg = global['jd_list']
+    p = p/60d/24d + x_arg[0] 
+    xrange = [x_arg[0], x_arg[-1]]
+    xtickinterval = 1d/24d/60d * ceil((xrange[1] - xrange[0])*24d*60d /10d)
+    tvplot, td0, x_arg, y_arg, xrange = xrange, yrange = yrange $
+        , xtickformat='asu_julday_tick', xtickinterval = xtickinterval $
+        , xmargin = global['xmargin'], ymargin = global['ymargin'], xtitle = 'Time, HH:MM', ytitle = 'Distance, Mm'
+endif else begin
+    xrange = [0, dt_min]
+    x_arg = asu_linspace(0, xrange[1], sz[1])
+    tvplot, td0, x_arg, y_arg, xrange = xrange, yrange = yrange $
+        , xmargin = global['xmargin'], ymargin = global['ymargin'] $
+        , xtitle = 'Time, min', ytitle = 'Distance, Mm'
+end
 
 device, decomposed = 1
 oplot, [p, p], [0, yrange[1]], color = 'FF0000'x, thick = 1.5
@@ -212,9 +226,18 @@ to   = p0+global['slitwidth']-1
 slit = str[from:to, *, *]
 flux_p = total(slit, 1)
 flux = total(flux_p, 1)
-;flux = total(td0, 2)
 flux = flux/flux[0]
-plot, x_arg, flux, xrange = xrange, xstyle = 1, xmargin = global['xmargin'], ymargin = global['ymargin'], thick = 1, color = 'FFFFFF'x, xtitle = 'Time, min', ytitle = 'Rel. Flux, -'
+if acttime then begin
+    plot, x_arg, flux, xrange = xrange, xstyle = 1, xtickformat='asu_julday_tick', xtickinterval = xtickinterval $
+        , xmargin = global['xmargin'], ymargin = global['ymargin'], xgridstyle = 1, xticklen = 1 $
+;        , xgridstyle = 1 $
+        , thick = 1, color = 'FFFFFF'x, xtitle = 'Time, HH:MM', ytitle = 'Rel. Flux, -'
+endif else begin
+    plot, x_arg, flux, xrange = xrange, xstyle = 1 $
+        , xmargin = global['xmargin'], ymargin = global['ymargin'], xgridstyle = 1, xticklen = 1 $
+        , thick = 1, color = 'FFFFFF'x, xtitle = 'Time, min', ytitle = 'Rel. Flux, -'
+endelse
+    
 oplot, [p, p], [0, yrange[1]], color = 'FF0000'x, thick = 1.5
 
 end
@@ -237,7 +260,7 @@ endif
 file = dialog_pickfile(DEFAULT_EXTENSION = 'sav', FILTER = ['*.sav'], GET_PATH = path, PATH = path, file = global['proj_name'], /write, /OVERWRITE_PROMPT)
 if file eq '' then return
 
-first = global['data_ind', 0]
+first_ind = global['data_ind', 0]
 last = global['data_ind', -1]
 
 szd = size(global['data_list'])
@@ -247,10 +270,12 @@ sz = size(xy)
 slit_crd_from = xy[*, 0]
 slit_crd_to = xy[*, sz[2]-1]
 
-slit_time_from = first.date_obs
+slit_time_from = first_ind.date_obs
 slit_time_to = last.date_obs
 
 half_width = global['slitwidth']
+arcsec = first_ind.cdelt1
+half_width_arc = half_width * arcsec
 mode = global['slitmode']
 
 sz = size(timedist)
@@ -275,7 +300,7 @@ if slist.Count() gt 0 then begin
     end
 endif
 
-save, filename = file, timedist, slit_crd_from, slit_crd_to, slit_time_from, slit_time_to, dist_step, time_step, half_width, mode, jets
+save, filename = file, timedist, slit_crd_from, slit_crd_to, slit_time_from, slit_time_to, dist_step, time_step, half_width, half_width_arc, mode, jets
 
 pref['expsav_path'] = path
 save, filename = pref['pref_path'], pref
