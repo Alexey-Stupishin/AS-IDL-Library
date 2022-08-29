@@ -1,37 +1,37 @@
+pro mfo_box_lines_aia, aia_data, aia_index, line_res, boxdata, rotator = rotator
+
+sz = size(aia_data)
+x = (dindgen(sz[1])-(sz[1]-1)/2d)*aia_index.cdelt1 + aia_index.xcen
+y = (dindgen(sz[2])-(sz[2]-1)/2d)*aia_index.cdelt2 + aia_index.ycen
+
+device, decomposed = 0
+aia_lct_silent, wave = 171, /load
+implot, comprange(double(aia_data), 2, /global), x, y, /iso
+
+device, decomposed = 1
+for i = 0, line_res.nLines-1 do begin
+    line = asu_gxbox_get_line(line_res, i, boxdata, rotator = rotator)
+    oplot, line[0,*], line[1,*], color = '00FF00'x
+endfor
+
+end    
+
+;-----------------------------------------------------------------------    
 pro test_mfo_box_lines
 
-;sourcefile = 'c:\11312_hmi.M_720s.20111010_085818.W121N24CR.CEA.NAS_750.sav'
-sourcefile = 'g:\BIGData\UData\SDOBoxes\12533_hmi.M_720s.20160428_094643.E177S2CR.CEA.POT.sav';
+aiafits = 's:\University\Work\11312_for_2022\20111010_080000_20111010_100000_-95_285_267_267\aia_data\171\aia.lev1_euv_12s_mod.2011-10-10T085813Z.3.image.fits'   
+sourcefile = 's:\University\Work\11312_for_2022\HMI_wide\11312_hmi.M_720s.20111010_085818.W116N26CR.CEA.NAS.sav';
+iz = 2
+porosity = 15
+
 restore, sourcefile
 
 asu_box_get_coord, box, boxdata
-;mfodata = {  sst_version:'20200228' $
-;           , bx:transpose(data.by, [1, 0, 2]), by:transpose(data.bx, [1, 0, 2]), bz:transpose(data.bz, [1, 0, 2]) $
-;           , ic:transpose(box.base.ic, [1, 0]), magn_src:magnetogram, cont_src:continuum, model_mask:transpose(model_mask, [1, 0]) $
-;           , obstime:box.index.date_obs, fileid:fileid $
-;           , x_box:transpose(boxdata.y_box, [1, 0]), y_box:transpose(boxdata.x_box, [1, 0]) $
-;           , dkm:boxdata.dkm, dx_arc:boxdata.dy*boxdata.rsun, dy_arc:boxdata.dx*boxdata.rsun $
-;           , x_cen:boxdata.y_cen, y_cen:boxdata.x_cen, R_arc:boxdata.rsun $
-;           , lon_cen:boxdata.lon_cen, lat_cen:boxdata.lat_cen $
-;           , vcos:vcos $
-;           , lon_hg:transpose(boxdata.lon_hg, [1, 0]), lat_hg:transpose(boxdata.lat_hg, [1, 0]) $
-;           , input_x:input_coords.y, input_y:input_coords.x $
-;           , aia_ids:aia.ids, aia_data:aia.data, aia_size:aia.size, aia_center:aia.center, aia_step:aia.step, aia_RSun:aia.RSun $
-;           , version_info:version_info $
-;                  }
-
-anchor_function = 'gx_box_calculate_lines'
-resolve_routine, anchor_function, /compile_full_file, /either
-dll_location = file_dirname((ROUTINE_INFO(anchor_function, /source, /functions)).path, /mark) + 'WWNLFFFReconstruction.dll'
-
-maxLength = 1000000L
 
 ;----------------------------------------------
 ; example of using seeds
 sz = size(box.bz)
 inputSeeds = dblarr(3, sz[1]*sz[2]*sz[3])
-iz = 2
-porosity = 6
 
 cnt = 0
 for ix = 0, sz[1]-1, porosity do begin
@@ -43,32 +43,34 @@ inputSeeds = inputSeeds[*, 0:cnt-1]
 
 ;----------------------------------------------
 t0 = systime(/seconds)
-nonStored = gx_box_calculate_lines(dll_location, box $
-                        , coords = coords, linesPos = linesPos, linesLength = linesLength, nLines = nLines $
-                        , inputSeeds = inputSeeds $
-                        , maxLength = maxLength $
-                        )
-
+nLines = asu_gxbox_calc_lines(box, inputSeeds, line_res)
 message, strcompress(string(systime(/seconds)-t0,format="('processed in ',g0,' seconds')")), /cont
 print, "stored lines: ", nLines
-print, "non-stored lines: ", nonStored
+print, "non-stored lines: ", line_res.nonStored
 
-dx_arc = boxdata.dx*boxdata.rsun
-dy_arc = boxdata.dy*boxdata.rsun
-
+window, 0
 device, decomposed = 0
 loadct, 0, /silent
 
-x_arc = indgen(sz(1))*dx_arc
-y_arc = indgen(sz(2))*dy_arc
-;implot, bytscl(box.bz[*,*,0]), x_arc, y_arc, /iso, xtitle = 'arcsec', ytitle = 'arcsec'
-tvplot, bytscl(box.bz[*,*,0]), x_arc, y_arc, /iso, xtitle = 'arcsec', ytitle = 'arcsec'
+x_arc = dindgen(sz(1))*boxdata.dx*boxdata.rsun
+y_arc = dindgen(sz(2))*boxdata.dy*boxdata.rsun
+implot, bytscl(box.bz[*,*,0]), x_arc, y_arc, /iso, xtitle = 'arcsec', ytitle = 'arcsec'
 
 device, decomposed = 1
 for i = 0, nLines-1 do begin
-    x = coords[0, linesPos[i]:(linesPos[i]+linesLength[i]-1)]*dx_arc
-    y = coords[1, linesPos[i]:(linesPos[i]+linesLength[i]-1)]*dy_arc
-    oplot, x, y, color = '00FF00'x
+    line = asu_gxbox_get_line(line_res, i, boxdata)
+    oplot, line[0,*], line[1,*], color = '00FF00'x
 endfor
+
+rotator = asu_gxbox_get_rotator(boxdata)
+
+if asu_gxbox_get_aia(box, 171, aia_data, aia_index) then begin
+    window, 1
+    mfo_box_lines_aia, aia_data, aia_index, line_res, boxdata, rotator = rotator
+endif    
+
+read_sdo_silent, aiafits, aia_index, aia_data, /use_shared, /uncomp_delete, /hide, /silent
+window, 2
+mfo_box_lines_aia, aia_data, aia_index, line_res, boxdata, rotator = rotator
 
 end

@@ -28,12 +28,12 @@ parameterMap[nParameters].itemName = '!____idl_map_terminator_key___!';
   
 data_ptr = CALL_EXTERNAL(dll_location, 'reoInitialize', parameterMap, alt_dll_location, VALUE = value, /UL64_VALUE)
 
-if arg_present(version_info) then begin
-    b = bytarr(512)
-    b(*) = 32B
-    version_info = STRING(b)
-    rcv = CALL_EXTERNAL(dll_location, 'reoLibraryVersion', version_info)
-endif
+;if arg_present(version_info) then begin
+;    b = bytarr(512)
+;    b(*) = 32B
+;    version_info = STRING(b)
+;    rcv = CALL_EXTERNAL(dll_location, 'reoLibraryVersion', version_info)
+;endif
 
 return, data_ptr
 

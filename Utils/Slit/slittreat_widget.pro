@@ -752,7 +752,7 @@ mainrow = WIDGET_BASE(base, /row)
             WIDGET_CONTROL, size1, SET_BUTTON = 1
             global['drawmode'] = 'FITWIN'
         ;selinforow = WIDGET_BASE(ctrlcol, /column)
-        dummy = WIDGET_LABEL(ctrlcol, VALUE = '    (Ctrl+LeftMouse)', XSIZE = 120)
+        dummy = WIDGET_LABEL(ctrlcol, VALUE = '    (Ctrl+LeftMouse+Drag)', XSIZE = 120)
         dummy = WIDGET_LABEL(ctrlcol, VALUE = ' ', XSIZE = 40)
         orderbutton = WIDGET_DROPLIST(ctrlcol, VALUE = ass_slit_widget_fit_orders(), UNAME = 'ORDER', UVALUE = 'ORDER', XSIZE = 120)
         fitbutton = WIDGET_BUTTON(ctrlcol, VALUE = 'Fit', UVALUE = 'FIT', XSIZE = 120)
