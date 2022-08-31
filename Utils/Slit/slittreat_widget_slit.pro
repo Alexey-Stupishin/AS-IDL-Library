@@ -121,6 +121,24 @@ return, speed
 end
 
 ;----------------------------------------------------------------------------------
+function ass_slit_widget_to_timescale, v
+compile_opt idl2
+
+common G_ASS_SLIT_WIDGET, global
+
+acttime = widget_info(asw_getctrl('ACTTIME'), /BUTTON_SET)
+
+v_act = v
+if acttime then begin
+    x_arg = global['jd_list']
+    v_act = v/60d/24d + x_arg[0]
+end
+
+return, v_act
+
+end
+
+;----------------------------------------------------------------------------------
 pro ass_slit_widget_show_slit
 compile_opt idl2
 
@@ -157,11 +175,10 @@ yrange = [0, total_Mm]
 y_arg = asu_linspace(0, yrange[1], sz[2])
 
 acttime = widget_info(asw_getctrl('ACTTIME'), /BUTTON_SET)
-p = global['currpos']/60d * global['cadence']
+p =  ass_slit_widget_to_timescale(global['currpos']/60d * global['cadence'])
 
 if acttime then begin
     x_arg = global['jd_list']
-    p = p/60d/24d + x_arg[0] 
     xrange = [x_arg[0], x_arg[-1]]
     xtickinterval = 1d/24d/60d * ceil((xrange[1] - xrange[0])*24d*60d /10d)
     tvplot, td0, x_arg, y_arg, xrange = xrange, yrange = yrange $
@@ -183,19 +200,23 @@ for k = 0, slist.Count()-1 do begin
     crds = slist[k]
     crd0 = crds.first
     crd1 = crds.second
+    speed = ass_slit_widget_get_speed(crd0, crd1)
+    sstr = strcompress(string(abs(speed), format = '(%"%5d")'), /remove_all) + ' km/s'
+    
+    crd0[0] =  ass_slit_widget_to_timescale(crd0[0])
+    crd1[0] =  ass_slit_widget_to_timescale(crd1[0])
+    
     oplot, [crd0[0], crd1[0]], [crd0[1], crd1[1]], color = '00FF00'x, thick = 1.5
     oplot, [crd0[0]], [crd0[1]], psym = 2, symsize = 1.5, thick = 1.5, color = '00FF00'x
     oplot, [crd1[0]], [crd1[1]], psym = 2, symsize = 1.5, thick = 1.5, color = '00FF00'x
     
-    speed = ass_slit_widget_get_speed(crd0, crd1)
-    sstr = strcompress(string(abs(speed), format = '(%"%5d")'), /remove_all) + ' km/s'
-
     align = speed gt 0 ? 1.0 : 0.0
     XYOUTS, (crd0[0]+crd1[0])/2, (crd0[1]+crd1[1])/2, sstr, color = '0000FF'x, alignment = align, charsize = 1.8, charthick = 1.5 
 endfor
 
 if global['speed_first_pt'] ne !NULL then begin
     crd0 = global['speed_first_pt']
+    crd0[0] =  ass_slit_widget_to_timescale(crd0[0])
     oplot, [crd0[0]], [crd0[1]], psym = 2, symsize = 1.5, thick = 1.5, color = '00FF00'x
 endif
 

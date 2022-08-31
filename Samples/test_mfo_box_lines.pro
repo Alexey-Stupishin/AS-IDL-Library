@@ -19,12 +19,12 @@ end
 ;-----------------------------------------------------------------------    
 pro test_mfo_box_lines
 
-aiafits = 's:\University\Work\11312_for_2022\20111010_080000_20111010_100000_-95_285_267_267\aia_data\171\aia.lev1_euv_12s_mod.2011-10-10T085813Z.3.image.fits'   
-sourcefile = 's:\University\Work\11312_for_2022\HMI_wide\11312_hmi.M_720s.20111010_085818.W116N26CR.CEA.NAS.sav';
+aia_fits_file = 's:\University\Work\11312_for_2022\20111010_080000_20111010_100000_-95_285_267_267\aia_data\171\aia.lev1_euv_12s_mod.2011-10-10T085813Z.3.image.fits'   
+hmi_file = 's:\University\Work\11312_for_2022\HMI_wide\11312_hmi.M_720s.20111010_085818.W116N26CR.CEA.NAS.sav';
 iz = 2
-porosity = 15
+porosity = 10
 
-restore, sourcefile
+restore, hmi_file
 
 asu_box_get_coord, box, boxdata
 
@@ -69,7 +69,7 @@ if asu_gxbox_get_aia(box, 171, aia_data, aia_index) then begin
     mfo_box_lines_aia, aia_data, aia_index, line_res, boxdata, rotator = rotator
 endif    
 
-read_sdo_silent, aiafits, aia_index, aia_data, /use_shared, /uncomp_delete, /hide, /silent
+read_sdo_silent, aia_fits_file, aia_index, aia_data, /use_shared, /uncomp_delete, /hide, /silent
 window, 2
 mfo_box_lines_aia, aia_data, aia_index, line_res, boxdata, rotator = rotator
 

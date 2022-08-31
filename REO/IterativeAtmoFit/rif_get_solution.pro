@@ -1,5 +1,5 @@
 function rif_get_solution, freqs, idxR, idxL, R, L, obsR, obsL, calcR, calcL, T, params $
-                         , resT, M, F, w, incl  
+                         , M = M, F = F, w = w, incl = incl  
 compile_opt idl2
 
 M = [[R], [L]]
@@ -57,11 +57,11 @@ if param.wTemp > 0 then begin
     w = [w, dblarr(n_elements(T)-1) + param.wTemp];
 endif
 
-;x = lscov(M, Fr', w');
-;x = min(param.expMax, max(x, param.expMin));
-;resT = x';
+x = asu_least_mean_weighted(M, F, w)
 
-return, 0
+solution = param.expMax > x < param.expMin
+
+return, solution
 
 end
  
