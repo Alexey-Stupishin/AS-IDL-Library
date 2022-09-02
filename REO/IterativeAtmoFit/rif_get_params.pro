@@ -18,7 +18,7 @@ expMin = 1d/expMax
 param = {wFreq:1d, wTemp:1d, wCross:1d, wR:wR, wL:wL, wT:wT $
        , harms:[2, 3, 4], taus:[1, 100], dunit:1 $
        , mode:3, c:0d, d:0d $
-       , Hmin:1d, Tmin:Tmin, Hb:1d, Tb:4d3, barometric:0 $
+       , Hmin:1d, Tmin:Tmin, Hb:1d, Tb:6d3, barometric:0 $
        , expMax:expMax, expMin:expMin $
        , fluxLim:0, thinLim:5e-1, thinpow:5e-1, uselim:0 $
         }

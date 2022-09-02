@@ -45,7 +45,7 @@ if count gt 0 then begin
     bz[idx] = 0; conditional QS Bph
     cont[idx] = max(cont); conditional QS cont
 endif
-model_mask = decompose(bz, cont); see Fontenla 2009. e.g. 7 - umbra, 6 - penumbra etc.
+model_mask = decompose_as(bz, cont); see Fontenla 2009. e.g. 7 - umbra, 6 - penumbra etc.
 
 return, model_mask
 
