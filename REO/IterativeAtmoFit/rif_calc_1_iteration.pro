@@ -1,6 +1,6 @@
 function rif_calc_1_iteration, ptr, freqsR, obsR, freqsL, obsL, Ht1, Ht2, H, T, D, pos, params $
                              , R, calcR, L, calcL, cntR = cntR, cntL = cntL $ 
-                             , use_mask = use_mask, freqs = freqs, idxR = idxR, idxL = idxL, _extra = _extra
+                             , freqs = freqs, idxR = idxR, idxL = idxL, _extra = _extra
 compile_opt idl2
 
 freqs = rif_get_freq_idxs(freqsR, freqsL, idxR, idxL)
@@ -21,6 +21,7 @@ for f = 0, n_elements(freqs)-1 do begin
     , fluxL = fluxL $
     , depthR = depthR, heightsR = heightsR $
     , depthL = depthL, heightsL = heightsL $
+    , _extra = _extra $
     )
     
     useR = (where(f eq idxR, /NULL) ne !NULL)
@@ -30,7 +31,7 @@ for f = 0, n_elements(freqs)-1 do begin
         rcr = reo_convolve_map(ptr, fluxR, freqs[f], scanR)
         calcR[f] = scanR[pos]
         rcr = reo_beam_multiply_map(ptr, fluxR, multR, freqs[f], pos)
-    endif    
+    endif
     if useL then begin
         rcr = reo_convolve_map(ptr, fluxL, freqs[f], scanL)
         calcL[f] = scanL[pos]
