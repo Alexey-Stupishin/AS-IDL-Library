@@ -1,4 +1,4 @@
-function rif_iteration_step, ptr, freqsR, obsR, freqsL, obsL, Ht1, Ht2, H, calcT, NT, pos, model_mask, masks_n, params, calcR, calcL $
+function rif_iteration_step, ptr, freqsR, obsR, freqsL, obsL, Ht1, Ht2, H, calcT, NT, pos, params, calcR, calcL $
                            , calcD = calcD, freqs = freqs, idxR = idxR, idxL = idxL, _extra = _extra
 compile_opt idl2
 

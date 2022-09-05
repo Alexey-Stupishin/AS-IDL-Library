@@ -21,7 +21,7 @@ pro test_mfo_box_lines
 
 aia_fits_file = 's:\University\Work\11312_for_2022\20111010_080000_20111010_100000_-95_285_267_267\aia_data\171\aia.lev1_euv_12s_mod.2011-10-10T085813Z.3.image.fits'   
 hmi_file = 's:\University\Work\11312_for_2022\HMI_wide\11312_hmi.M_720s.20111010_085818.W116N26CR.CEA.NAS.sav';
-iz = 2
+iz = 15
 porosity = 10
 
 restore, hmi_file
