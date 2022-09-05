@@ -10,7 +10,11 @@ if idx ne !NULL then Tin[idx] = params.Tmin
 idx = where(Hin le params.Hmin, /NULL)
 if idx ne !NULL then Tin[idx] = params.Tmin
 
-Din = NT/Tin
+if params.barometric then begin
+    Din = asu_atm_barometric(Hin, Tin, NT)
+endif else begin    
+    Din = NT/Tin
+endelse    
 
 rc = rif_calc_1_iteration(ptr, freqsR, obsR, freqsL, obsL, Ht1, Ht2, Hin, Tin, Din, pos, params $
                         , R, calcR, L, calcL, freqs = freqs, idxR = idxR, idxL = idxL, _extra = _extra)

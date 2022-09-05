@@ -26,7 +26,8 @@ Hx = [0.1, 0.5, asu_linspace(0.9, 1.5, 7), asu_linspace(1.7, 3.5, 10), asu_linsp
 Tc = dblarr(n_elements(Hx)+1) + 1d6
 params = rif_get_params(n_elements(Hx), n_elements(freqs))
 params.wTemp = 100
-params.Hmin = 2e8
+params.Hmin = 1.2e8
+params.barometric = 1
 
 ; -------- preparing ----------
 ptr = reo_prepare_calc_map( $
