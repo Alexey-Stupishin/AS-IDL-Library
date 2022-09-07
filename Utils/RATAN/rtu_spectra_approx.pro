@@ -46,6 +46,7 @@ function rtu_spectra_approx, freqs, fluxes $ ; in
 ptr = reo_init(dll_location = dll_location, version_info = version_info)
 vptr = ulong64(ptr)
 vfreqs = double(freqs)
+if min(freqs) gt 1d8 then vfreqs *= 1d-9  
 vfluxes = double(fluxes)
 
 if ptr eq 0 then begin
@@ -56,6 +57,7 @@ n = long(n_elements(freqs))
 result = dblarr(n)
     
 returnCode = CALL_EXTERNAL(getenv('reo_dll_location'), 'reo_aduSpectraAsym2Sig', vptr, n, vfreqs, vfluxes, result, value = [1, 1, 0, 0])
+returnCode2 = reo_uninit(ptr)
     
 return, returnCode
 
