@@ -10,7 +10,7 @@
 ; Parameters description:
 ; 
 ; Parameters required (in):
-;   (in)    freqs           (float/double)  GHz         array of observation frequncies (GHz)
+;   (in)    freqs           (float/double)  any units   array of observation frequncies
 ;   (in)    fluxes          (float/double)  any units   array of observed fluxes (of the same length as freqs)
 ;   
 ; Parameters optional (in):
