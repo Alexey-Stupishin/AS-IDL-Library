@@ -1,4 +1,4 @@
-function asu_gxbox_calc_lines, box, seeds, result, dll_location = dll_location
+function asu_gxbox_calc_lines, box, seeds, result, dll_location = dll_location, _extra = _extra
 
 if n_elements(dll_location) eq 0 then begin
     anchor_function = 'gx_box_calculate_lines'
@@ -10,6 +10,7 @@ nonStored = gx_box_calculate_lines(dll_location, box $
                         , coords = coords, linesPos = linesPos, linesLength = linesLength, nLines = nLines $
                         , inputSeeds = seeds $
                         , maxLength = 1000000 $
+                        , _extra = _extra $
                         )
                         
 result = {coords:coords, linesPos:linesPos, linesLength:linesLength, nLines:nLines, nonStored:nonStored}
