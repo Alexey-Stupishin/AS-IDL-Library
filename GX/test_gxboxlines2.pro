@@ -28,11 +28,12 @@ for reduce_passed = 0, 3 do begin
     idx = where(status and 1, count) ; processed
     message, 'processed(0) = ' + asu_compstr(count), /info
     idx = where(status and 2, count) ; passed voxels
-    message, 'passed(0) = ' + asu_compstr(count), /info
+    message, 'passed(1) = ' + asu_compstr(count), /info
     idx = where(status and 4, count) ; voxels of closed lines
-    message, 'closed(0) = ' + asu_compstr(count), /info
+    message, 'closed(2) = ' + asu_compstr(count), /info
     idx = where(status and 8, count) ; seed voxels
-    message, 'seeds(0) = ' + asu_compstr(count), /info
+    message, 'seeds(3) = ' + asu_compstr(count), /info
+    message, ' ', /info
 endfor
                            
 end
