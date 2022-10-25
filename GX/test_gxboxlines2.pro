@@ -10,7 +10,7 @@ end
 dll_path = ppath + 'GX_SIMULATOR'  + path_sep() + 'nlfff' + path_sep() + 'idl' + path_sep() + 'WWNLFFFReconstruction' + ext
 
 ;restore, ppath + 'gx_models' + path_sep() + '2012-07-12' + path_sep() + 'hmi.M_720s.20120712_044626.W82S16CR.CEA.NAS.sav'
-restore, ppath + 'benchmark' + path_sep() + 'hmi.M_720s.20160220_165811.E34N4CR.CEA.NAS.sav'
+restore, ppath + 'GX_SIMULATOR'  + path_sep() + 'benchmark' + path_sep() + 'hmi.M_720s.20160220_165811.E34N4CR.CEA.NAS.sav'
 
 chromo_level = 1000
 
@@ -26,14 +26,18 @@ for reduce_passed = 0, 3 do begin
     message, 'nLines+non_stored = ' + asu_compstr(nLines+non_stored), /info
     message, 'totLength = ' + asu_compstr(double(total(linesLength))), /info
     message, 'nPassed = ' + asu_compstr(nPassed), /info
-    idx = where(status and 1, count) ; processed
-    message, 'processed(0) = ' + asu_compstr(count), /info
-    idx = where(status and 2, count) ; passed voxels
-    message, 'passed(1) = ' + asu_compstr(count), /info
-    idx = where(status and 4, count) ; voxels of closed lines
-    message, 'closed(2) = ' + asu_compstr(count), /info
-    idx = where(status and 8, count) ; seed voxels
-    message, 'seeds(3) = ' + asu_compstr(count), /info
+    idx = where(status and 1, count1) ; processed
+    message, 'processed(0) = ' + asu_compstr(count1), /info
+    idx = where(status and 2, count2) ; passed voxels
+    message, 'passed(1) = ' + asu_compstr(count2), /info
+    idx = where(status and 4, count4) ; voxels of closed lines
+    message, 'closed(2) = ' + asu_compstr(count4), /info
+    idx = where(status and 8, count8) ; seed voxels
+    message, 'seeds(3) = ' + asu_compstr(count8), /info
+    
+    idx=where((status and 4L) eq 4L)
+    oidx=where(((status and 2L) eq 2l) and ((status and 4L) eq 0))
+        
     message, ' ', /info
 endfor
                            
