@@ -43,7 +43,7 @@ inputSeeds = inputSeeds[*, 0:cnt-1]
 
 ;----------------------------------------------
 t0 = systime(/seconds)
-nLines = asu_gxbox_calc_lines(box, inputSeeds, line_res, dll_location = '/home/stupishin/cpp/MagFieldLibrary/Linux/WWNLFFFReconstruction.so')
+nLines = asu_gxbox_calc_lines(box, inputSeeds, line_res, dll_location = '/home/stupishin/GX_SIMULATOR/nlfff/source/binaries/WWNLFFFReconstruction.so')
 message, strcompress(string(systime(/seconds)-t0,format="('processed in ',g0,' seconds')")), /cont
 print, "stored lines: ", nLines
 print, "non-stored lines: ", line_res.nonStored

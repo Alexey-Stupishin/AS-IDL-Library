@@ -7,7 +7,7 @@ endif else begin
     ppath = 's:\'
     ext = '.dll'
 end
-dll_path = ppath + 'GX_SIMULATOR'  + path_sep() + 'nlfff' + path_sep() + 'idl' + path_sep() + 'WWNLFFFReconstruction' + ext
+dll_path = ppath + 'GX_SIMULATOR'  + path_sep() + 'nlfff' + path_sep() + 'source' + path_sep() + 'binaries' + path_sep() + 'WWNLFFFReconstruction' + ext
 
 ;restore, ppath + 'gx_models' + path_sep() + '2012-07-12' + path_sep() + 'hmi.M_720s.20120712_044626.W82S16CR.CEA.NAS.sav'
 restore, ppath + 'GX_SIMULATOR'  + path_sep() + 'benchmark' + path_sep() + 'hmi.M_720s.20160220_165811.E34N4CR.CEA.NAS.sav'
