@@ -1,6 +1,6 @@
 pro test_mfo_nlfff
 
-lib_location = 's:\Projects\CPP\MagFieldLibrary\binaries\WWNLFFFReconstruction.dll'
+lib_location = 's:\Projects\CPP\MagFieldLibrary V3\binaries\WWNLFFFReconstruction.dll'
 
 version_info = gx_box_field_library_version(lib_location)
 
