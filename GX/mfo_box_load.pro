@@ -86,7 +86,7 @@
 ;
 
 pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
-                , dll_location = dll_location $
+                , lib_location = lib_location $
                 , box = box $
                 , dx_maxsize = dx_maxsize $
                 , size_fov = size_fov $
@@ -227,20 +227,15 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     endif
           
 ; ----- NLFFF+SAVE -----
-    if not keyword_set(dll_location) then begin
-        ;pro2search = 'gx_box_make_nlfff_wwas_field'
-        ;resolve_routine, pro2search, /compile_full_file, /either
-        ;dirpath = file_dirname((ROUTINE_INFO(pro2search, /source, /functions)).path, /mark)
-        pro2search = 'mfo_box_load'
-        dirpath = file_dirname((ROUTINE_INFO(pro2search, /source)).path, /mark)
-        dll_location = dirpath + 'WWNLFFFReconstruction.dll'
+    if not keyword_set(lib_location) then begin
+        lib_location = asu_gxbox_get_library_location()
     endif
     if not keyword_set(version) then version = 1
       
     message, 'Performing NLFFF extrapolation (can take some minutes, or tens of minutes) ...', /cont
     t0 = systime(/seconds)
       
-    return_code = gx_box_make_nlfff_wwas_field(dll_location, box, version_info = version_info, _extra = _extra)
+    return_code = gx_box_make_nlfff_wwas_field(lib_location, box, version_info = version_info, _extra = _extra)
       
     message, strcompress(string(systime(/seconds)-t0,format="('NLFFF extraplolation performed in ',g0,' seconds')")), /cont
       
