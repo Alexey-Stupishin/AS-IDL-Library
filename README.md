@@ -18,5 +18,5 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)
-* [SliTreat](https://github.com/Alexey-Stupishin/StilTreat)
+* [SlitTreat](https://github.com/Alexey-Stupishin/StilTreat)
 
