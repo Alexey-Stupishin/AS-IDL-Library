@@ -199,7 +199,7 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
         save, box, file = filepath(bndp+".sav", root_dir = out_dir)
         if save_sst gt 0 then begin
             fileid = bndp+sst_post
-            asu_box_create_mfodata, mfodata, box, box, aia, boxdata, fileid, input_coords=input_coords
+            asu_box_create_mfodata, mfodata, box, box, aia, boxdata, fileid, input_coords = input_coords
             BND_filename = filepath(fileid+".sav", root_dir = out_dir)
             save, file = BND_filename, mfodata 
             message, 'Box structure (potential+boundary) saved to ' + BND_filename,/cont
@@ -211,7 +211,7 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
         save, file = filepath(potp+".sav", root_dir = out_dir), box
         if save_sst gt 0 then begin
             fileid = potp+sst_post
-            asu_box_create_mfodata, mfodata, pbox, box, aia, boxdata, fileid, input_coords=input_coords
+            asu_box_create_mfodata, mfodata, pbox, box, aia, boxdata, fileid, input_coords = input_coords
             POT_filename = filepath(fileid+".sav", root_dir = out_dir)
             save, file = POT_filename, mfodata
         endif 
@@ -227,27 +227,8 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     endif
           
 ; ----- NLFFF+SAVE -----
-    if not keyword_set(lib_location) then begin
-        lib_location = asu_gxbox_get_library_location()
-    endif
-    if not keyword_set(version) then version = 1
+    mfo_box_nlfff, box, out_dir, prefix, lib_location = lib_location $
+                 , sst_post = sst_post, aia = aia, boxdata = boxdata, input_coords = input_coords $
+                 , _extra = _extra
       
-    message, 'Performing NLFFF extrapolation (can take some minutes, or tens of minutes) ...', /cont
-    t0 = systime(/seconds)
-      
-    return_code = gx_box_make_nlfff_wwas_field(lib_location, box, version_info = version_info, _extra = _extra)
-      
-    message, strcompress(string(systime(/seconds)-t0,format="('NLFFF extraplolation performed in ',g0,' seconds')")), /cont
-      
-    print, version_info
-    nlfp = box.id
-    if strlen(prefix) gt 0 then nlfp = prefix + '_' + nlfp
-    save, file = filepath(nlfp+".sav", root_dir = out_dir), box
-    if save_sst gt 0 then begin
-        fileid = nlfp+sst_post
-        asu_box_create_mfodata, mfodata, box, box, aia, boxdata, fileid, version_info=version_info, input_coords=input_coords
-        NLFFF_filename = filepath(fileid+".sav", root_dir = out_dir)
-        save, file = NLFFF_filename, mfodata 
-        message, 'Box structure (NLFFF) saved to ' + NLFFF_filename,/cont
-    endif
 end

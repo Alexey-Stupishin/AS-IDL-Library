@@ -1,6 +1,8 @@
-pro asuml_box2sst_files, filename
+pro asuml_box2sst_files, filename, pbox = pbox
 
 restore, filename
+
+if n_elements(pbox) ne 0 then box = pbox
 
 mfodata = asuml_box2sst(box)
 

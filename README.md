@@ -15,6 +15,11 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 * 29 June 2021: improvements for version 28 June 2021
 * 27 February 2022: SlitTreat widget implemented
 * 23 Nov 2022: Major reorganization
+* 30 Jan 2023:
+	* Some polishing
+	* Colortable added
+	* Anchor function added
+	* GOES XRS NetCDF download introduced
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)

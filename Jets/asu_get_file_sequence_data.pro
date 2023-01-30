@@ -7,6 +7,8 @@ if err gt 0 then return, !NULL
 
 read_sdo_silent, flist.ToArray(), ind, data, /silent, /use_shared, /hide
 
+aia_prep, ind, data, oind, odata
+
 WIDGET_CONTROL, /HOURGLASS
 
 med_data = 5
