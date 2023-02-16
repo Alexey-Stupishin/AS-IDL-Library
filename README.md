@@ -20,6 +20,7 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 	* Colortable added
 	* Anchor function added
 	* GOES XRS NetCDF download introduced
+* 17 Feb 2023: Cyrillic utilities added, some polishing
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)
