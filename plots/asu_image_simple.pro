@@ -1,4 +1,4 @@
-pro asu_tvplot, image, scale = scale, _extra =_extra
+pro asu_image_simple, image, scale = scale, _extra =_extra
 compile_opt idl2
 
 sz = size(image)

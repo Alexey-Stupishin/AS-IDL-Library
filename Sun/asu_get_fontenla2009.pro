@@ -49,8 +49,6 @@
 ;     1.5. 'Facula (very bright plage)' (5, 'Facula',   'p')
 ;     1.6. 'Penumbra'                   (6, 'Penumbra', 'r')
 ;     1.7. 'Umbra'                      (7, 'Umbra',    's')
-;     (и ежели вы меня спросите, что такое первые три, и в чем разница между четвертой и пятой, то не ожидайте
-;      быстрого ответа, и вообще никакого не ожидайте, проще будет просто заткнуть уши).
 ;
 ;     According to the table above, parameter 'model' can be either:
 ;       * the number from 1 to 7 (first value in the parentheses), or

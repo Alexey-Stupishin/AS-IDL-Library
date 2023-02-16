@@ -1,4 +1,4 @@
-	pro tvplot_as, Image, x_arg, y_arg, _extra = _extra, $
+pro asu_tvplot_as, Image, x_arg, y_arg, _extra = _extra, $
 sample = sample, xmargin=xmargin, ymargin=ymargin, $
 fit_window = fit_window, resolution = resolution, scale = scale, $
 xtick_get = xtick_get, ytick_get = ytick_get, xstyle = xstyle, ystyle = ystyle, $

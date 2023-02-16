@@ -132,8 +132,15 @@ function gx_box_jsoc_get_fits_as, t1, t2, ds, segment, cache_dir, wave = wave
 
 query = gx_box_jsoc_make_query_as(t1, t2, ds, segment, wave = wave)
 ssw_jsoc_time2data, t1, t2, index, urls, /urls_only, ds=ds, segment = segment, wave = wave, count = count
+errstr = ''
 if n_elements(index) eq 0 then begin
-    s = 'can not get urls/index for ds ="' + ds + '"'
+    errstr = 'no index'
+endif else begin
+    if index.cdelt1 lt 0 || index.cdelt2 lt 0 then errstr = 'dummy index'
+endelse
+    
+if strlen(errstr) gt 0 then begin
+    s = 'can not get urls/index for ds ="' + ds + '", problem: ' + errstr
     if n_elements(wave) gt 0 then s += ' and wave = ' + strcompress(wave)
     message, s, /info
     message, 'execution terminated', /info
