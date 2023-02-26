@@ -1,4 +1,4 @@
-function asu_download_goes_xrs_by_date, date, loc_dir = loc_dir, sat = sat ; , sec = sec
+function asu_download_goes_xrs_by_date, date, loc_dir = loc_dir, sat = sat, sec = sec
 compile_opt idl2
 
 t = asu_extract_time(date + ' 00:00:00', out_style = 'UTC_EXT')
@@ -9,16 +9,21 @@ d = string(t.day,FORMAT='(I02)')
 if n_elements(sat) eq 0 then sat = '17'
 if ~isa(sat, 'STRING') then sat = asu_compstr(sat)
 
+cadence = n_elements(sec) ne 0 && sec ne 0 ? 'flx1s' : 'avg1m'
+
 path = 'https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes'
-base1m = path + sat + '/l2/data/xrsf-l2-avg1m_science'
-file1m = 'sci_xrsf-l2-avg1m_g' + sat + '_d' + y + m + d + '_v2-1-0.nc'
-path1m = base1m + '/' + y + '/' + m + '/' + file1m  
+basef = path + sat + '/l2/data/xrsf-l2-' + cadence + '_science'
+srcf = 'sci_xrsf-l2-' + cadence + '_g' + sat + '_d' + y + m + d + '_v2-1-0.nc'
+path1m = basef + '/' + y + '/' + m + '/' + srcf  
 
 if n_elements(loc_dir) eq 0 then loc_dir = GETENV('IDL_TMPDIR')
 if not file_test(loc_dir, /directory) then file_mkdir, loc_dir
  
 aria2_urls_rand, path1m, loc_dir
 
-return, loc_dir + path_sep() + file1m
+locfile = loc_dir + path_sep() + srcf
+filedate = y + '-' + m + '-' + d
+
+return, {source:srcf, local:locfile, date:filedate, cadence:cadence}
 
 end
