@@ -140,10 +140,11 @@ endif else begin
 endelse
     
 if strlen(errstr) gt 0 then begin
-    s = 'can not get urls/index for ds ="' + ds + '", problem: ' + errstr
+    s = '***** can not get urls/index for ds ="' + ds + '", problem: ' + errstr
     if n_elements(wave) gt 0 then s += ' and wave = ' + strcompress(wave)
     message, s, /info
-    message, 'execution terminated', /info
+    message, '***** possibly required dataset does not exist', /info
+    message, '***** execution terminated', /info
     return , ''
 endif
   
@@ -152,10 +153,11 @@ local_file = gx_box_jsoc_try_cache_as(cache_dir, query, index, ds, segment, wave
 if local_file ne '' then return, local_file
   
 if n_elements(urls) eq 0 then begin
-    s = 'can not download data for ds ="' + ds + '"'
+    s = '***** can not download data for ds ="' + ds + '"'
     if n_elements(wave) gt 0 then s += ' and wave = ' + strcompress(wave)
     message, s, /info
-    message, 'execution terminated', /info
+    message, '***** possibly required URL cannot be accessed', /info
+    message, '***** execution terminated', /info
     return , ''
 endif
   
@@ -175,6 +177,9 @@ read_sdo, tmp_file, tmp_index, data, /uncomp_delete
 file_delete, tmp_file
   
 gx_box_jsoc_save2cache_as, cache_dir, query, data, index, file_basename(local_file)
-return, gx_box_jsoc_try_cache_as(cache_dir, query) ; just to be sure
+out = gx_box_jsoc_try_cache_as(cache_dir, query) ; just to be sure
+  
+message, '***** execution finished successfully', /info
+return, out  
   
 end

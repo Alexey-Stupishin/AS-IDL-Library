@@ -19,11 +19,14 @@ path1m = basef + '/' + y + '/' + m + '/' + srcf
 if n_elements(loc_dir) eq 0 then loc_dir = GETENV('IDL_TMPDIR')
 if not file_test(loc_dir, /directory) then file_mkdir, loc_dir
  
-aria2_urls_rand, path1m, loc_dir
+aria2_urls_rand, path1m, loc_dir, output = output
 
-locfile = loc_dir + path_sep() + srcf
-filedate = y + '-' + m + '-' + d
-
-return, {source:srcf, local:locfile, date:filedate, cadence:cadence}
+if output[-1] eq '(OK):download completed.' then begin
+    locfile = loc_dir + path_sep() + srcf
+    filedate = y + '-' + m + '-' + d
+    return, {status:'OK', source:srcf, local:locfile, date:filedate, cadence:cadence}
+endif else begin
+    return, {status:'FAIL', output:output}
+endelse        
 
 end

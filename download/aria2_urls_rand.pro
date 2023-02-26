@@ -1,5 +1,4 @@
-pro aria2_urls_rand, urls, dir, output=output
-  ;wget='"C:\Program Files\GnuWin32\bin\wget"'
+pro aria2_urls_rand, urls, dir, output = output
   
   aria2cpath = file_dirname((ROUTINE_INFO('aria2_urls_rand', /source)).path, /mark)
   
@@ -18,11 +17,11 @@ pro aria2_urls_rand, urls, dir, output=output
   openw, Unit, filename, /GET_LUN 
   printf,unit,urls
   free_lun,unit
+
+  if not file_test(filename) then break
   
   cmd = aria2c+' -d '+dir+' -i '+filename
   print, cmd
   spawn, cmd, output ;, /log_output
-  file_delete,filename
-  
-  ;print,wget+' -P '+dir+' -i '+filename
+  file_delete, filename
 end
