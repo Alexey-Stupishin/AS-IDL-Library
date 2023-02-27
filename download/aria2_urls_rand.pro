@@ -18,7 +18,7 @@ pro aria2_urls_rand, urls, dir, output = output
   printf,unit,urls
   free_lun,unit
 
-  if not file_test(filename) then break
+  if not file_test(filename) then return
   
   cmd = aria2c+' -d '+dir+' -i '+filename
   print, cmd
