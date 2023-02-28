@@ -1,7 +1,17 @@
-function asu_get_safe_json_key, hashvar, field, default
+function asu_get_safe_json_key, hashvar, field, default, nocase = nocase, lower = lower
 
-if hashvar.HasKey(field) then begin
-    value = hashvar[field]
+hcase = 'U'
+if n_elements(nocase) ne 0 && nocase ne 0 then hcase = 'N' 
+if n_elements(lower) ne 0 && lower ne 0 then hcase = 'L' 
+
+case hcase of
+    'U': f = strupcase(field)
+    'L': f = strlowcase(field)
+    else: f = field
+endcase      
+
+if hashvar.HasKey(f) then begin
+    value = hashvar[f]
 endif else begin
     value = default
 endelse    
