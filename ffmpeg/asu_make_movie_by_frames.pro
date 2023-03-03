@@ -1,4 +1,6 @@
 pro asu_make_movie_by_frames, pattern, to_filename, fps = fps
+; call sample:
+; asu_make_movie_by_frames, 'd:\work2022\jets\QPPs_051113\AIA_png_304A\aia_%05d.png', 'd:\work2022\jets\QPPs_051113\AIA_png_304A\ilename.mp4',fps = 5
 
 ffmpegpath = file_dirname((ROUTINE_INFO('asu_make_movie_by_frames', /source)).path, /mark)
 if !version.OS_FAMILY eq 'unix' then begin ;use ffmpeg binary from the system in unix based OS
@@ -13,6 +15,5 @@ print, cmd
 
 spawn, cmd
   
-;; ffmpeg -f image2 -framerate 30 -i lin_%05d.png foo.mp4
-
+; ffmpeg -f image2 -framerate 30 -i lin_%05d.png foo.mp4   
 end
