@@ -40,8 +40,8 @@ yy = y/solar_r
 sa = sin(position_angle*!DTOR)
 ca = cos(position_angle*!DTOR)
 
-if arg_present(scan_pos) then scan_pos = (xx*ca + yy*sa)*solar_r
-yrot = -xx*sa + yy*ca
+if arg_present(scan_pos) then scan_pos = (xx*ca - yy*sa)*solar_r
+yrot = xx*sa + yy*ca
 
 return, yrot*solar_r
 
