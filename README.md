@@ -21,6 +21,7 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 	* Anchor function added
 	* GOES XRS NetCDF download introduced
 * 17 Feb 2023: Cyrillic utilities added, some polishing
+* 04 Mar 2023: Smoothing utils update, new smoothing method introduced
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)

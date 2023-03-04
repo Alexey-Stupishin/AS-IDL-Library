@@ -1,4 +1,4 @@
-function asu_dyn_smooth_symm, scan, smoo, Imod, half_slit_vert, half_slit_horz
+function asu_dyn_smooth_symm, scan, smoo, Imod, half_slit_vert, half_slit_horz, method = method
 
 im = asu_find_symm_center(smoo)
 
@@ -11,6 +11,6 @@ for k = 0, im-1 do begin
     endif    
 endfor     
 
-return, asu_dyn_smooth(Imod, half_slit_vert, half_slit_horz) 
+return, asu_dyn_smooth(Imod, half_slit_vert, half_slit_horz, method = method) 
 
 end
