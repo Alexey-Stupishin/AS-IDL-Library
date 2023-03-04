@@ -42,6 +42,8 @@ all_c0 = dblarr(nx, ny, nf)
 all_cp = dblarr(nx, ny, nf)
 all_r0 = dblarr(nx, ny, nf)
 all_rp = dblarr(nx, ny, nf)
+xind = indgen(nx) + xrange[0]
+yind = indgen(ny) + yrange[0]
 
 ccum = [0d, 0d]
 rcum = [0d, 0d]
@@ -51,10 +53,10 @@ for i = 0, n_elements(dynamics)-1 do begin
     rot0 = dynamics[i].rot_first
     ccum += dynamics[i].corr_prev
     rcum += dynamics[i].rot_prev
-    all_c0[*, *, i] = data[xrange+floor(corr0[0]), yrange+floor(corr0[1])]
-    all_r0[*, *, i] = data[xrange+floor(rot0[0]), yrange+floor(rot0[1])]
-    all_cp[*, *, i] = data[xrange+floor(ccum[0]), yrange+floor(ccum[1])]
-    all_rp[*, *, i] = data[xrange+floor(rcum[0]), yrange+floor(rcum[1])]
+    all_c0[*, *, i] = data[xind+floor(corr0[0]), yind+floor(corr0[1])]
+    all_r0[*, *, i] = data[xind+floor(rot0[0]), yind+floor(rot0[1])]
+    all_cp[*, *, i] = data[xind+floor(ccum[0]), yind+floor(ccum[1])]
+    all_rp[*, *, i] = data[xind+floor(rcum[0]), yind+floor(rcum[1])]
 end
 
 save, filename = 's:\temp\shifts.sav', all_c0, all_r0, all_cp, all_rp

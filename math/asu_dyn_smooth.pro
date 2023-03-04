@@ -26,6 +26,9 @@ for k = pos, n-1 do begin
     if to-from gt 2 then begin
         res = poly_fit(indgen(to-from+1), scan[from:to], 2, yfit = yfit)
         smoo[k] = yfit[k-from]
+;        if k eq 998 then begin
+;            stophere = 1
+;        endif    
     endif
 endfor     
 

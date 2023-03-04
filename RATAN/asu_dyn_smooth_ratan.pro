@@ -6,19 +6,28 @@
 ; 
 ; Parameters:
 ;     Required:
-;         scan (in) RATAN  
-;         step (in)
+;         scan (in)         RATAN scan (1st dimension is scan, ther dims arbitrary)  
+;         step (in)         RATAN scan step, arcsec
 ;         
 ;     Optional:
-;         down (in) 
-;         step (in)
-;         
+;         slit_vert (in)    vertical slit (for mostly steep parts of scan, such as limbs) (rel.part of max, default = 0.2)  
+;         slit_horz (in)    horizontal slit (for mostly flat parts of scan, such disk center) (arcsec, default = 900)
+;         lim_top (in)      level abouve which points considered as "exceedings" (rel.part of max, default = 0.8) 
+;         lim_edge (in)     relative part of most exceeding points, which should be corrected (default = 0.9)
+;         symm (in)         if set (/symm), required that paddle should be symmetric
+;         down (in)         number of iterations (smooth of smoothed) (default = 1)
+;
 ; Return value:
-;     RATAN position angle (between "E-W" line and RATAN scan line), counter clock wise, degrees
-;           (positive e.g. if the RATAN scan line goes from bottom-left to top-right direction)                    
+;         smoothed value of the same size as scan
+;           
+; Notes:
+;   To get more smoothed (but maybe not precise) scan you can:
+;       1. increase slit_vert (for steep of scan)
+;       2. increase slit_horz (for flat of scan)
+;       3. decrease lim_top
+;       3. decrease lim_edge
+;       3. increase down
 ; 
-; Sources: Scientific report, SAO RAN, 1983
-;    
 ; (c) Alexey G. Stupishin, Saint Petersburg State University, Saint Petersburg, Russia, 2017-2020
 ;     mailto:agstup@yandex.ru
 ;
@@ -28,14 +37,6 @@
 ;     /|\                                                         /|\      ;  
 ;--------------------------------------------------------------------------;
 ;
-;smoo = asu_dyn_smooth_RATAN(scan, step)
-; где scan – скан для сглаживания, step – шаг скана, угл.сек,  smoo – сглаженные значения в тех же точках.
-;входной массив может быть от одно- до трехмерного (скан – всегда по первому измерению), выход будет такого же размера. Т.е. можно, например, сгладить только на выбранных частотах:
-; smoo = asu_dyn_smooth_RATAN(template_qs_sun[*, 1, [1, 10, 60]], step)
-; получится размерностью 2041x1x3.
-;Симметрию задает ключ /symm, по умолчанию он не установлен, подложка будет несимметричной. Кроме того, есть 2 ключа, down (количество итераций, по умолчанию 1) и lim_edge (отвечает за степень приближения к нижней огибающей, по умолчанию 0.9). Ежели тебе кажется, что подложка слишком занижена, можешь уменьшить lim_edge (значение 0 – отсутствие подгонки к нижней огибающей). Ежели наоборот, хочется подложку опустить ниже, можно увеличить lim_edge вплоть до единицы, либо увеличить количество итераций (down = 2, 3).
-;Ключ  slit_vert по умолчанию он 0.2, если на подложке появляются выбросы, его можно немного увеличить, скажем, до 0.25. Очень сильно увеличивать опасно, подложка слишком сгладится.
-
 
 function asu_dyn_smooth_RATAN, scan, step, down = down, slit_vert = slit_vert, slit_horz = slit_horz, symm = symm, lim_top = lim_top, lim_edge = lim_edge
 
@@ -47,7 +48,7 @@ if n_elements(lim_edge) eq 0 then lim_edge = 0.9
 down = fix(0 > down < 10)
 slit_vert = 0.01 > slit_vert < 0.99
 slit_horz = 10 > slit_horz < 3000
-lim_top = 0.1 > lim_top < 0.9 
+lim_top = 0.01 > lim_top < 0.99
 lim_edge = 0 > lim_edge < 0.99
 
 sz0 = size(scan)
