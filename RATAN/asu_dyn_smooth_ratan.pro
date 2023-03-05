@@ -13,12 +13,15 @@
 ;         method (in)       smoothing method (1 or 2) (default = 1)
 ;         
 ;         slit_vert (in)    vertical slit (for mostly steep parts of scan, such as limbs) (rel.part of max)
-;                           (default = 0.2 for method 1, 0.4 for method 2)  
-;         slit_horz (in)    horizontal slit (for mostly flat parts of scan, such disk center) (arcsec, default = 900)
+;                           (range 0.01 ... 0.99, default = 0.2 for method 1, 0.4 for method 2)  
+;         slit_horz (in)    horizontal slit (for mostly flat parts of scan, such disk center)
+;                           (arcsec, range 10 ... 3000, default = 900)
 ;         
-;         lim_edge (in)     relative part of most "exceeding" points, which should be corrected (default = 0.9)
+;         lim_edge (in)     relative part of most "exceeding" points, which should be corrected
+;                           (range 0 ... 0.99, default = 0.9)
 ;                           provides approach to the lower envelop, see Note below  
-;         down (in)         number of iterations (smooth of smoothed) (default = 1)
+;         down (in)         number of iterations (smooth of smoothed)
+;                           (reasonable range 1 ... 4, default = 1)
 ;         
 ;         symm (in)         if set (/symm), required that paddle should be symmetric
 ;
