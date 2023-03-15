@@ -23,6 +23,7 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 * 17 Feb 2023: Cyrillic utilities added, some polishing
 * 04 Mar 2023: Smoothing utils update, new smoothing method introduced
 * 14 Mar 2023: HMI download bug fixing
+* 15 Mar 2023: AIA download refactoring
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)
