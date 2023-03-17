@@ -11,7 +11,7 @@ yc = fix((y[1]+y[0])/2d)
 wpix = fix(x[1]-x[0])
 hpix = fix(y[1]-y[0])
 config = {tstart:tstart, tstop:tstop, tref:tstart, xc:xc, yc:yc, wpix:wpix, hpix:hpix}
-lims = pipeline_aia_download_aia_cutout(waves, outdir, config)
+lims = aia_utils_download_cutout(waves, outdir, config)
 
 pipeline_aia_get_input_files, config, outdir, files_in
 files_in_array = files_in.ToArray()

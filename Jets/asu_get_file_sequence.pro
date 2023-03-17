@@ -12,13 +12,13 @@ if ~infofrom.exists || ~infoto.exists then begin
     return, files_in
 endif    
 
-ts = aia_date_from_filename(from, /q_anytim)
-te = aia_date_from_filename(to, /q_anytim)
+ts = asu_date_from_filename(from, /q_anytim)
+te = asu_date_from_filename(to, /q_anytim)
 tims = minmax([ts, te]) 
 
 files_in_all = file_search(filepath('*.fits', root_dir = path))
 foreach file_in, files_in_all, i do begin
-    tf = aia_date_from_filename(file_in, /q_anytim)
+    tf = asu_date_from_filename(file_in, /q_anytim)
     if tf ge tims[0] && tf le tims[1] then files_in.Add, file_in
 endforeach
 

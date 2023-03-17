@@ -27,7 +27,7 @@ foreach url, urls, j do begin
     time_download_started = systime(1)
     if keyword_set(down_message) then message, /info, "Wave " + swave + ": downloading "+filenames[j]+" from "+url+'...'
     
-    date = aia_date_from_filename(filenames[j])
+    date = asu_date_from_filename(filenames[j])
     
     if n_elements(dirmode) eq 0 || dirmode eq 'cache' then begin
         date_dir = save_dir + path_sep() + date

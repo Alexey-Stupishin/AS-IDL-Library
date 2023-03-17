@@ -24,6 +24,7 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 * 04 Mar 2023: Smoothing utils update, new smoothing method introduced
 * 14 Mar 2023: HMI download bug fixing
 * 15 Mar 2023: AIA download refactoring
+* 17 Mar 2023: Major refactoring for AIA and HMI utilities
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)

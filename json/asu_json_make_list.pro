@@ -5,6 +5,9 @@ if n_elements(shift) eq 0 then shift = ''
 
 if isa(var, 'LIST') then begin
     n = var.Count()
+    if n eq 0 then begin
+        return, '[]'
+    endif    
     str = strarr(n)
     for i = 0, n-1 do str[i] = asu_json_make_list(var[i])
     return, '[' + strjoin(str,',') + ']'
