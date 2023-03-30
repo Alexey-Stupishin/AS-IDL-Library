@@ -3,6 +3,7 @@ function jsoc_get_query_ex,ds,starttime,stoptime,wave,segment=segment,cadence=ca
     t1=strmid(t1,0,19)+'_TAI'
     t2= str_replace(str_replace(anytim(stoptime,/cc),'-','.'),'T','_')
     t2=strmid(t2,0,19)+'_TAI'
+    use_cadence = keyword_set(cadence) && strlen(cadence) gt 0
     if keyword_set(t_ref) and (n_elements(x) eq 1) and (n_elements(y) eq 1) then begin
       if n_elements(width) ne 1 then width=100
       if n_elements(height) ne 1 then height=100
@@ -11,7 +12,7 @@ function jsoc_get_query_ex,ds,starttime,stoptime,wave,segment=segment,cadence=ca
       processing="im_patch,"
       processing+="t_start="+t1+",t_stop="+t2+",t=0,r=1,c=0,cadence="
       
-      processing += keyword_set(cadence) && strlen(cadence) ? cadence : '1s'
+      processing += use_cadence ? cadence : '1s'
        
       processing+=",locunits=arcsec,boxunits=pixel,t_ref="+$
                 t_ref_+',x='+strcompress(x,/remove)+',y='+strcompress(y,/remove)+',width='+strcompress(width,/remove)+',height='+strcompress(height,/remove)
@@ -19,7 +20,7 @@ function jsoc_get_query_ex,ds,starttime,stoptime,wave,segment=segment,cadence=ca
     endif
     
     res = ds+'['+t1+'-'+t2
-    if keyword_set(cadence) && strlen(cadence) then res += '@' + cadence
+    if use_cadence then res += '@' + cadence
     res += ']'
     
     if keyword_set(wave) then res=res+'['+strjoin(sstring(wave),',')+']'
