@@ -12,9 +12,10 @@ if Robs gt Rctr then begin
     config.yc *= Rctr/Robs 
 endif   
 
-query = jsoc_get_query(ds, config.tstart, config.tstop, item, segment = segment, $
-                       processing=processing, t_ref=config.tref, x=config.xc, y=config.yc,$
-                       width=config.wpix, height=config.hpix)
+query = jsoc_get_query_ex(ds, config.tstart, config.tstop, item, segment = segment $
+                          , cadence = config.cadence $   
+                          , processing=processing, t_ref=config.tref, x=config.xc, y=config.yc $
+                          , width=config.wpix, height=config.hpix)
 message,"Requesting data from JSOC...",/info
 urls = jsoc_get_urls(query, processing = processing, file_names = filenames)
 msg = "got "+strcompress(n_elements(urls), /remove_all)+" URLs"

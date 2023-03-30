@@ -25,6 +25,7 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 * 14 Mar 2023: HMI download bug fixing
 * 15 Mar 2023: AIA download refactoring
 * 17 Mar 2023: Major refactoring for AIA and HMI utilities
+* 30 Mar 2023: Rotation utilities, JSOC query with cadence
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)

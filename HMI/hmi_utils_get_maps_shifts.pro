@@ -11,7 +11,7 @@ arccenx = (pixcenx-ind1.CRPIX1)*ind1.CDELT1 + ind1.CRVAL1
 pixceny = (yrange[0]+yrange[1])*0.5d
 arcceny = (pixceny-ind1.CRPIX2)*ind1.CDELT2 + ind1.CRVAL2
 
-asu_sun_diff_rotation, arccenx, arcceny, dsec, solar_b, solar_r, x_new, y_new, latitude = latitude, longitude = longitude
+rc = asu_sun_diff_rotation(arccenx, arcceny, dsec, solar_b, solar_r, x_new, y_new, latitude = latitude, longitude = longitude)
 shifts_rot = [x_new-arccenx, y_new-arcceny]/[ind1.CDELT1, ind1.CDELT2]
 if n_elements(verbose) ne 0 then print, shifts_rot
 

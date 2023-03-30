@@ -25,7 +25,7 @@ position_angle = asu_ratan_position_angle(azimuth, sol_dec, solar_p)
 
 t = anytim(t_get)
 if t ne t0 then begin 
-    asu_sun_diff_rotation, x, y, t-t0, solar_b, solar_r, x_new, y_new, latitude = latitude, longitude = longitude
+    rc = asu_sun_diff_rotation(x, y, t-t0, solar_b, solar_r, x_new, y_new, latitude = latitude, longitude = longitude)
 endif        
 
 scan_dist = asu_ratan_distance(x_new, y_new, position_angle, solar_r = solar_r, scan_pos = scan_pos)

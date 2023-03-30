@@ -1,4 +1,4 @@
-function jsoc_get_query,ds,starttime,stoptime,wave,segment=segment,processing=processing,t_ref=t_ref,x=x,y=y,width=width,height=height
+function jsoc_get_query_ex,ds,starttime,stoptime,wave,segment=segment,cadence=cadence,processing=processing,t_ref=t_ref,x=x,y=y,width=width,height=height
     t1= str_replace(str_replace(anytim(starttime,/cc),'-','.'),'T','_')
     t1=strmid(t1,0,19)+'_TAI'
     t2= str_replace(str_replace(anytim(stoptime,/cc),'-','.'),'T','_')
@@ -9,11 +9,19 @@ function jsoc_get_query,ds,starttime,stoptime,wave,segment=segment,processing=pr
       t_ref_= str_replace(str_replace(anytim(t_ref,/cc),'-','.'),'T','_')
       t_ref_=strmid(t_ref_,0,19)+'_TAI'
       processing="im_patch,"
-      processing+="t_start="+t1+",t_stop="+t2+",t=0,r=1,c=0,cadence=1.000000s,locunits=arcsec,boxunits=pixel,t_ref="+$
+      processing+="t_start="+t1+",t_stop="+t2+",t=0,r=1,c=0,cadence="
+      
+      processing += keyword_set(cadence) && strlen(cadence) ? cadence : '1s'
+       
+      processing+=",locunits=arcsec,boxunits=pixel,t_ref="+$
                 t_ref_+',x='+strcompress(x,/remove)+',y='+strcompress(y,/remove)+',width='+strcompress(width,/remove)+',height='+strcompress(height,/remove)
                 processing=str_replace(processing,'=','%3d')
     endif
-    res=ds+'['+t1+'-'+t2+']'
+    
+    res = ds+'['+t1+'-'+t2
+    if keyword_set(cadence) && strlen(cadence) then res += '@' + cadence
+    res += ']'
+    
     if keyword_set(wave) then res=res+'['+strjoin(sstring(wave),',')+']'
     if keyword_set(segment) then res=res+'{'+segment+'}'
     return,res  
