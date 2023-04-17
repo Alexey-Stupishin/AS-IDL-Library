@@ -28,6 +28,9 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 * 30 Mar 2023: Rotation utilities, JSOC query with cadence
 * 05 Apr 2023: Some improvement and new utils for coordinate transformation processing, some polishing
 * 06 Apr 2023: Trim FITS, AIA utils small improvement
+* 17 Apr 2023:
+	* Convert GX map into data/index
+	* FITS rotation
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)
