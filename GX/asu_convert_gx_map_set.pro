@@ -1,4 +1,4 @@
-pro asu_convert_gx_map_set, map, data, index, freqs = freqs
+pro asu_convert_gx_map_set, map, data, index, freqs = freqs, freq_set = freq_set
 
 data = !NULL
 index = !NULL
@@ -19,17 +19,18 @@ for k = 0, nlist-1 do begin
     index[k] = index1    
 endfor
 
+freq_set = index.freq
 n = n_elements(freqs)
 if n ne 0 then begin
-    m_freqs = index.freq
     sz = size(data)
     keep = intarr(n)
     for k = 0, n-1 do begin
-        mm = min(abs(freqs[k]-m_freqs), idx)
+        mm = min(abs(freqs[k]-freq_set), idx)
         keep[k] = idx
     endfor
     data = data[*,*,keep]
     index = index[keep]
+    freq_set = freq_set[keep]
 endif
 
 end

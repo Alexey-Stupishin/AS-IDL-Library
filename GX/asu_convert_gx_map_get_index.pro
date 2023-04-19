@@ -1,4 +1,5 @@
 pro asu_convert_gx_map_get_index, rmap, index
+compile_opt idl2
 
 sz = size(rmap.data)
 crpix1 = rmap.xc/rmap.dx + (sz[1]-1)/2d 
