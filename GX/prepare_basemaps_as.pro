@@ -27,8 +27,9 @@
   ;
   ; :Author: Sergey Anfinogentov  (anfinogentov@iszf.irk.ru)
   ;-
-function prepare_basemaps_as, file_field, file_inclination, file_azimuth, file_disambig, file_continuum,$
- center_arcsec, size_pix, dx_km, WCS = WCS, carrington = carrington, cea = cea, top = top, sfq = sfq, hmi_prep = hmi_prep
+function prepare_basemaps_as, file_field, file_inclination, file_azimuth, file_disambig, file_continuum $
+                            , center_arcsec, size_pix, dx_km, WCS = WCS, carrington = carrington $
+                            , cea = cea, top = top, sfq = sfq, hmi_prep = hmi_prep, _extra = _extra
  compile_opt idl2
    
    

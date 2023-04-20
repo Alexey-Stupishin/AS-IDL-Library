@@ -31,6 +31,7 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 * 17 Apr 2023:
 	* Convert GX map into data/index
 	* FITS rotation
+* 20 Apr 2023: Calculate GS/FF by GX-model
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)
