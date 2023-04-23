@@ -116,7 +116,7 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , box = box, save_pbox = save_pbox, pbox = pbox $
                 , hmi_files = hmi_files, hmi_dir = hmi_dir $
                 , aia_uv = aia_uv, aia_euv = aia_euv $
-                , magnetogram = magnetogram, full_Bz = full_Bz, hmi_prep = hmi_prep
+                , magnetogram = magnetogram, full_Bz = full_Bz, hmi_prep = hmi_prep, _extra = _extra
     
     if box eq !NULL then return
     
