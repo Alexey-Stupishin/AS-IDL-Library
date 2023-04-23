@@ -113,6 +113,8 @@ function prepare_basemaps_as, file_field, file_inclination, file_azimuth, file_d
     
     pos = [min(crd_ref[0,*]),min(crd_ref[1,*]),max(crd_ref[0,*]),max(crd_ref[1,*])]
     rsun_arcsec = wcs_rsun()/wcs0.position.dsun_obs*180d*60d*60d/!dpi
+
+save, filename = 'c:\temp\sfq_input_HMI.sav', field_s, azimuth_s, inclination_s, bx, by, bz, pos, rsun_arcsec
     
     sfq_disambig,bx,by,bz,pos, rsun_arcsec,/hmi
     
@@ -121,8 +123,10 @@ function prepare_basemaps_as, file_field, file_inclination, file_azimuth, file_d
     az = atan(bx,by)
     data[xrange[0]:xrange[1],yrange[0]:yrange[1],2] = az*180d/!dpi
 
-
-
+azimuth_s = data[xrange[0]:xrange[1],yrange[0]:yrange[1],2]
+bx = field_s*sin(inclination_s*(!dpi/180d))*sin(azimuth_s*!dpi/180d)
+by = -field_s*sin(inclination_s*(!dpi/180d))*cos(azimuth_s*!dpi/180d)
+save, filename = 'c:\temp\sfq_output_HMI.sav', bx, by, bz
     
    ;stop
     
