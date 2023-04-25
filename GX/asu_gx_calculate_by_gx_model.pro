@@ -1,4 +1,4 @@
-pro asu_gx_get_scans_by_gx_model, mag_file, maps, xarc, scans = scans, freqs = freqs, freq_set = freq_set $
+pro asu_gx_calculate_by_gx_model, mag_file, maps, xarc, scans = scans, freqs = freqs, freq_set = freq_set $
                                 , subtr = subtr, rot = rot, visstep = visstep
 compile_opt idl2
 
