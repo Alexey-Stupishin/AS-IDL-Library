@@ -3,18 +3,26 @@ pro asu_convert_gx_map_set, map, data, index, freqs = freqs, freq_set = freq_set
 data = !NULL
 index = !NULL
 
-mapex = map.getlist()
-nlist = mapex.Count()
+rmap = map
+if isa(rmap, 'string') then begin
+    restore, rmap
+    rmap = map
+endif
+if isa(rmap, 'map') then begin
+    rmap = rmap.getlist()
+endif
+
+nlist = rmap.Count()
 
 for k = 0, nlist-1 do begin
-    rmap = mapex[k]
+    map_k = rmap[k]
     if data eq !NULL then begin
-        sz = size(rmap.data)
-        asu_convert_gx_map_get_index, rmap, index1
+        sz = size(map_k.data)
+        asu_convert_gx_map_get_index, map_k, index1
         data = dblarr(sz[1], sz[2], nlist)
         index = replicate(index1, nlist)
     endif
-    asu_convert_gx_map, rmap, data1, index1
+    asu_convert_gx_map, map_k, data1, index1
     data[*,*,k] = data1
     index[k] = index1    
 endfor

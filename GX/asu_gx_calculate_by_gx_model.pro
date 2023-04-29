@@ -1,10 +1,8 @@
-pro asu_gx_calculate_by_gx_model, mag_file, maps, xarc, scans = scans, freqs = freqs, freq_set = freq_set $
+pro asu_gx_calculate_by_gx_model, gx_radio_map, maps, xarc, scans = scans, freqs = freqs, freq_set = freq_set $
                                 , subtr = subtr, rot = rot, visstep = visstep
 compile_opt idl2
 
-restore, mag_file
-
-asu_convert_gx_map_set, map, data, index, freqs = freqs, freq_set = freq_set
+asu_convert_gx_map_set, gx_radio_map, data, index, freqs = freqs, freq_set = freq_set
 if n_elements(rot) ne 0 then begin
     asu_fits_rotate, data, index, rot, maps, out_index
 endif else begin
