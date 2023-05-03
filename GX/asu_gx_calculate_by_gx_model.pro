@@ -1,13 +1,5 @@
-;--------------------------------------------------------------------------;
-;     \|/     I will battle for the Sun                           \|/      ;
-;    --O--    And I won’t stop until I’m done                    --O--     ;
-;     /|\         Placebo, album "Battle for the Sun", 2009       /|\      ;  
-;--------------------------------------------------------------------------;
-
-pro asu_gx_calculate_by_gx_model, gx_radio_map $ ; obligatory in
-                                , maps, xarc $   ; obligatory out
-                                , freqs = freqs, subtr = subtr, rot = rot $ ; optional in
-                                , scans = scans, freq_set = freq_set, visstep = visstep; optional out
+pro asu_gx_calculate_by_gx_model, gx_radio_map, maps, xarc, scans = scans, freqs = freqs, freq_set = freq_set $
+                                , subtr = subtr, rot = rot, visstep = visstep
 compile_opt idl2
 
 asu_convert_gx_map_set, gx_radio_map, data, index, freqs = freqs, freq_set = freq_set
