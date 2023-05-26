@@ -48,7 +48,7 @@ while ~call_function(criteria, x, f, context) do begin
         endif
     endfor
     
-    if n_elements(report) ne 0 then call_procedure, report, x[kL, *]
+    if n_elements(report) ne 0 then call_procedure, report, x[kL, *], f = fL, context = context
     
     xL = x[kL, *]
     xH = x[kH, *]
