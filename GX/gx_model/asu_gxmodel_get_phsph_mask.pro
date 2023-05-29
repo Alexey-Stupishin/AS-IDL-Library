@@ -1,30 +1,17 @@
-function asu_gxmodel_get_phsph_mask, map, box, map_magnetogram = map_magnetogram, map_continuum = map_continuum
+function asu_gxmodel_get_phsph_mask, model, map_magnetogram = map_magnetogram, map_continuum = map_continuum
 compile_opt idl2
 
-rmap = map
-if isa(rmap, 'string') then begin
-    restore, rmap
-    rmap = map
-endif
-if isa(rmap, 'map') then begin
-    rmap = rmap.getlist()
-endif
-if isa(rmap, 'list') then begin
-    rmap = rmap[0]
-endif
-
-refmaps = *(box.Refmaps())
-for i=0, refmaps->get(/count)-1 do begin
-    if refmaps->get(i,/id) eq 'LOS_magnetogram' then magnetogram = refmaps->get(i,/map)
-    if refmaps->get(i,/id) eq 'Continuum' then continuum = refmaps->get(i,/map)
-endfor
-for i=0, refmaps->get(/count)-1 do begin
-    if refmaps->get(i,/id) eq 'Bz_reference' then magnetogram = refmaps->get(i,/map)
-    if refmaps->get(i,/id) eq 'Ic_reference' then continuum = refmaps->get(i,/map)
+model->GetProperty, refmaps = refmaps
+for i=0, *refmaps.get(/count)-1 do begin
+    if *refmaps.get(i,/id) eq 'Bz_reference' then magnetogram = *refmaps.get(i,/map)
+    if *refmaps.get(i,/id) eq 'Ic_reference' then continuum = *refmaps.get(i,/map)
 endfor
 
 chromo_mask = decompose(magnetogram.data, continuum.data)
 
+fov = model->GetFovMap()
+maps = fov.getlist()
+rmap = maps[0]
 szp = size(rmap.data)
 map_xlim = rmap.xc + [-0.5d, 0.5d]*szp[1]*rmap.dx
 map_x = asu_linspace(map_xlim[0], map_xlim[1], szp[1])
