@@ -4,7 +4,7 @@ dll_location = getenv('reo_dll_location')
 
 if keyword_set(model) then begin
     names = tag_names(box)
-    rsun = 360
+    rsun = 960
     idx = where(names eq 'rsun')
     if idx ge 0 then rsun = box.rsun
     vcos = [0, 0, 1]
