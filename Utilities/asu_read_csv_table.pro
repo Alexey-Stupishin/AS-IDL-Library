@@ -6,10 +6,10 @@ data = dblarr(info.lines, info.nfields)
 arr = read_csv(filename)
 tags = tag_names(arr)
 
-n_col_form = 'FIELD%0' + asu_compstr(ceil(alog10(info.nfields))) + 'd'
+format = '(%"FIELD%0' + asu_compstr(ceil(alog10(info.nfields))) + 'd")'
 
 for k = 1, info.nfields do begin
-    fieldname = strcompress(string(k, format = '(%"' + n_col_form + '")'))
+    fieldname = strcompress(string(k, format = format))
     idx = where(tags eq fieldname, count)
     t = arr.(idx)
     data[*, k-1] = t
