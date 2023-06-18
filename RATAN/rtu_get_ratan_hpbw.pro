@@ -9,13 +9,13 @@ default, b, 8.5
 lamb = 30d/freqs
 
 case mode of
-   1: horz =          8.5  *lamb
-   2: horz =  4.38  + 6.87 *lamb
-   3: horz =  0.009 + 8.338*lamb
-   4: horz =      c +     b*lamb
-   5: horz =  0.2   + 9.4  *lamb
-   6: horz = -0.16  + 8.162*lamb
-   else: horz =  c  + b*lamb
+   1: horz =          8.5  *lamb ; simple, from SAO site
+   2: horz =  4.38  + 6.87 *lamb ; theoretical for spiral feed, unrealistic
+   3: horz =  0.009 + 8.338*lamb ; some last private letter (S. Tokchukova? Need to clarify)
+   4: horz =      c +     b*lamb ; user defined (default c = 0, b = 8.5)
+   5: horz =  0.2   + 9.4  *lamb ; wide, source unknown
+   6: horz = -0.16  + 8.162*lamb ; 1-3 GHz, 2023 (spring) by N.Ovchinnikova/M.Lebedev
+   else: horz =  c  +     b*lamb ; user defined, see mode = 4
 endcase
 
 end
