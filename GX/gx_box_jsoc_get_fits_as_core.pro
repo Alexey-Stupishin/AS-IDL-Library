@@ -128,7 +128,7 @@ endif
 end
 
 ;----------------------------------------------------------------------------
-function gx_box_jsoc_get_fits_as, t1, t2, ds, segment, cache_dir, wave = wave
+function gx_box_jsoc_get_fits_as_core, t1, t2, ds, segment, cache_dir, wave = wave
 
 query = gx_box_jsoc_make_query_as(t1, t2, ds, segment, wave = wave)
 ssw_jsoc_time2data, t1, t2, index, urls, /urls_only, ds=ds, segment = segment, wave = wave, count = count
