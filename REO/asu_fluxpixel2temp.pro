@@ -4,7 +4,10 @@
 ; Call:
 ;   temperature = reo_fluxpixel2temp(flux, frequency, step)
 ; 
-; Parameters description: (obviously, but will be defined)
+; Parameters description:
+;   flux - flux from area of step^2 size
+;   frequency - in GHz
+;   step - in arcsec
 ;    
 ; (c) Alexey G. Stupishin, Saint Petersburg State University, Saint Petersburg, Russia, 2017-2020
 ;     mailto:agstup@yandex.ru

@@ -1,12 +1,12 @@
 pro rtu_get_ratan_hpbw, freqs, vert, horz, mode = mode, c = c, b = b
 ; freqs in GHz!
 
-vert = 7.5d * 60d * 30d / freqs
+lamb = 30d/freqs
+vert = 7.5d * 60d * lamb
 
 default, mode, 3
 default, c, 0.009
 default, b, 8.338
-lamb = 30d/freqs
 
 case mode of
    1: horz =          8.5  *lamb ; simple, from SAO site

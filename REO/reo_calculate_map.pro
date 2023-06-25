@@ -43,8 +43,8 @@
 ;   (in)      mode, beam_c, beam_b, scan_lim                              RATAN-600 scan specific (see reo_convolve_map.pro and separate document)(**)  
 ;
 ; Parameters optional (out):
-;   (out)     FluxR           (double 2-D array)         s.f.u./arcsec^2  Radiomap of the flux in the right polarization  
-;   (out)     FluxL           (double 2-D array)         s.f.u./arcsec^2  Radiomap of the flux in the left polarization
+;   (out)     FluxR           (double 2-D array)                  s.f.u.  Radiomap of the flux in the right polarization  
+;   (out)     FluxL           (double 2-D array)                  s.f.u.  Radiomap of the flux in the left polarization
 ;   (out)     scanR           (double 1-D array)           s.f.u./arcsec  Emulated RATAN-600 scan, right polarization, specific for RATAN-600(**)
 ;   (out)     scanL           (double 1-D array)           s.f.u./arcsec  Emulated RATAN-600 scan, left polarization, specific for RATAN-600(**)
 ; 

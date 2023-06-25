@@ -109,7 +109,7 @@ if arg_present(field) then begin
     field = {bx:transpose(by, [1, 0]), by:transpose(bx, [1, 0]), bz:transpose(bz, [1, 0])}
 endif
 
-version_info = '---' ; NB! placeholder!
+; version_info = '---' ; NB! placeholder!
 
 return, ptr
 
