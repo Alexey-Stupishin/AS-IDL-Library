@@ -4,11 +4,11 @@ dll_location = getenv('reo_dll_location')
 
 if keyword_set(model) then begin
     names = tag_names(box)
-    rsun = 960
-    idx = where(names eq 'rsun')
+    rsun = 960d
+    idx = where(names eq 'RSUN')
     if idx ge 0 then rsun = box.rsun
-    vcos = [0, 0, 1]
-    idx = where(names eq 'vcos')
+    vcos = [0d, 0d, 1d]
+    idx = where(names eq 'VCOS')
     if idx ge 0 then vcos = box.vcos
     boxdata = {dx:box.modstep, rsun:rsun, vcos:vcos}
 endif else begin  
