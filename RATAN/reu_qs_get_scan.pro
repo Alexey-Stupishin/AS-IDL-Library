@@ -21,7 +21,7 @@ rmap = rtu_circle_map(sz, R/step)
 
 basev = -R
 steps = asu_linspace(-3*R, 3*R, sz[0])
-rtu_create_ratan_diagrams, freq, sz, [step, step], [0, basev], diagrH, diagrV
+rtu_create_ratan_diagrams, freq*1d9, sz, [step, step], [0, basev], diagrH, diagrV
 
 fluxmap = asu_temp2intensity(rmap*T, freq*1d9) * step^2 * 2.35d8 *1d4
 

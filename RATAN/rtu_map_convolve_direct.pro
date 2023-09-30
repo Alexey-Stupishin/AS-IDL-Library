@@ -5,7 +5,7 @@ function rtu_map_convolve_direct, freq, visstep, base, fluxmap, mode = mode, c =
 
 steps = double([visstep, visstep])
 sz = size(fluxmap)
-rtu_create_ratan_diagrams, freq*1e-9, sz[1:2], steps, [0, base[1]], diagrH, diagrV, mode = mode, c = c, b = b
+rtu_create_ratan_diagrams, freq, sz[1:2], steps, [0, base[1]], diagrH, diagrV, mode = mode, c = c, b = b
 scan = rtu_map_convolve(fluxmap, diagrH, diagrV, steps)
 
 return, scan
