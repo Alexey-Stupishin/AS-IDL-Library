@@ -41,6 +41,7 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 * 19 Jun - 17 Jul 2023: RATAN beam and convolution updates, dipole utilities
 * 01 Oct - 02 Oct 2023: "twosinc" RATAN diagram
 * 02 Nov 2023: polishing, replace NLFFF utility
+* 02 Nov 2023: Extract [RATAN-in-GX](https://github.com/Alexey-Stupishin/RATAN-in-GX) modules as separate product
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)
