@@ -30,9 +30,18 @@ function gx_box_create_as, file_field, file_inclination, file_azimuth, file_disa
             , center_arcsec, size_pix, dx_km, WCS = WCS, carrington = carrington $
             , cea = cea, top = top, sfq = sfq, hmi_prep = hmi_prep, _extra = _extra)
     
-
   base={bx:basemaps.bp ,by:-basemaps.bt, bz:basemaps.br,ic:basemaps.ic}
   
+  save_data_index_filename = 'save_data_index_filename'
+  if required_tags(_extra, save_data_index_filename) then begin
+      keys = strlowcase(tag_names(_extra))
+      idx = where(keys eq save_data_index_filename)
+      bx = base.bx
+      by = base.by
+      bz = base.bz
+      save, filename = _extra.(idx) + '_remap.sav', bx, by, bz
+  endif
+
   ;Prepare a dummy object for LOS reference maps
   refmaps=obj_new('map')
   dr = [dx_km*1d3,dx_km*1d3,dx_km*1d3]/wcs_rsun()

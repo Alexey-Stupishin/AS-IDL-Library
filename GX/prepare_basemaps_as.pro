@@ -41,9 +41,12 @@ function prepare_basemaps_as, file_field, file_inclination, file_azimuth, file_d
   ; if n_elements(hmi_prep) eq 0 then begin
   ;    hmi_prep, files, [0,1,2,3], index4, data4
   read_sdo, files, index4, data4
-        
+
+  save_data_index_filename = 'save_data_index_filename'
+
   azimuth  = reform(data4[*,*,2])
   disambig = reform(data4[*,*,3])
+  azimuth0 = azimuth
   hmi_disambig, azimuth, disambig, 0
   data = data4[*, *, 0:2]
   data[*,*,2] = azimuth
@@ -55,6 +58,16 @@ function prepare_basemaps_as, file_field, file_inclination, file_azimuth, file_d
   
   wcs0 = FITSHEAD2WCS( index[0] )
   
+  if required_tags(_extra, save_data_index_filename) then begin
+      keys = strlowcase(tag_names(_extra))
+      idx = where(keys eq save_data_index_filename)
+      index0 = index4[0]
+      data0 = data
+      ind = where(abs(data0) gt 10000)
+      data0[ind] = 0
+      save, filename = _extra.(idx) + '_data3.sav', index0, data0, wcs0, azimuth0, disambig
+  endif
+
   ;trying to correct position bug
   wcs2map,data[*,*,0], wcs0, map
   map2wcs, map,wcs0
@@ -123,11 +136,12 @@ save, filename = 'c:\temp\sfq_input_HMI.sav', field_s, azimuth_s, inclination_s,
     az = atan(bx,by)
     data[xrange[0]:xrange[1],yrange[0]:yrange[1],2] = az*180d/!dpi
 
-azimuth_s = data[xrange[0]:xrange[1],yrange[0]:yrange[1],2]
-bx = field_s*sin(inclination_s*(!dpi/180d))*sin(azimuth_s*!dpi/180d)
-by = -field_s*sin(inclination_s*(!dpi/180d))*cos(azimuth_s*!dpi/180d)
-save, filename = 'c:\temp\sfq_output_HMI.sav', bx, by, bz
-    
+    if required_tags(_extra, save_data_index_filename) then begin
+        azimuth_s = data[xrange[0]:xrange[1],yrange[0]:yrange[1],2]
+        bx = field_s*sin(inclination_s*(!dpi/180d))*sin(azimuth_s*!dpi/180d)
+        by = -field_s*sin(inclination_s*(!dpi/180d))*cos(azimuth_s*!dpi/180d)
+        save, filename = 'c:\temp\sfq_output_HMI.sav', bx, by, bz
+   endif    
    ;stop
     
   endif else begin
@@ -136,13 +150,7 @@ save, filename = 'c:\temp\sfq_output_HMI.sav', bx, by, bz
   
   ;Converting field to spherical coordinates
   hmi_b2ptr, index[0], data, bptr, lonlat=lonlat
-  
-  
-  
-
-  
-
-  
+    
   ; remapping data to the basmap projection
   bp = wcs_remap(bptr[*,*,0],wcs0, wcs, /ssaa)
   bt = wcs_remap(bptr[*,*,1],wcs0, wcs, /ssaa)
@@ -153,11 +161,7 @@ save, filename = 'c:\temp\sfq_output_HMI.sav', bx, by, bz
   wcs2map,data, wcs0, map
   map2wcs, map,wcs0
   ic = wcs_remap(data, wcs0, wcs, /ssaa)
-  
- 
- 
-  
+    
   return, {wcs:wcs, bp:bp, bt:bt, br:br, ic: ic}
-
 
 end

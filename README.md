@@ -32,7 +32,15 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 	* Convert GX map into data/index
 	* FITS rotation
 * 20 Apr 2023: Calculate GS/FF by GX-model
-* 30 Apr 2023: Calc GS/FF by GX-model - mask & level subtract
+* 30 Apr 2023 - 03 May 2023: Calc GS/FF by GX-model - mask & level subtract
+* 24 May 2023: GOES XRS update
+* 27 May 2023: GX model. Utilities for stand-alone corona heating calculations
+* 07 Jun 2023: New RATAN diagrams functionality
+* 09-19 Jun 2023: read CSV utility
+* 19 Jun 2023: JSOC utils refactoring
+* 19 Jun - 17 Jul 2023: RATAN beam and convolution updates, dipole utilities
+* 01 Oct - 02 Oct 2023: "twosinc" RATAN diagram
+* 02 Nov 2023: polishing, replace NLFFF utility
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)
