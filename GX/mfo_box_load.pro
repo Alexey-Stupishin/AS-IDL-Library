@@ -1,18 +1,12 @@
 ; IDL Wrapper to:
 ;   load SDO/HMI data for specified date/time and selected region, 
-;   save GX-box models, and
+;   save GX-box models,
 ;   external call of Weighted Wiegelmann NLFF Field Reconstruction Method library
+;   create model (magnetic field lines + chromosphere filling)
 ;   
-; v 2.1.21.1019 (rev.---)
+; v 2.2.23.1123 (rev. 793)
 ; 
 ; NB! Beta-version!
-; 
-; Call:
-;   mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
-;               , aia_uv = aia_uv, aia_euv = aia_euv  
-;               , save_pbox = save_pbox, pbox = pbox $
-;               , version_info = version_info, NLFFF_filename = NLFFF_filename $
-;               , dll_location = dll_location, save_sst = save_sst, _extra = _extra
 ; 
 ; Parameters description:
 ; 
@@ -31,7 +25,7 @@
 ;                                                                                 multiply downloaded without necessity
 ;                                                                                 (if there is no such folder, it will be created automatically). 
 ;                                                                                 Take care of enough disk space! (SDO/HMI observation data for
-;                                                                                 one time takes abot 400 MB of disk space)
+;                                                                                 one time takes about 400 MB of disk space)
 ;   
 ; Parameters optional (in):
 ;   (in)      save_pbox       (numeric)                     if not omitted and greater-than-zero, save also full-potential field  model GX-box (postfix .POT)                 
@@ -41,11 +35,14 @@
 ;   (in)      aia_uv          (numeric)                     if not omitted and greater-than-zero, load and store AIA ultraviolet images in GX-box                 
 ;   (in)      aia_euv         (numeric)                     if not omitted and greater-than-zero, load and store AIA extraultraviolet images in GX-box                 
 ;   
-;   (in)      dll_location    (string)                      full path to calling NLFFF reconstruction DLL; if omitted, DLL will be searched in the folder,
+;   (in)      lib_location    (string)                      full path to calling NLFFF reconstruction DLL; if omitted, DLL will be searched in the folder,
 ;                                                           containing gx_box_prepare_box.pro procedure (typically SSW\packages\gx_simulator\gxbox)
 ;   (in)      save_sst        (numeric)                     if not omitted and greater-than-zero, forced saving 'sst-plain' file (*)                 
 ;   (in)      noSelCheck      (numeric)                     ........................................................................                 
-;   (in)      askNLFFF        (numeric)                     ........................................................................                 
+;   (in)      no_NLFFF        (numeric)                     ........................................................................                 
+;   (in)      ask_NLFFF       (numeric)                     ........................................................................                 
+;   (in)      do_model        (numeric)                     ........................................................................
+;   (in)      ask_model       (numeric)                     ........................................................................
 ;   (in)      _extra          (various data types)          additional setting (such as tuning parameters, additional conditions etc.), is not a subject
 ;                                                           of the current wrapper implementation 
 ;   
@@ -93,10 +90,13 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , save_pbox = save_pbox $
                 , save_sst = save_sst $
                 , save_bnd = save_bnd $
+                , no_sel_check = no_sel_check $
+                , no_NLFFF = no_NLFFF, ask_NLFFF = ask_NLFFF $
+                , do_model = do_model, ask_model = ask_model, no_chr, do_gxm $
+                , tr_height_km = tr_height_km, reduce_passed = reduce_passed $
                 , version_info = version_info, NLFFF_filename = NLFFF_filename $
                 , POT_filename = POT_filename, BND_filename = BND_filename $
-                , no_sel_check = no_sel_check $
-                , ask_NLFFF = ask_NLFFF, no_NLFFF = no_NLFFF, winclose = winclose $
+                , winclose = winclose $
                 , hmi_files = hmi_files, hmi_dir = hmi_dir $
                 , aia_uv = aia_uv, aia_euv = aia_euv $
                 , pict_dir = pict_dir, pict_win = pict_win, sun_graph = sun_graph, ph_graph = ph_graph $
@@ -217,18 +217,29 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
         endif 
     endif
   
-; ----- NLFFF/ASK -----
-    if keyword_set(no_NLFFF) then return
-        
-    if keyword_set(ask_NLFFF) then begin
-        ans = ''
-        read, ans, prompt = 'Perform NLFFF? (y/n) '
-        if strlowcase(ans) ne 'y' then return
+    ; ----- NLFFF -----
+    if ~keyword_set(no_NLFFF) then begin
+        do_NLFFF = 1
+        if keyword_set(ask_NLFFF) then begin
+            ans = ''
+            read, ans, prompt = 'Perform NLFFF? (y/n) '
+            if strlowcase(ans) ne 'y' then do_NLFFF = 0
+        endif
+        if do_NLFFF then begin
+            mfo_box_nlfff, box, out_dir, prefix, lib_location = lib_location $
+                , sst_post = sst_post, aia = aia, boxdata = boxdata, input_coords = input_coords $
+                , _extra = _extra
+        endif
     endif
-          
-; ----- NLFFF+SAVE -----
-    mfo_box_nlfff, box, out_dir, prefix, lib_location = lib_location $
-                 , sst_post = sst_post, aia = aia, boxdata = boxdata, input_coords = input_coords $
-                 , _extra = _extra
-      
+    
+    ; ----- Model -----
+    if keyword_set(do_model) then begin
+        if keyword_set(ask_model) then begin
+            ans = ''
+            read, ans, prompt = 'Create model? (y/n) '
+            if strlowcase(ans) ne 'y' then do_model = 0
+        endif
+        
+        if do_model then asu_gxm_box2model_save, box, out_dir, prefix, tr_height_km = tr_height_km, reduce_passed = reduce_passed, lib_path = lib_path, no_chr = no_chr, do_gxm = do_gxm
+    endif
 end

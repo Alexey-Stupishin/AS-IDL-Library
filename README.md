@@ -42,6 +42,9 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 * 01 Oct - 02 Oct 2023: "twosinc" RATAN diagram
 * 02 Nov 2023: polishing, replace NLFFF utility
 * 02 Nov 2023: Extract [RATAN-in-GX](https://github.com/Alexey-Stupishin/RATAN-in-GX) modules as separate product
+* 23-24 Nov 2023: 
+	* Add GX-model create (lines+chromosphere) into mfo_ stuff
+	* Add corona dressing utilities
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)
