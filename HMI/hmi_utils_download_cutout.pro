@@ -1,6 +1,6 @@
 function hmi_utils_download_cutout, cadence, save_dir, config
 
-if n_elements(cadence) eq 0 then cadence = 720d
+if n_elements(cadence) eq 0 then cadence = 720
 case cadence of
     720: ds = 'hmi.M_720s'
      45: ds = 'hmi.M_45s'
