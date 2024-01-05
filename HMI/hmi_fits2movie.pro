@@ -9,12 +9,14 @@ if n_elements(video_name) eq 0 then video_name = 'video'
 file_mkdir, visdir
 files_in_all = file_search(filepath('*.fits', root_dir = fitsdir))
 
+win = window(dimensions = windim)
 foreach fits, files_in_all, i do begin
     hmi_utils_get_image, fits, win, windim
     outfile = visdir + path_sep() + img_name + string(i, FORMAT = '(I08)') + '.png'
     win.Save, outfile, width = windim[0], height = windim[1], bit_depth = 2
-    win.Close
+    win.Erase
 endforeach
+win.Close
 
 to_filename = visdir + path_sep() + video_name + '.mp4'
 hmi_mask = visdir + path_sep() + img_name + '%08d.png'

@@ -12,7 +12,7 @@ y = indgen(sz[2])
 x = indgen(sz[1])*xstep+xshift
 y = indgen(sz[2])*ystep+yshift
 
-win = window(dimensions = windim)
+;win = window(dimensions = windim)
 
 title = str_replace(index.t_obs, '_TAI', '')
 title = str_replace(str_replace(title, 'T', ' '), 'Z', '')
