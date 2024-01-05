@@ -1,4 +1,6 @@
-function sdo_utils_download_cutout, item, config, ds, save_dir, segment = segment
+function sdo_utils_download_cutout, item, config, ds, save_dir, segment = segment, no_tracking = no_tracking
+
+if n_elements(no_tracking) eq 0 then no_tracking = 0
 
 ts = anytim(config.tstart)
 te = anytim(config.tstop)
@@ -15,7 +17,7 @@ endif
 query = jsoc_get_query_ex(ds, config.tstart, config.tstop, item, segment = segment $
                           , cadence = config.cadence $   
                           , processing=processing, t_ref=config.tref, x=config.xc, y=config.yc $
-                          , width=config.wpix, height=config.hpix)
+                          , width=config.wpix, height=config.hpix, no_tracking = no_tracking)
 message,"Requesting data from JSOC...",/info
 urls = jsoc_get_urls(query, processing = processing, file_names = filenames)
 msg = "got "+strcompress(n_elements(urls), /remove_all)+" URLs"
