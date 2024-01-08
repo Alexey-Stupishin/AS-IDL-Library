@@ -25,8 +25,8 @@ for k = 0, n_elements(tags)-1 do begin
                                 zz = z[idx_use, *]
                             end
                         2:  begin
-                            zz = z[*, idx_use]
-                        end
+                                zz = z[*, idx_use]
+                            end
                     endcase        
                 endif
             end
@@ -38,11 +38,11 @@ for k = 0, n_elements(tags)-1 do begin
                                 zz = z[idx_use, *, *]
                             end
                         2:  begin
-                            zz = z[*, idx_use, *]
-                        end
+                                zz = z[*, idx_use, *]
+                            end
                         3:  begin
-                            zz = z[*, *, idx_use]
-                        end
+                                zz = z[*, *, idx_use]
+                            end
                     endcase        
                 endif
             end
@@ -50,5 +50,7 @@ for k = 0, n_elements(tags)-1 do begin
     
     new_s = create_struct(new_s, create_struct(tags[k], zz))
 endfor
+
+return, new_s
 
 end
