@@ -1,4 +1,4 @@
-pro hmi_utils_get_image, filename, win, windim, out_value = out_value
+pro hmi_utils_get_image, filename, out_value = out_value, xrange = xrange, yrange = yrange
 compile_opt idl2
 
 read_sdo, filename, index, data
@@ -24,6 +24,6 @@ if n_elements(out_value) ne 0 then begin
     if count gt 0 then data[excl] = out_value 
 end
 
-asu_fits2image, index, data, win, windim
+asu_fits2image, index, data, xrange = xrange, yrange = yrange
 
 end
