@@ -1,4 +1,5 @@
 function sdo_utils_download_cutout, item, config, ds, save_dir, segment = segment, no_tracking = no_tracking
+compile_opt idl2
 
 if n_elements(no_tracking) eq 0 then no_tracking = 0
 

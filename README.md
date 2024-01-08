@@ -46,7 +46,7 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 	* Add GX-model create (lines+chromosphere) into mfo_ stuff
 	* Add corona dressing utilities
 * 30 Dec 2023: New HMI download sequence utility
-* 05-06 Jan 2024: HMI download sequence utilities update, fits2images/movie utilities introduced
+* 05-08 Jan 2024: HMI download sequence utilities update/polishing, fits2images/movie utilities introduced
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)

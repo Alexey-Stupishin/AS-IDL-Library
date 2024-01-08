@@ -1,4 +1,5 @@
 pro asu_fits2image, index, data, win, windim
+compile_opt idl2
 
 xstep = index.CDELT1
 ystep = index.CDELT2

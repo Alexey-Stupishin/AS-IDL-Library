@@ -15,6 +15,7 @@ Function jsoc_get_urls,query,directory,requestid=requestid,processing=processing
   if not keyword_set(processing) then processing="n%3d0,no_op"
   if not keyword_set(requestid) then begin
     params={op:'exp_request', protocol:'fits,compress rice',method:'url',ds:query,filenamefmt:'{seriesname}.{T_OBS:A}.{CAMERA}.{segment}',process:processing, notify: 'sergey.istp@gmail.com'}
+    ;params={op:'exp_request', protocol:'fits,compress rice',method:'url',ds:query,filenamefmt:'{seriesname}.{T_OBS:A}.{CAMERA}.{segment}',process:processing, notify: 'jsocrequestagstup@gmail.com'}
 
     ourl->SetProperty,url_query=encode_url(params)
       message,'Connecting to JSOC Server',/info

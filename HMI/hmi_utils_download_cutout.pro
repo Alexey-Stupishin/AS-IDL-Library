@@ -1,4 +1,5 @@
 function hmi_utils_download_cutout, cadence, save_dir, config, no_tracking = no_tracking
+compile_opt idl2
 
 if n_elements(no_tracking) eq 0 then no_tracking = 0
 

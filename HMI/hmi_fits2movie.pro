@@ -1,4 +1,5 @@
-pro hmi_fits2movie, fitsdir, windim = windim, visdir = visdir, fps = fps, img_name = img_name, video_name = video_name
+pro hmi_fits2movie, fitsdir, windim = windim, visdir = visdir, fps = fps, img_name = img_name, video_name = video_name, out_value = out_value
+compile_opt idl2
 
 if n_elements(windim) eq 0 then windim = [1000, 1000]
 if n_elements(visdir) eq 0 then visdir = fitsdir + path_sep() + 'visual'
@@ -11,7 +12,7 @@ files_in_all = file_search(filepath('*.fits', root_dir = fitsdir))
 
 win = window(dimensions = windim)
 foreach fits, files_in_all, i do begin
-    hmi_utils_get_image, fits, win, windim
+    hmi_utils_get_image, fits, win, windim, out_value = out_value
     outfile = visdir + path_sep() + img_name + string(i, FORMAT = '(I08)') + '.png'
     win.Save, outfile, width = windim[0], height = windim[1], bit_depth = 2
     win.Erase
