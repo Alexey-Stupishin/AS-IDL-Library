@@ -52,24 +52,35 @@ return, byte(c*255)
 
 end
 
-pro asu_colortable_create, step_colors = step_colors, bottom = bottom, center = center, top = top, contrast = contrast, load = load, rb = rb, gb = gb, bb = bb
+pro asu_colortable_create, step_colors = step_colors, bottom = bottom, center = center, top = top, abs_bottom = abs_bottom, contrast = contrast, load = load, rb = rb, gb = gb, bb = bb
 compile_opt idl2
 
+is_abs_bottom = n_elements(abs_bottom) ne 0
 if n_elements(step_colors) gt 0 then begin
     bgr = bytarr(3, 256)
     sz = size(step_colors)
     ncol = isa(step_colors, /number) ? sz[2] : sz[1]
-    step = 255d/(ncol-1)
-    curr_idx = 0
-    curr_c = asu_colortable_create_parse(step_colors[0])
+    if is_abs_bottom then ncol++
+    num_colors = bytarr(3, ncol)
+    from = 0
+    if is_abs_bottom then begin
+        bgr[*, 0] = asu_colortable_create_parse(abs_bottom)
+        from = 1
+    endif
+    
+    for k = from, ncol-1 do begin
+        num_colors[*, k] = asu_colortable_create_parse(step_colors[k-from])
+    endfor
+    
+    step = (255d - from)/(ncol-1-from)
+    curr_idx = from
     last_k = step/2d
-    k = 0
+    k = from
     while k lt 256 do begin
-        bgr[*, k] = curr_c
+        bgr[*, k] = num_colors[*, curr_idx]
         if k gt last_k then begin
             last_k += step
             curr_idx++
-            curr_c = asu_colortable_create_parse(step_colors[curr_idx])
         endif
         k++
     endwhile
@@ -77,32 +88,42 @@ if n_elements(step_colors) gt 0 then begin
     gb = transpose(bgr[1, *])
     bb = transpose(bgr[0, *])
 endif else begin
-    r = dblarr(256)
-    g = dblarr(256)
     b = dblarr(256)
+    g = dblarr(256)
+    r = dblarr(256)
     
     default, bottom,   [  0,   0,   1]
     default, center,   [  1,   1,   1]
     default, top,      [  1,   0,   0]
     default, contrast, 0.8
     default, load,     0
+
+    dk = 0
+    if is_abs_bottom then begin
+        bott_c = asu_colortable_create_parse(abs_bottom)
+        b[0] = bott_c[0]
+        g[0] = bott_c[1]
+        r[0] = bott_c[2]
+        dk = 1
+    endif
     
     for k = 0, 127 do begin
-        r[k] = bottom[0]  + (center[0]-bottom[0])*k/127d
-        g[k] = bottom[1]  + (center[1]-bottom[1])*k/127d
-        b[k] = bottom[2]  + (center[2]-bottom[2])*k/127d
-        r[255-k] = top[0] + (center[0]-top[0])*k/127d
+        b[k+dk] = bottom[0]  + (center[0]-bottom[0])*k/127d
+        g[k+dk] = bottom[1]  + (center[1]-bottom[1])*k/127d
+        r[k+dk] = bottom[2]  + (center[2]-bottom[2])*k/127d
+        b[255-k] = top[0] + (center[0]-top[0])*k/127d
         g[255-k] = top[1] + (center[1]-top[1])*k/127d
-        b[255-k] = top[2] + (center[2]-top[2])*k/127d
+        r[255-k] = top[2] + (center[2]-top[2])*k/127d
     endfor    
-    r[0] = 0
-    g[0] = 0
-    b[0] = 0
     
     contr_scale = ((indgen(128)/127d)^contrast)*127d
     contr_scale_inv = 255 - contr_scale[127:0:-1]
     
-    contr_scale = [contr_scale, contr_scale_inv]
+    if is_abs_bottom then begin
+        contr_scale = [contr_scale[0], contr_scale[0:-2], contr_scale_inv]
+    endif else begin
+        contr_scale = [contr_scale, contr_scale_inv]
+    endelse
     r = interpol(r, contr_scale, indgen(256))
     g = interpol(g, contr_scale, indgen(256))
     b = interpol(b, contr_scale, indgen(256))
