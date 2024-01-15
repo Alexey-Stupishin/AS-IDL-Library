@@ -3,7 +3,8 @@ pro asu_tvscale_ct, image2show, x_arg, y_arg $
     , step_colors = step_colors $
     , bottom = bottom, center = center, top = top, contrast = contrast $
     , abs_bottom = abs_bottom, abs_top = abs_top $
-    , outimage = img, xout = xout, yout = yout, colortab = colortab
+    , outimage = img, xout = xout, yout = yout, colortab = colortab $
+    , _extra = _extra
 
     default, abs_bottom, 'black'
     default, abs_top, 'white'
@@ -26,5 +27,6 @@ pro asu_tvscale_ct, image2show, x_arg, y_arg $
         , xtitle = xtitle, ytitle = ytitle $
         , axis_color_idx = 255, bkgr_color_idx = 0 $
         , cm_symm = cm_symm, cm_asymm = cm_asymm $
-        , outimage = img, xout = xout, yout = yout
+        , outimage = img, xout = xout, yout = yout $
+        , _extra = _extra
 end

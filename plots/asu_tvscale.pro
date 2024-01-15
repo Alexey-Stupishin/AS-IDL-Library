@@ -2,7 +2,8 @@ pro asu_tvscale, image2show, x_arg, y_arg $
     , xtitle = xtitle, ytitle = ytitle $
     , axis_color_idx = axis_color_idx, bkgr_color_idx = bkgr_color_idx $
     , cm_symm = cm_symm, cm_asymm = cm_asymm, minvalue = minvalue, maxvalue = maxvalue $
-    , outimage = img, xout = xout, yout = yout
+    , outimage = img, xout = xout, yout = yout $
+    , _extra = _extra
 
 asu_ratios, image2show, xmargin_pix, ymargin_pix, xmargin_ch, ymargin_ch, newsize
 
@@ -35,6 +36,6 @@ tv, img, !d.x_size*!x.window[0], !d.y_size*!y.window[0]
 contour, img, xout, yout, xstyle = 1, ystyle = 1, /nodata $
     , xmargin = xmargin_ch, ymargin = ymargin_ch, xrange = [min(x_arg), max(x_arg)], yrange = [min(y_arg), max(y_arg)] $
     , xtitle = xtitle, ytitle = ytitle $
-    , color = axis_color_idx
+    , color = axis_color_idx, _extra = _extra
 
 end
