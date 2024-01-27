@@ -4,8 +4,6 @@ compile_opt idl2
 extremums = !NULL
 features = !NULL
 
-; unit test data
-default, fit0, [1,2,3,4,5,6,7,6,5,4,3,4,5,6,7,8,9,8,7,6,5,6,7,7]*1d
 default, nearby_x_tol, 2
 default, x_pos, indgen(n_elements(fit0))
 
