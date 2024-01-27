@@ -1,6 +1,6 @@
 function asu_colortable_create_parse, color, normal = normal
 
-    if isa(color, /number, /array) then return, c
+    if isa(color, /number, /array) then return, n_elements(normal) gt 0 ? float(color)/255 : color
     if ~isa(color, /string) then return, byte([0, 0, 0])
 
     case color of

@@ -19,7 +19,8 @@ if n_elements(step_colors) gt 0 then begin
     if is_abs_bottom then up = 1
     
     for k = from, ncol-1-up do begin
-        num_colors[*, k] = asu_colortable_create_parse(step_colors[k-from])
+        sc = isa(step_colors, /number) ? step_colors[*, k-from] : step_colors[k-from]
+        num_colors[*, k] = asu_colortable_create_parse(sc)
     endfor
     
     step = (255d - from)/(ncol-1-from-up)
