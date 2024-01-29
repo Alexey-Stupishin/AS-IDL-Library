@@ -24,7 +24,7 @@ n_idx = n_elements(idxs)
 
 ; remove first(s) and last(s), if ones
 single_idx = where(leaps ge 0, leaps_count)
-if leaps_count eq 1 then begin ; special case of single extremum
+if leaps_count eq 1 then begin ; special case of single sharp extremum
     from = single_idx[0]
     to = single_idx[0]
 endif else begin
@@ -97,5 +97,12 @@ pro asu_find_peaks_unit_test
     fit = [1,2,1,2,3,4,5,6,5,6,7,9,9,4,3,5,4,5,3] ; firsts, lasts, wide single extremum, iflation before
     s = asu_find_peaks(fit, /conv_win, features = f) & print, s & print, f ; -> [9], [2]
     s = asu_find_peaks(fit, features = f) & print, s & print, f ; -> [9], [2]
+    
+    fit = [1, 2, 1, 2, 3, 4, 5, 6, 6, 5, 6, 7, 8, 9, 9, 9, 9, 8, 7, 6, 5, 4, 4, 4, 3, 2, 1, 0, 0, 0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 3, 2, 2, 1, 0, 1, 2, 3, 4, 5, 4, 2, 1, 2, 2]
+    s = asu_find_peaks(fit, /conv_win, features = f) & print, s & print, f
+    s = asu_find_peaks(fit, features = f) & print, s & print, f
 
+    fit = [5,5,6,5,4,3,2,1]
+    s = asu_find_peaks(fit, /conv_win, features = f) & print, s & print, f ; -> [9], [2]
+    s = asu_find_peaks(fit, features = f) & print, s & print, f ; -> [9], [2]
 end

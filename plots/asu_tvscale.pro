@@ -1,7 +1,9 @@
 pro asu_tvscale, image2show, x_arg, y_arg $
     , xtitle = xtitle, ytitle = ytitle $
     , axis_color_idx = axis_color_idx, bkgr_color_idx = bkgr_color_idx $
-    , cm_symm = cm_symm, cm_asymm = cm_asymm, minvalue = minvalue, maxvalue = maxvalue $
+    , cm_symm = cm_symm, cm_asymm = cm_asymm $
+    , n_colors = n_colors, ct_minmax = ct_minmax $
+    , minvalue = minvalue, maxvalue = maxvalue $
     , outimage = img, xout = xout, yout = yout $
     , _extra = _extra
 
@@ -13,7 +15,7 @@ if n_elements(cm_symm) gt 0 then begin
     maxvalue = srange[1]
 endif else begin
     if n_elements(cm_asymm) gt 0 then begin
-        srange = asu_asymm_range(image2show)
+        srange = asu_asymm_range(image2show, n_colors = n_colors, ct_minmax = ct_minmax)
         minvalue = srange[0]
         maxvalue = srange[1]
     endif

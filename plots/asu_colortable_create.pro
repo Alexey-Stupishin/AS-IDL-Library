@@ -23,9 +23,9 @@ if n_elements(step_colors) gt 0 then begin
         num_colors[*, k] = asu_colortable_create_parse(sc)
     endfor
     
-    step = (255d - from)/(ncol-1-from-up)
+    step = (255d - from)/(ncol-from-up)
     curr_idx = from
-    last_k = step/2d
+    last_k = step; /2d
     k = from
     while k lt 256-up do begin
         bgr[*, k] = num_colors[*, curr_idx]

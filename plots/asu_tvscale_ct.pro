@@ -58,6 +58,8 @@ pro asu_tvscale_ct, image2show, x_arg, y_arg $
         if isa(step_colors, /number) && n_elements(step_colors) eq 1 then step_colors = ['black', 'darkgray', 'gray', 'lightgray', 'white']
         asu_colortable_create, step_colors = step_colors, abs_bottom = abs_bottom, abs_top = abs_top, rb = rb, gb = gb, bb = bb, /load
         cm_asymm = 1
+        ct_minmax = [0, n_elements(step_colors)-1]
+        n_colors = n_elements(step_colors)
     endif else begin
         default, bottom,   'red'
         default, center,   'white'
@@ -72,6 +74,7 @@ pro asu_tvscale_ct, image2show, x_arg, y_arg $
     asu_tvscale, image2show, x_arg, y_arg $
         , axis_color_idx = 255, bkgr_color_idx = 0 $
         , cm_symm = cm_symm, cm_asymm = cm_asymm $
+        , n_colors = n_colors, ct_minmax = ct_minmax $
         , outimage = img, xout = xout, yout = yout $
         , _extra = _extra
 end
