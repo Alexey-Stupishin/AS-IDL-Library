@@ -49,7 +49,7 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 * 05-08 Jan 2024: HMI download sequence utilities update/polishing, fits2images/movie utilities introduced
 * 08 Jan 2024: Trim structure fields utility
 * 10-15 Jan 2024: tvscale-like and range utilities added, colortable utility extended
-* 27-29 Jan 2024: tvscale-like, colormap updated, find peaks implemented
+* 27-31 Jan 2024: tvscale-like, colormap updated, find peaks implemented
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)

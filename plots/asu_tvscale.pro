@@ -4,7 +4,7 @@ pro asu_tvscale, image2show, x_arg, y_arg $
     , cm_symm = cm_symm, cm_asymm = cm_asymm $
     , n_colors = n_colors, ct_minmax = ct_minmax $
     , minvalue = minvalue, maxvalue = maxvalue $
-    , outimage = img, xout = xout, yout = yout $
+    , outimage = img $
     , _extra = _extra
 
 asu_ratios, image2show, xmargin_pix, ymargin_pix, xmargin_ch, ymargin_ch, newsize
@@ -27,8 +27,8 @@ if n_elements(axis_color_idx) eq 0 then axis_color_idx = 255
 img = congrid(double(image2show), newsize[0], newsize[1])
 img = bytscl(img, min = minvalue, max = maxvalue)
 
-xout = findgen(newsize[0])/(newsize[0]-1)*(x_arg[1] - x_arg[0]) + x_arg[0]
-yout = findgen(newsize[1])/(newsize[1]-1)*(y_arg[1] - y_arg[0]) + y_arg[0]
+xout = findgen(newsize[0])
+yout = findgen(newsize[1])
 contour, img, xout, yout, xstyle = 5, ystyle = 5, /nodata $
        , xmargin = xmargin_ch, ymargin = ymargin_ch
     
