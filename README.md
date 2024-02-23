@@ -50,6 +50,9 @@ See [Licence](https://github.com/Alexey-Stupishin/AS-IDL-Library/blob/main/LICEN
 * 08 Jan 2024: Trim structure fields utility
 * 10-15 Jan 2024: tvscale-like and range utilities added, colortable utility extended
 * 27-31 Jan 2024: tvscale-like, colormap updated, find peaks implemented
+* 23 Feb 2024:
+	* Add utility to convert IDL-'map'-object to structure array to export to MATLAB 
+	* Start implementation: widget for gyrosynchrotron spectra behaviour vs. physical parameters changes
 
 Current using:
 * [JeAn - Jet Analyzer](https://github.com/Alexey-Stupishin/JeAn---Jet-Analyzer)
