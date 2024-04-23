@@ -1,4 +1,4 @@
-pro asu_box_create_mfodata, mfodata, data, box, aia, boxdata, fileid, version_info=version_info, input_coords=input_coords
+pro asu_box_create_mfodata, mfodata, data, box, aia, boxdata, fileid, version_info=version_info, input_coords=input_coords, bfloat = bfloat
 
 if not keyword_set(version_info) then begin
     version_info = 'none'
@@ -23,8 +23,18 @@ model_mask = decompose(box.base.bz, box.base.ic)
 
 vcos = boxdata.vcos
 vcos[0:1] = reverse(vcos[0:1])
+
+bx = transpose(data.by, [1, 0, 2]);
+by = transpose(data.bx, [1, 0, 2]);
+bz = transpose(data.bz, [1, 0, 2]);
+if n_elements(bfloat) ne 0 then begin
+    bx = float(bx)
+    by = float(by)
+    bz = float(bz)
+endif
+
 mfodata = {  sst_version:'20200228' $
-           , bx:transpose(data.by, [1, 0, 2]), by:transpose(data.bx, [1, 0, 2]), bz:transpose(data.bz, [1, 0, 2]) $
+           , bx:bx, by:by, bz:bz $
            , ic:transpose(box.base.ic, [1, 0]), magn_bz:transpose(box.base.bz, [1, 0]), magn_src:magnetogram, cont_src:continuum, model_mask:transpose(model_mask, [1, 0]) $
            , obstime:box.index.date_obs, fileid:fileid $
            , x_box:transpose(boxdata.y_box, [1, 0]), y_box:transpose(boxdata.x_box, [1, 0]) $
