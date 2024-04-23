@@ -1,5 +1,5 @@
 ;----------------------------------------------------------
-function gyrosync_sketch_get_DulkMarsh, freqs, B, theta, N, L, deltaE, tau = tau
+function gyrosync_sketch_get_DulkMarsh, freqs, B, theta, N, L, deltaE, tau = tau, Temp = Temp
 compile_opt idl2
 
 fB = 2.699d6*B
@@ -12,6 +12,8 @@ S = ibn/kbn * B^2
 tau = kbn/B*N*L ; * double((deltaE-2))/(deltaE-1)*0.5
 
 F = S*(1 - exp(-tau))
+
+Temp = 6.513d36 * F / freqs^2;
 
 return, F
 
@@ -48,38 +50,45 @@ N = gyrosync_sketch_get_value('SLIDEN', 'N')
 L = gyrosync_sketch_get_value('SLIDEL', 'L')
 de = gyrosync_sketch_get_value('SLIDED', 'de', /linear)
 
-gss_control, 'B', SET_VALUE = string(B)
-gss_control, 'TH', SET_VALUE = string(Th)
-gss_control, 'N', SET_VALUE = string(N)
-gss_control, 'L', SET_VALUE = string(L)
-gss_control, 'D', SET_VALUE = string(de)
+gss_control, 'B', SET_VALUE = string(B, FORMAT = '(%"%4.0f")')
+gss_control, 'TH', SET_VALUE = string(Th, FORMAT = '(%"%3.0f")')
+gss_control, 'N', SET_VALUE = string(N, FORMAT = '(%"%8.1e")')
+gss_control, 'L', SET_VALUE = string(L, FORMAT = '(%"%8.1e")')
+gss_control, 'D', SET_VALUE = string(de, FORMAT = '(%"%5.1f")')
 
 ;min_freq = 10 * 2.699e6*B 
 min_freq = 1e9
 max_freq = 2e10
 xrange = [min_freq, max_freq]
 
-freqs = linspace(min_freq, max_freq, 100)
+freqs = linspace(min_freq, max_freq, 1000)
 
-F = gyrosync_sketch_get_DulkMarsh(freqs, B, Th, N, L, de, tau = tau)
-idx = where(tau lt 0.01, count)
-if count gt 0 then tau[idx] = 0.01
-idx = where(tau gt 100, count)
-if count gt 0 then tau[idx] = 100
+F = gyrosync_sketch_get_DulkMarsh(freqs, B, Th, N, L, de, tau = tau, Temp = Temp)
+;idx = where(tau lt 0.01, count)
+;if count gt 0 then tau[idx] = 0.01
+;idx = where(tau gt 100, count)
+;if count gt 0 then tau[idx] = 100
 
 gss_control, 'SPECTRA', GET_VALUE = fluxID
 WSET, fluxID
 !P.FONT = 1
 device, decomposed = 0, set_font = 'Helvetica*32'
-loadct, 30, /silent
-plot, freqs, F, xrange = xrange, yrange = [0, 5e-8], color = 100
+loadct, 0, /silent
+plot, freqs, F, xrange = xrange, /ylog, yrange = [1e-12, 1e-7] ; , color = 100
+
+gss_control, 'TEMP', GET_VALUE = tempID
+WSET, tempID
+!P.FONT = 1
+device, decomposed = 0, set_font = 'Helvetica*32'
+loadct, 0, /silent
+plot, freqs, Temp, xrange = xrange, /ylog, yrange = [1e5, 1e10] ; , yrange = [0, 5e-8], color = 100
 
 gss_control, 'TAU', GET_VALUE = tauID
 WSET, tauID
 !P.FONT = 1
 device, decomposed = 0, set_font = 'Helvetica*32'
 loadct, 0, /silent
-plot, freqs, tau, xrange = xrange, /ylog, ystyle = 1, color = 100, yrange = [0.01, 100]
+plot, freqs, tau, xrange = xrange, /ylog, ystyle = 1, yrange = [0.01, 100] ; , color = 100
 
 end
 
@@ -121,16 +130,16 @@ compile_opt idl2
 common G_ASU_GYROSYNC_SKETCH, global
 global = hash()
 
-winsize = [800, 500]
+winsize = [800, 250]
 labsize = 60
 valsize = 60
 slidesize = winsize[0] - labsize - valsize
 
-B = [1, 1000]
-Th = [20, 80]
-N = [1e6, 1e10]
-L = [1e8, 1e11]
-de = [3, 7]
+B = [150, 300]
+Th = [45, 75]
+N = [1e7, 1e8]
+L = [1e5, 1e11]
+de = [2.5, 4]
 global['B'] = B
 global['Th'] = Th
 global['N'] = N
@@ -142,6 +151,7 @@ global['widbase'] = base
 
 ;mainrow = WIDGET_BASE(base, /row)
 spectra = WIDGET_DRAW(base, GRAPHICS_LEVEL = 0, UNAME = 'SPECTRA', UVALUE = 'SPECTRA', XSIZE = winsize[0], YSIZE = winsize[1]) ; , /BUTTON_EVENTS)
+temp =    WIDGET_DRAW(base, GRAPHICS_LEVEL = 0, UNAME = 'TEMP', UVALUE = 'TEMP', XSIZE = winsize[0], YSIZE = winsize[1]) ; , /BUTTON_EVENTS)
 tau =     WIDGET_DRAW(base, GRAPHICS_LEVEL = 0, UNAME = 'TAU', UVALUE = 'TAU', XSIZE = winsize[0], YSIZE = winsize[1]) ; , /BUTTON_EVENTS)
 
 Brow = WIDGET_BASE(base, /row)
