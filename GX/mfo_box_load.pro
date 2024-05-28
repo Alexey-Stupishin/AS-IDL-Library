@@ -104,7 +104,7 @@ pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , bmax = bmax, blim = blim $
                 , no_title_prefix = no_title_prefix $
                 , find_B_region = find_B_region $
-                , hmi_prep = hmi_prep $
+                , hmi_prep = hmi_prep, test_save_bz $
                 , _extra = _extra 
                 
 version_info = ''
@@ -168,6 +168,11 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
         pict_win.Close
         pict_win = !NULL
     endif
+    
+    if n_elements(test_save_bz) ne 0 then begin
+        BZ = box.bz[*,*,0]
+        save, filename = test_save_bz, BZ
+    endif  
       
 ; ----- ASK IS OK? -----
     if not keyword_set(no_sel_check) then begin
