@@ -9,8 +9,9 @@ heights = coords[2, *] * rotator.dircos[2] * box.dr[2]
 if n_elements(km) ne 0 then heights *= wcs_rsun()*1e-3
 
 BLOS = asu_get_B_by_box_coords(box, coords)
+BLOS_r = rotator.M#BLOS
 
-LOS = {Bx:BLOS.x, By:BLOS.y, Bz:BLOS.z, heights:heights}
+LOS = {B:BLOS, Br:BLOS_r, heights:heights}
 
 return, LOS
 

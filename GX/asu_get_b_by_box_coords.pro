@@ -5,7 +5,7 @@ Bx = asu_interpolate_3D_in_grid(box.bx, coords)
 By = asu_interpolate_3D_in_grid(box.by, coords)
 Bz = asu_interpolate_3D_in_grid(box.bz, coords)
 
-B = {x:Bx, y:By, z:Bz}
+B = [Bx, By, Bz]
 
 return, B
 

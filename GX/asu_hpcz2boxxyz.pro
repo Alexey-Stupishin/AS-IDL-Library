@@ -11,7 +11,7 @@ rotator = asu_gxbox_get_rotator(boxdata)
 if n_elements(arcsec) ne 0 then hpc /= boxdata.rsun
 if n_elements(km) ne 0 then Z /= wcs_rsun()*1d-3
 
-; return, asu_gxbox_rotate_to_box([hpc[0], hpc[1], Z], rotator)
-return, asu_gxbox_hpc_to_box_cartesian(hpc, rotator)
+return, asu_gxbox_rotate_to_box([hpc[0], hpc[1], Z], rotator)
+; return, asu_gxbox_hpc_to_box_cartesian(hpc, rotator)
 
 end
