@@ -12,7 +12,7 @@ for k = 0, sz[3]-1 do begin
         valid[*, cnt] = [curr[0], curr[1], k]
         cnt++
     endif
-    curr[0:1] += rotator.dircos[0:1]
+    curr[0:1] += rotator.dircos[0:1]/rotator.dircos[2]
 endfor
 
 if cnt eq 0 then valid = !NULL else valid = valid[*, 0:cnt-1]
