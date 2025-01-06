@@ -31,8 +31,8 @@ time_window = double(n_segment)
 
 for k = 0, n_elements(list)-1 do begin
     t_ = anytim(list[k])
-    t1 = t_ - time_window/2d + 0.1
-    t2 = t_ + time_window/2d - 0.1
+    t1 = t_ - time_window/2d
+    t2 = t_ + time_window/2d
     if keyword_set(vso) then begin
         n_success = hmi_utils_dowload_vso(t1, t2, dataset, hmi_dir, /first)
         if n_success lt 0 then message, 'unsuccessful query, queried time = ' + anytim(t_, /ccsds) + ', code = ' + strcompress(string(n_success), /remove_all), /continue else $
