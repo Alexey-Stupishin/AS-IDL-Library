@@ -1,9 +1,9 @@
-pro aia_download_by_config, wave, save_dir, config, dirmode = dirmode, down_message = down_message, downlist = downlist
+pro aia_download_by_config, wave, save_dir, config, dirmode = dirmode, down_message = down_message, downlist = downlist, vso = vso
 compile_opt idl2
 
 t0 = systime(/seconds)
 
-delt = wave gt 1000 ? 12 : 6
+delt = fix(wave) gt 1000 ? 12 : 6
 ts = anytim(config.tstart)
 te = anytim(config.tstop)
 n_frames = (te-ts)/delt
@@ -20,7 +20,7 @@ endif
 postponed = list()
 post_n = 0
 
-aia_download_get_query, wave, config.tstart, config.tstop, urls, filenames
+aia_download_get_query, wave, config.tstart, config.tstop, urls, filenames, vso = vso
 swave = strcompress(wave, /remove_all)
 
 foreach url, urls, j do begin
@@ -40,7 +40,7 @@ foreach url, urls, j do begin
     filename = wave_dir + path_sep() + filenames[j]
     
     for itry = 1, config.count do begin
-        sock_get, url, filename, status = status, /quiet
+        as_sock_get, url, filename, status = status, /quiet, /no_rename
         if status eq 0 then begin
             message, /info, "Downloading failed (" + strcompress(itry) + ")"
             if itry lt config.count then wait, config.timeout
