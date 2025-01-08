@@ -12,10 +12,15 @@ for j = 0, n_elements(waves)-1 do begin
     for k = 0, n_elements(list)-1 do begin
         config.tstart = anytim(list[k]) - dt
         config.tstop = config.tstart + 2*dt
-        aia_download_by_config, waves[j], aia_dir, config, downlist = downlist, vso = vso, /down_message
+        code = aia_download_by_config(waves[j], aia_dir, config, downlist = downlist, vso = vso, /down_message)
+        if code lt 0 then begin
+            message, /info, 'Download for wave ' + waves[j] + ' failed, code = ' + strcompress(string(code), /remove_all)
+            continue
+        endif
         if downlist.Count() eq 0 then continue
         read_sdo_silent, downlist[0].filename, index_in, data_in, /use_shared, /uncomp_delete, /hide, /silent
         writefits_silent, downlist[0].filename, float(data_in), struct2fitshead(index_in)
+        message, /info, 'Download for wave ' + waves[j] + ' successful, output file = "' + downlist[0].filename + '"' 
     endfor    
 endfor
     

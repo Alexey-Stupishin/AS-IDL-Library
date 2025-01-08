@@ -1,4 +1,4 @@
-pro aia_download_by_config, wave, save_dir, config, dirmode = dirmode, down_message = down_message, downlist = downlist, vso = vso
+function aia_download_by_config, wave, save_dir, config, dirmode = dirmode, down_message = down_message, downlist = downlist, vso = vso
 compile_opt idl2
 
 t0 = systime(/seconds)
@@ -20,7 +20,8 @@ endif
 postponed = list()
 post_n = 0
 
-aia_download_get_query, wave, config.tstart, config.tstop, urls, filenames, vso = vso
+code = aia_download_get_query(wave, config.tstart, config.tstop, urls, filenames, vso = vso)
+if code lt 0 then return, code
 swave = strcompress(wave, /remove_all)
 
 foreach url, urls, j do begin
@@ -51,7 +52,8 @@ foreach url, urls, j do begin
 
     if status eq 0 then begin
         if post_n gt config.limit then begin
-            message, "Too many downloads failed, session stopped"
+            message, /info, "Too many downloads failed, rejected"
+            return, -3
         endif else begin
             postponed.Add, {url:url, filename:filename}
         endelse    
@@ -87,12 +89,17 @@ for j = 0, n_elements(postponed)-1 do begin
             if itry lt config.count_post then wait, config.timeout_post
         endif    
     endfor
-    if status eq 0 then message, "Postponed downloads failed, session stopped"
+    if status eq 0 then begin
+        message, /info, "Postponed downloads failed, rejected"
+        return, -4
+    endif
     if status ne 0 && outresult ne 0 then downlist.Add, {url:url, filename:filename}
 endfor
 
 ;message, strcompress(string(systime(/seconds)-t0,format="('download performed in ',g0,' seconds')")), /cont
 message, 'download complete in ' + asu_sec2hms(systime(/seconds)-t0, /issecs), /info
+
+return, 0
   
 end
 
