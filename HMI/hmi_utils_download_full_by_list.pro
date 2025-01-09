@@ -35,7 +35,7 @@ for k = 0, n_elements(list)-1 do begin
     t2 = t_ + time_window/2d
     if keyword_set(vso) then begin
         n_success = hmi_utils_dowload_vso(t1, t2, dataset, hmi_dir, /first)
-        if n_success lt 0 then message, 'unsuccessful query, queried time = ' + anytim(t_, /ccsds) + ', code = ' + strcompress(string(n_success), /remove_all), /continue else $
+        if n_success lt 0 then message, 'unsuccessful query, queried time = ' + anytim(t_, /ccsds) + ', code = ' + strcompress(string(n_success), /remove_all) + ' (' + asu_download_code_message(code) + ')', /continue else $
             if n_success eq 0 then message, 'No queried URLs, queried time = ' + anytim(t_, /ccsds), /continue
     endif else begin
         file = gx_box_jsoc_get_fits_as(t1, t2, segment, dataset, hmi_dir)

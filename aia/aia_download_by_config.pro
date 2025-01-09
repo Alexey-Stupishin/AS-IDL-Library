@@ -24,11 +24,14 @@ code = aia_download_get_query(wave, config.tstart, config.tstop, urls, filenames
 if code lt 0 then return, code
 swave = strcompress(wave, /remove_all)
 
+ccsds = anytim(config.tstart, /ccsds)
+date = strmid(ccsds, 0, 4) + strmid(ccsds, 5, 2) + strmid(ccsds, 8, 2) 
+
 foreach url, urls, j do begin
     time_download_started = systime(1)
     if keyword_set(down_message) then message, /info, "Wave " + swave + ": downloading "+filenames[j]+" from "+url+'...'
     
-    date = asu_date_from_filename(filenames[j])
+    ; date = asu_date_from_filename(filenames[j])
     
     if n_elements(dirmode) eq 0 || dirmode eq 'cache' then begin
         date_dir = save_dir + path_sep() + date

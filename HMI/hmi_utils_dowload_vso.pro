@@ -15,6 +15,7 @@ if meta ne !NULL then begin
             ; ...series=hmi__M_45s...
             parse = stregex(url, '.*series=hmi__(.*)_45s.*',/subexpr,/extract)
             if parse[1] eq '' then continue
+            if parse[1] eq 'V' then continue
             if parse[1] eq 'Ic' && dataset ne 'continuum' then continue
             if parse[1] eq 'M' && dataset ne 'magnetogram' then continue
     
@@ -28,6 +29,7 @@ if meta ne !NULL then begin
     
             read_sdo_silent, fullname, index_in, data_in, /use_shared, /uncomp_delete, /hide, /silent
             writefits_silent, fullname, float(data_in), struct2fitshead(index_in)
+            message, /info, 'Download ' + dataset + ' successful, output file = "' + fullname + '"'
             cnt++
     
             if keyword_set(first) then break

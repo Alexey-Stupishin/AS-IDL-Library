@@ -14,7 +14,7 @@ for j = 0, n_elements(waves)-1 do begin
         config.tstop = config.tstart + 2*dt
         code = aia_download_by_config(waves[j], aia_dir, config, downlist = downlist, vso = vso, /down_message)
         if code lt 0 then begin
-            message, /info, 'Download for wave ' + waves[j] + ' failed, code = ' + strcompress(string(code), /remove_all)
+            message, /info, 'Download for wave ' + waves[j] + ' failed, code = ' + strcompress(string(code), /remove_all) + ' (' + asu_download_code_message(code) + ')'
             continue
         endif
         if downlist.Count() eq 0 then continue
