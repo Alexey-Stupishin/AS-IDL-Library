@@ -1,5 +1,5 @@
 pro mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
-                , dx_maxsize = dx_maxsize, dx_kmc = dx_kmc, centre = centre $
+                , dx_maxsize = dx_maxsize, dx_kmc = dx_kmc, centre = centre, matr_size = matr_size $
                 , box = box, save_pbox = save_pbox, pbox = pbox $
                 , hmi_files = hmi_files, hmi_dir = hmi_dir $
                 , aia_uv = aia_uv, aia_euv = aia_euv $
@@ -36,6 +36,19 @@ pro mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     size_pix[0] = ceil(size_arc[0]/d_arc)
     size_pix[1] = ceil(size_arc[1]/d_arc)
     size_pix[2] = double(floor(max(size_pix[0:1])*0.7))
+    
+    if keyword_set(matr_size) then begin
+        minN = min(size_pix[0:1])
+        sfactor = double(minN)/matr_size
+        depth = ceil(alog10(sfactor)/alog10(2d))
+        m = 2^(depth - 1)
+        dx = floor((size_pix[0]-1)/m)
+        dy = floor((size_pix[1]-1)/m)
+        dz = floor((size_pix[2]-1)/m)
+        size_pix[0] = dx*m + 1
+        size_pix[1] = dy*m + 1
+        size_pix[2] = dz*m + 1
+    endif
     
     print, '***** dx_km = ' + asu_compstr(dx_kmc) + ', box = ' + asu_compstr(size_pix[0]) + ' x ' + asu_compstr(size_pix[1]) + ' x ' + asu_compstr(size_pix[2])
      

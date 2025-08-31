@@ -85,6 +85,7 @@
 pro mfo_box_load, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
                 , lib_location = lib_location $
                 , box = box $
+                , matr_size = matr_size $
                 , dx_maxsize = dx_maxsize $
                 , size_fov = size_fov $
                 , save_pbox = save_pbox $
@@ -112,7 +113,7 @@ NLFFF_filename = ''
 
 ; ----- BASE -----
 mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
-                , dx_maxsize = dx_maxsize, dx_kmc = dx_kmc, centre = centre $
+                , dx_maxsize = dx_maxsize, dx_kmc = dx_kmc, centre = centre, matr_size = matr_size $
                 , box = box, save_pbox = save_pbox, pbox = pbox $
                 , hmi_files = hmi_files, hmi_dir = hmi_dir $
                 , aia_uv = aia_uv, aia_euv = aia_euv $
@@ -196,6 +197,9 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
     if not keyword_set(save_bnd) then save_bnd = 0
     if not keyword_set(save_pbox) then save_pbox = 0
     
+    exec = sst_get_execute(box)
+    box.execute = exec 
+    
     POT_filename = ''
     BND_filename = ''
     if save_bnd gt 0 then begin
@@ -211,9 +215,10 @@ mfo_box_load_base, obstime, prefix, x_arc, y_arc, dx_km, out_dir, tmp_dir $
         endif
     endif
     if save_pbox gt 0 then begin
+        pbox.execute = exec
         potp = pbox.id
         if strlen(prefix) gt 0 then potp = prefix + '_' + potp
-        save, file = filepath(potp+".sav", root_dir = out_dir), box
+        save, file = filepath(potp+".sav", root_dir = out_dir), pbox
         if save_sst gt 0 then begin
             fileid = potp+sst_post
             asu_box_create_mfodata, mfodata, pbox, box, aia, boxdata, fileid, input_coords = input_coords

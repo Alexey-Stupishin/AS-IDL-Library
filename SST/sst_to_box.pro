@@ -7,19 +7,30 @@ end
 pro sst_to_box
 
 date_obs = '2018-09-30T09:22:00'
-fpath = 'g:\BIGData\Work\ISSI\12723\Process\Trim\Potential\'
-ID = 'HMI+SST_combtrim'
+fpath = 'g:\BIGData\Work\ISSI\12723\Preparation\SST\cube\'
+ID = 'SST+HMI'
 continuum = 'g:\BIGData\Work\ISSI\12723\Sources\HMI\hmi.Ic_noLimbDark_720s.20180930_092400_TAI.continuum.fits'
 magnetogram = 'g:\BIGData\Work\ISSI\12723\Sources\HMI\hmi.M_720s.20180930_092400_TAI.magnetogram.fits'
 
 t0 = systime(/seconds)
 
-restore, fpath + ID + '.sav' 
+restore, fpath + ID + '.sav'
+
+;ABSB    DOUBLE[1111, 621]
+;AZIM    DOUBLE[1111, 621]
+;INCL    DOUBLE[1111, 621]
+;CDELT1  0.11799999999999999
+;CDELT2  0.11799999999999999
+;CRPIX1  556.00000000000000
+;CRPIX2  311.00000000000000
+;CRVAL1  94.762100000000004
+;CRVAL2  -260.52600000000001
+
 factor = 1
 depth = 6
 z_factor = 0.5
 
-sz = size(BX)
+sz = size(absB)
 naxis1 = sz[1]
 naxis2 = sz[2]
 

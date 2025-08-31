@@ -20,7 +20,7 @@
   ;    top - set this keyword to use the TOP VIEW projection for the base of the box
   ;
   ; :Author: Sergey Anfinogentov (anfinogentov@iszf.irk.ru)
-  ; :Author: Alexey G/Stupishin (agstup@yandex.ru)
+  ; :Author: Alexey G. Stupishin (agstup@yandex.ru)
   ;
 function gx_box_create_as, file_field, file_inclination, file_azimuth, file_disambig, file_continuum,$
   center_arcsec, size_pix, dx_km, carrington = carrington, cea = cea, top = top, sfq = sfq, hmi_prep = hmi_prep, _extra = _extra
@@ -84,6 +84,6 @@ function gx_box_create_as, file_field, file_inclination, file_azimuth, file_disa
   ID = ID + '.NONE'
 
   
-  return, {bx:bx,by:by,bz:bz,dr:dr, add_base_layer:0,base:base,index:index, refmaps: ptr_new(refmaps), ID: ID}
+  return, {bx:bx,by:by,bz:bz,dr:dr, add_base_layer:0,execute:'', base:base,index:index, refmaps: ptr_new(refmaps), ID: ID}
 
 end
