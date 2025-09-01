@@ -30,7 +30,9 @@
 ;   (in)      _extra          (various data types)                        Additional setting (such as tuning parameters, additional 
 ;                                                                         conditions etc.), partially:
 ;   (in)      harmonics                       (integer/long)              Calculated harmonic numbers (default [2, 3, 4]) 
-;   (in)      tau_ctrl                        (float/double)              NB! To be described!
+;   (in)      tau_ctrl                        (float/double)              Values of optical depth, where values of fluxes, heights and
+;                                                                         harmonic number will be stored in corresponding variables
+;                                                                         (default [1, 25])
 ;   (in)      freefree                        (integer/long)       -----  (see description in reo_prepare_calc_map.pro)
 ;   (in)      cycloCalc_Distribution_Type     (integer/long)       -----  (see description in reo_prepare_calc_map.pro)
 ;   (in)      cycloCalc_Distribution_kappaK   (float/double)       -----  (see description in reo_prepare_calc_map.pro)
@@ -43,8 +45,14 @@
 ;   (in)      mode, beam_c, beam_b, scan_lim                              RATAN-600 scan specific (see reo_convolve_map.pro and separate document)(**)  
 ;
 ; Parameters optional (out):
-;   (out)     FluxR           (double 2-D array)                  s.f.u.  Radiomap of the flux in the right polarization  
-;   (out)     FluxL           (double 2-D array)                  s.f.u.  Radiomap of the flux in the left polarization
+;   (out)     FluxR, FluxL        (double 2-D arrays)             s.f.u.  Radiomap of the flux in the right/left polarization  
+;   (out)     tauR, tauL          (double 2-D arrays)             ------  Map of the full optical depth (right/left)
+;   
+;   (out)     depthR, depthL      (integer 2-D arrays)            ------  Map of the number of really achived optical depths (right/left)
+;   (out)     heightsR, heightsL  (double 2-D arrays)             cm      Map of the .......... (right/left)
+;   (out)     fluxesR, fluxesL    (double 2-D arrays)             s.f.u.  Map of the .......... (right/left)
+;   (out)     sR, sL              (double 2-D arrays)             ------  Map of the .......... (right/left)
+;   
 ;   (out)     scanR           (double 1-D array)           s.f.u./arcsec  Emulated RATAN-600 scan, right polarization, specific for RATAN-600(**)
 ;   (out)     scanL           (double 1-D array)           s.f.u./arcsec  Emulated RATAN-600 scan, left polarization, specific for RATAN-600(**)
 ; 

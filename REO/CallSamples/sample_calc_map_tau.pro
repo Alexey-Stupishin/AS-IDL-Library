@@ -34,7 +34,7 @@ ptr = reo_prepare_calc_map( $
       box, visstep $ ; GX-модель и шаг радиокарты 
     , M, base $ результат: размер и смещение радиокарты
     , posangle = posangle $  
-    , freefree = 0 $ ; no free-free considered
+    , freefree = 1 $ ; free-free considered
     , arcbox = arcbox $ ; вернет границы радиокарты в угл. секундах
     , field = field $ ; вернет полное поле на фотосфере, как мы видим его с Земли
 ;    , /model $
