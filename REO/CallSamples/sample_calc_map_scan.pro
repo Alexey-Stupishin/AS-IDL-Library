@@ -5,9 +5,9 @@ pro sample_calc_map_scan
 ;---------------------------------------------------------------------------------------
 ; загрузка GX-box ----------------------------------------------------------------------
 ;     пример из поставляемого пакета:
-resolve_routine,'as_library_data_anchor',/compile_full_file, /either
-dirpath = file_dirname((ROUTINE_INFO('as_library_data_anchor', /source)).path, /mark)
-filename = dirpath + '12470_hmi.M_720s.20151216_085809.W85N12CR.CEA.NAS(_1000).sav' 
+resolve_routine,'asu_get_anchor_module_dir',/compile_full_file, /either
+dirpath = file_dirname((ROUTINE_INFO('asu_get_anchor_module_dir', /source, /functions)).path, /mark)
+filename = dirpath + '..\Samples\12470_hmi.M_720s.20151216_085809.W85N12CR.CEA.NAS(_1000).sav' 
  
 restore, filename ; GX-box
 
@@ -22,8 +22,8 @@ visstep = 0.5 ; arcsec - шаг видимой сетки радиокарты
 posangle = 0 ; позиционный угол: 
              ; для нулевого азимута РАТАН-600 равен позиционному углу Солнца
              ; для ненулевого азимута РАТАН-600 может быть получен утилитой asu_ratan_position_angle
-freq = 5.7e9 ; Hz - частота
 freq = 4e9 ; Hz - частота
+harmonics = [2, 3, 4]
 
 ;---------------------------------------------------------------------------------------
 ; подготовка библиотеки, установка магнитного поля и разметка радиокарты ---------------
@@ -50,7 +50,6 @@ endif
 
 print, version_info
 
-
 ;---------------------------------------------------------------------------------------
 ; нарисуем полное поле на фотосфере, как мы видим его с Земли --------------------------
 ; (это не совсем то, что получено со спутника; данные наблюдений преобразованы в систему координат,
@@ -63,7 +62,7 @@ cB = contour(Bph, RGB_TABLE = 0, N_LEVELS=30, ASPECT_RATIO=1.0, window_title = '
 ; вычисление радиокарт и сканов --------------------------------------------------------
 rc = reo_calculate_map( $
       ptr, H, Temp, Dens, freq $
-    , harmonics = [2, 3, 4] $
+    , harmonics = harmonics $
     , FluxR = FluxR $
     , FluxL = FluxL $
     , scanR = scanR $
