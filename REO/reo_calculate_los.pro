@@ -22,7 +22,7 @@
 ;   (in)      T               (n-elements fload/double array)         K   Corresponding temperatures (non-negative, no greater 10^8)
 ;   (in)      D               (n-elements fload/double array)    cm^{-3}  Corresponding electron densities (non-negative)
 ;                                                                         Note: all 5 arrays should be of the same length
-;   (in)      freq            (fload/double)                         Hz   Frequency to calculate radioemission  
+;   (in)      freqs           (fload/double)                         Hz   Frequencies to calculate radioemission  
 ;   
 ; Parameters optional (in):
 ;   (in)      dll_location                    (string)                    Full path to calling DLL; if omitted, DLL will be searched in the folder,
@@ -34,7 +34,7 @@
 ;   (in)      _extra          (various data types)                        Additional setting (such as tuning parameters, additional 
 ;                                                                         conditions etc.), partially:
 ;   (in)      freefree                        (integer/long)        ----- (see description in reo_prepare_calc_map.pro)
-;   (in)      cycloCalc_LaplasMethod_Use      (integer/long)        ----- (see description in reo_prepare_calc_map.pro).
+;   (in)      use_laplace                     (integer/long)        ----- (see description in reo_prepare_calc_map.pro).
 ;                                                                          Note: default value is 0. Highly recommended to leave it,
 ;                                                                          to provide most detailed height profile       
 ;   (in)      useqt                           (integer/long)        ----- (see description in reo_prepare_calc_map.pro)
@@ -84,10 +84,21 @@ nfreqs = long(n_elements(vfreqs))
 nharms = long(n_elements(vharms))
 ntaus = long(n_elements(vtaus))
 
-if n_elements(cycloCalc_LaplasMethod_Use) eq 0 then cycloCalc_LaplasMethod_Use = 0
+use_laplace = 0;
+n = n_tags(_extra)
+if n gt 0 then begin
+    keys = strlowcase(tag_names(_extra))
+    for i = 0, n-1 do begin
+        case keys[i] of
+            'use_laplace': use_laplace = long(_extra.(i))
+            else:
+        endcase
+    endfor    
+endif
+
 parameterMap = replicate({itemName:'',itemvalue:0d},2)
-parameterMap[0].itemName = 'cycloCalc.LaplasMethod.Use'
-parameterMap[0].itemValue = cycloCalc_LaplasMethod_Use
+parameterMap[0].itemName = asu_subst_map_name('use_laplace')
+parameterMap[0].itemValue = use_laplace
 parameterMap[1].itemName = '!____idl_map_terminator_key___!'
 
 vtotInts = dblarr(2, nfreqs)

@@ -13,6 +13,9 @@ case name of
   'usealtlibrary': begin 
       name = "cycloCalc.Calculation.useAltLibrary"
   end
+  'use_laplace': begin
+      name = "cycloCalc.LaplasMethod.Use"
+  end
   else: begin
       while (((pos = strpos(name, '_'))) ne -1) do strput, name, '.', pos
   end

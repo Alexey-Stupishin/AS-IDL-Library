@@ -1,9 +1,9 @@
 pro sample_calc_los_tau
 
-; высота, температура, плотность
-; атмосфера - Selhorst, 2008
 resolve_routine,'asu_get_anchor_module_dir',/compile_full_file, /either
 dirpath = file_dirname((ROUTINE_INFO('asu_get_anchor_module_dir', /source, /functions)).path, /mark)
+
+; высота, температура, плотность - Selhorst, 2008
 filename = dirpath + '..\Sun\selhorst2008_10_708_4_397.sav'
 restore, filename
 ; => height, temperature, density
@@ -19,40 +19,44 @@ restore, filename
 freqs = linspace(1, 18, 100)*1e9
 harmonics = [2, 3, 4];
 
-; оптическая толщина (208 значений в диапазоне от 0.01 до 10 в лог. масштабе)
-taus = 10^linspace(-2, 1, 208)
+; оптическая толщина (500 значений в диапазоне от 0.01 до 1000 в лог. масштабе)
+taus = 10^linspace(-2, 3, 500)
 
+; тормозное по умолчанию учитывается
 rc = reo_calculate_los(height, field, inclination, temperature, density, freqs $
                       , harmonics = harmonics, tau_ctrl = taus $
                       , totInts = totInts, totTau = totTau $
                       , depth = depth, profHeight = profHeight, profInts = profInts, profHarm = profHarm $
-                      , freefree = 1 $
                       )
                       
-; для примера: частота 3 ГГц
+; для примера: частота около 3 ГГц
 freq = 3e9
 mf = min(abs(freqs-freq), fidx)
 print, 'Frequency = ' + asu_compstr(freqs[fidx])
 
-; для каждой контролируемой величины (в правой поляризации) получим:
-hR = profHeight[0, 0:depth[0, fidx]-1, fidx] ; высоты
-fR = profInts[0, 0:depth[0, fidx]-1, fidx] ; интенсивности
-sR = profHarm[0, 0:depth[0, fidx]-1, fidx] ; номера гармоник
-tR = taus[0:depth[0, fidx]-1] ; на соответствующих контролируемых оптических толлщинах 
+; для каждой контролируемой величины получим:
+; правая поляризация: hR - высоты [Mm], fR - интенсивности [s.f.u/arcsec^2], sR - номера гармоник, tauR - соответствующие контролируемые оптические толлщины  
+sample_calc_los_tau_result, fidx, 0, depth, profHeight, profInts, profHarm, taus $
+                          , hR, fR, sR, tauR
+; левая поляризация - аналогично: hL, fL, sL, tauL
+sample_calc_los_tau_result, fidx, 1, depth, profHeight, profInts, profHarm, taus $
+                          , hL, fL, sL, tauL
+                          
+; определим высоты гармоник
+b1 = freq/2.799d6
+b2 = b1/2
+b3 = b1/3
+b4 = b1/4
+height *= 1d-8
 
-; и то же самое в левой:
-hL = profHeight[1, 0:depth[1, fidx]-1, fidx] ; высоты
-fL = profInts[1, 0:depth[1, fidx]-1, fidx] ; интенсивности
-sL = profHarm[1, 0:depth[1, fidx]-1, fidx] ; номера гармоник
-tL = taus[0:depth[1, fidx]-1] ; на соответствующих контролируемых оптических толлщинах 
+hh = dblarr(5)
+hh[2] = interpol(height, field, b2)
+hh[3] = interpol(height, field, b3)
+hh[4] = interpol(height, field, b4)
 
-pR = plot(hR, alog10(tR), '-r3')
-pL = plot(hL, alog10(tL), '-b2', overplot = pR)
-
-pR = plot(hR, sR, '-r3')
-pL = plot(hL, sL, '-b2', overplot = pR)
-
-pR = plot(hR, fR, '-r3')
-pL = plot(hL, fL, '-b2', overplot = pR)
+; все нарисуем
+sample_calc_los_tau_plot, hR, hL, alog10(tauR), alog10(tauL), 'Optical Depth', '$\tau$, -', hh
+sample_calc_los_tau_plot, hR, hL, transpose(sR), transpose(sL), 'Harmonics', 'Harmonic number, -', hh
+sample_calc_los_tau_plot, hR, hL, transpose(fR), transpose(fL), 'Intensity', 'Intensity, $s.f.u/arcsec^2$', hh
 
 end
