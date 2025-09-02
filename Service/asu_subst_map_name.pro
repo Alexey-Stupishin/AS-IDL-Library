@@ -16,6 +16,10 @@ case name of
   'use_laplace': begin
       name = "cycloCalc.LaplasMethod.Use"
   end
+  'n_proc': begin
+      name = "cycloMap.nThreadsInitial"
+  end
+    
   else: begin
       while (((pos = strpos(name, '_'))) ne -1) do strput, name, '.', pos
   end

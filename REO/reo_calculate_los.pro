@@ -63,7 +63,7 @@
 function reo_calculate_los, H, B, Th, T, D, freqs $
                           , harmonics = harmonics, tau_ctrl = tau_ctrl $
                           , totInts = totInts, totTau = totTau $
-                          , depth = depth, profHeight = profHeight, profInts = profInts, profHarm = profHarm $
+                          , depth = depth, profHeight = profHeight, profInts = profInts, profHarm = profHarm, profAbsorb = profAbsorb $
                           , dll_location = dll_location $
                           , _extra = _extra
 
@@ -108,9 +108,10 @@ vdepth = lonarr(2, nfreqs)
 vprofh = dblarr(2, ntaus, nfreqs)
 vproff = dblarr(2, ntaus, nfreqs)
 vprofs = lonarr(2, ntaus, nfreqs)
+vprofa = dblarr(2, ntaus, nfreqs)
 vrc = dblarr(1)
 
-value = bytarr(20)
+value = bytarr(21)
 value[2] = 1 ; L
 value[8] = 1 ; nfreqs
 value[10] = 1 ; nharms
@@ -120,8 +121,8 @@ returnCode = CALL_EXTERNAL(  dll_location, 'reoCalculateLOS', vptr, parameterMap
                            , vL, vH, vB, vcost, vT, vD $                            ; 2-7
                            , nfreqs, vfreqs, nharms, vharms, ntaus, vtaus $         ; 8-13
                            , vdepth, vtotInts, vtottau $                            ; 14-16
-                           , vprofh, vproff, vprofs $                               ; 17-19
-                           , vrc $                                                  ; 20        
+                           , vprofh, vproff, vprofs, vprofa $                       ; 17-20
+                           , vrc $                                                  ; 21        
                            , VALUE = value, /CDECL)
 
 if returnCode eq 0 then begin
@@ -131,6 +132,7 @@ if returnCode eq 0 then begin
     if arg_present(profHeight)  then profHeight = vprofh
     if arg_present(profInts)    then profInts   = vproff
     if arg_present(profHarm)    then profHarm   = vprofs
+    if arg_present(profAbsorb)  then profAbsorb = vprofa
     ; rc ?
 endif
 
