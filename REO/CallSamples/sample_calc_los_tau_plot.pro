@@ -11,7 +11,7 @@ endelse
 ; нарисуем (синяя - левая (в нашем случае необыкновенная), красная - правая (обыкновенная))
 pR = plot(hR, valR, color = 'RED', linestyle = line, thick = 3 $
         , symbol = symbol, sym_filled = 1, sym_size = 0.6 $
-        , title = title, xtitle = 'Height, Mm', ytitle = ytitle)
+        , title = title, xtitle = 'Height, Mm', ytitle = ytitle, xrange = [0, max([hR, hL])])
 pL = plot(hL, valL, color = 'BLUE', linestyle = line, thick = 2 $
         , symbol = symbol, sym_filled = 1, sym_size = 0.4 $
         , overplot = pR)

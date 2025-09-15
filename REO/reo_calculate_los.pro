@@ -60,7 +60,7 @@
 ;                                              
                                               
 ;----------------------------------------------------------------------------------------------
-function reo_calculate_los, H, B, Th, T, D, freqs $
+function reo_calculate_los, H, B, Th, Ha, T, D, freqs $
                           , harmonics = harmonics, tau_ctrl = tau_ctrl $
                           , totInts = totInts, totTau = totTau $
                           , depth = depth, profHeight = profHeight, profInts = profInts, profHarm = profHarm, profAbsorb = profAbsorb $
@@ -73,6 +73,8 @@ vL = long(n_elements(H))
 vH = double(H)
 vB = double(B)
 vcost = double(cos(Th*!DTOR))
+vLa = long(n_elements(Ha))
+vHa = double(Ha)
 vT = double(T)
 vD = double(D)
 vfreqs = double(freqs)
@@ -111,18 +113,19 @@ vprofs = lonarr(2, ntaus, nfreqs)
 vprofa = dblarr(2, ntaus, nfreqs)
 vrc = dblarr(1)
 
-value = bytarr(21)
+value = bytarr(23)
 value[2] = 1 ; L
-value[8] = 1 ; nfreqs
-value[10] = 1 ; nharms
-value[12] = 1 ; ntaus
+value[6] = 1 ; La
+value[10] = 1 ; nfreqs
+value[12] = 1 ; nharms
+value[14] = 1 ; ntaus
 
 returnCode = CALL_EXTERNAL(  dll_location, 'reoCalculateLOS', vptr, parameterMap $  ; 0-1
-                           , vL, vH, vB, vcost, vT, vD $                            ; 2-7
-                           , nfreqs, vfreqs, nharms, vharms, ntaus, vtaus $         ; 8-13
-                           , vdepth, vtotInts, vtottau $                            ; 14-16
-                           , vprofh, vproff, vprofs, vprofa $                       ; 17-20
-                           , vrc $                                                  ; 21        
+                           , vL, vH, vB, vcost, vLa, vHa, vT, vD $                  ; 2-9
+                           , nfreqs, vfreqs, nharms, vharms, ntaus, vtaus $         ; 10-15
+                           , vdepth, vtotInts, vtottau $                            ; 16-18
+                           , vprofh, vproff, vprofs, vprofa $                       ; 19-22
+                           , vrc $                                                  ; 23        
                            , VALUE = value, /CDECL)
 
 if returnCode eq 0 then begin
