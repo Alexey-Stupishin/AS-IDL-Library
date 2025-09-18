@@ -15,8 +15,8 @@ filename = dirpath + '..\Samples\mod_dipole_30_largeFOV2.sav'
 restore, filename
 
 ; поле 140х140 пикселей, макс. поле в центре на фотосфере 2000 Гс
-; возмем точку несколько в стороне от оси диполя (69, 82.8), макс. поле 3000 Гс (factor = 1.5)
-t = asu_box_get_los(box, [69, 83], factor = 1.5)
+; возмем точку несколько в стороне от оси диполя (69.6, 83.2), макс. поле 3000 Гс (factor = 1.5)
+t = asu_box_get_los(box, [69.6, 83.2], factor = 1.5)
 ; => t.height, t.field, t.inclination
 ; массивы одинаковой длины
 
