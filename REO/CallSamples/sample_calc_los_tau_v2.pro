@@ -33,7 +33,20 @@ rc = reo_calculate_los(t.height, t.field, t.inclination, height, temperature, de
                       , totInts = totInts, totTau = totTau $
                       , depth = depth, profHeight = profHeight, profInts = profInts, profHarm = profHarm, profAbsorb = profAbsorb $
                       )
+
+; все нарисуем
+windim = [1500, 1000]
+base_path = 'c:\temp\'
+
+; ---- Спектр -----
+win = window(dimensions = windim)
+intsR = plot(freqs*1d-9, totInts[0, *], color = 'RED', linestyle = '-', thick = 2, name = 'Right' $
+    , title = 'Intensity specta', xtitle = 'Frequency, GHz', ytitle = 'Intencity, $s.f.u./arcsec^2$', /current)
+intsL = plot(freqs*1d-9, totInts[1, *], color = 'BLUE', linestyle = '-', thick = 2, name = 'Left', overplot = intsR)
+dummy = legend(target = [intsR, intsL])
+win.Save, base_path + 'Spectra.png', width = windim[0], height = windim[1], bit_depth = 2
                       
+; ---- Структура по лучу зрения для выбранной частоты -----
 ; для примера: частота около 7.3 ГГц
 freq = 7.3e9
 mf = min(abs(freqs-freq), fidx)
@@ -61,11 +74,11 @@ hh[2] = interpol(t.height, t.field, b2)
 hh[3] = interpol(t.height, t.field, b3)
 hh[4] = interpol(t.height, t.field, b4)
 
-; все нарисуем
-sample_calc_los_tau_plot, hR, hL, alog10(tauR), alog10(tauL), 'Optical Depth', '$log(\tau, -)$', 0, hh, /zero
-sample_calc_los_tau_plot, hR, hL, transpose(sR), transpose(sL), 'Harmonics', 'Harmonic number, -', 1, hh
-sample_calc_los_tau_plot, hR, hL, transpose(fR), transpose(fL), 'Intensity', 'Intensity, $s.f.u/arcsec^2$', 0, hh
-sample_calc_los_tau_plot, hR, hL, transpose(alog10(aR)), transpose(alog10(aL)), 'Absorbtion', 'log(Absorbtion, $cm^{-1})$', 1, hh
+freq_str = ', frequency = ' + strcompress(string(freqs[fidx]*1e-9, format = '(F5.2)'), /remove_all) + ' GHz'
+sample_calc_los_tau_plot, hR, hL, alog10(tauR), alog10(tauL), 'Optical Depth' + freq_str, '$log(\tau, -)$', 0, hh, windim = windim, /zero, save_to = base_path + 'tau.png'
+sample_calc_los_tau_plot, hR, hL, transpose(sR), transpose(sL), 'Harmonics' + freq_str, 'Harmonic number, -', 1, hh, windim = windim, save_to = base_path + 'harmonics.png'
+sample_calc_los_tau_plot, hR, hL, transpose(fR), transpose(fL), 'Intensity' + freq_str, 'Intensity, $s.f.u/arcsec^2$', 0, hh, windim = windim, save_to = base_path + 'intensity.png'
+sample_calc_los_tau_plot, hR, hL, transpose(alog10(aR)), transpose(alog10(aL)), 'Absorbtion' + freq_str, 'log(Absorbtion, $cm^{-1})$', 1, hh, windim = windim, save_to = base_path + 'absorbtion.png'
 
 ; гармоники на температурном профиле
 tlog = alog10(temperature)
@@ -74,11 +87,15 @@ dmmt = mmt[1]-mmt[0]
 dlog = alog10(density)
 mmd = minmax(dlog)
 dmmd = mmd[1]-mmd[0]
+win = window(dimensions = windim)
 temp = plot(height*1d-8, tlog, color = 'RED', linestyle = '-', thick = 2, xrange = [0, max([hR, hL])] $
-          , title = 'Atmoshpere', xtitle = 'Height, Mm', ytitle = 'log(T, K)')
-dens = plot(height*1d-8, (dlog-mmd[0])/dmmd*dmmt+mmt[0], color = 'BLACK', linestyle = '-', thick = 2, overplot = temp)
-p = plot([hh[2], hh[2]], mmt, color = 'ORANGE', linestyle = ':', thick = 2, overplot = temp)
-p = plot([hh[3], hh[3]], mmt, color = 'LIME GREEN', linestyle = ':', thick = 2, overplot = temp)
-p = plot([hh[4], hh[4]], mmt, color = 'DEEP SKY BLUE', linestyle = ':', thick = 2, overplot = temp)
+          , title = 'Atmoshpere', xtitle = 'Height, Mm', ytitle = 'log(T, K)', name = 'Temperature', /current)
+dens = plot(height*1d-8, (dlog-mmd[0])/dmmd*dmmt+mmt[0], color = 'BLACK', linestyle = '-', thick = 2, name = 'Density', overplot = temp)
+p2 = plot([hh[2], hh[2]], mmt, color = 'ORANGE', linestyle = ':', thick = 2, name = '$2^{nd}$ harmonic', overplot = temp)
+p3 = plot([hh[3], hh[3]], mmt, color = 'LIME GREEN', linestyle = ':', thick = 2, name = '$3^{rd}$ harmonic', overplot = temp)
+p4 = plot([hh[4], hh[4]], mmt, color = 'DEEP SKY BLUE', linestyle = ':', thick = 2, name = '$4^{th}$ harmonic', overplot = temp)
+dummy = legend(target = [temp, dens, p2, p3, p4])
+
+win.Save, base_path + 'atmosphere.png', width = windim[0], height = windim[1], bit_depth = 2
 
 end
