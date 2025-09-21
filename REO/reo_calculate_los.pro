@@ -15,10 +15,11 @@
 ; Parameters description:
 ; 
 ; Parameters required (in):
-;         H, B, Th, T, D - height profiles
-;   (in)      H               (n-elements fload/double array)        cm   Heights above the photosphere, in ascending order  
+;         H, B, Th, Ha, T, D - height profiles
+;   (in)      H               (n-elements fload/double array)        cm   Heights above the photosphere, for mag.field parameters, in ascending order  
 ;   (in)      B               (n-elements fload/double array)         G   Corresponding abs. magnetic field values
 ;   (in)      Th              (n-elements fload/double array)   degrees   Corresponding angles between field and LOS
+;   (in)      Ha              (n-elements fload/double array)        cm   Heights above the photosphere, for temp./dens. parameters, in ascending order
 ;   (in)      T               (n-elements fload/double array)         K   Corresponding temperatures (non-negative, no greater 10^8)
 ;   (in)      D               (n-elements fload/double array)    cm^{-3}  Corresponding electron densities (non-negative)
 ;                                                                         Note: all 5 arrays should be of the same length
