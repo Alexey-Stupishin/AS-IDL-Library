@@ -1,4 +1,4 @@
-function aia_utils_download_cutout, wave, save_dir, config
+function aia_utils_download_cutout, wave, save_dir, config, transform = transform
 compile_opt idl2
 
 swave = strcompress(wave, /remove_all)
@@ -9,7 +9,7 @@ if (swave eq '1600') || (swave eq '1700') then begin
 endif
 
 file_mkdir, save_dir
-downloaded = sdo_utils_download_cutout(swave, config, ds, save_dir, segment = 'image')
+downloaded = sdo_utils_download_cutout(swave, config, ds, save_dir, segment = 'image', transform = transform)
 
 return, downloaded
   
