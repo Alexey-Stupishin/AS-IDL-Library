@@ -49,7 +49,22 @@ if config.rot_angle ne 0 then begin
     y = (vert[0]+vert[1])/2d
     harc = vert[1]-vert[0]
     height = round(harc/config.arcpix_aia)
-    transform = {angle:config.rot_angle, ltx:ltx, lty:lty, lbx:lbx, lby:lby, rtx:rtx, rty:rty, rbx:rbx, rby:rby}
+    if config.rot_angle ge 0 then begin
+        dleft = lby - vert[0]
+        dright = rty - vert[0]
+        dbottom = rbx - horz[0]
+        dtop = ltx - horz[0]
+    endif else begin
+        dleft = lty - vert[0]
+        dright = rby - vert[0]
+        dbottom = lbx - horz[0]
+        dtop = rtx - horz[0]
+    endelse
+    dleft /= config.arcpix_aia
+    dright /= config.arcpix_aia
+    dbottom /= config.arcpix_aia
+    dtop /= config.arcpix_aia
+    transform = {angle:config.rot_angle, dleft:dleft, dright:dright, dbottom:dbottom, dtop:dtop}
 endif
     
 query = jsoc_get_query_ex(ds, config.tstart, config.tstop, item, segment = segment $
