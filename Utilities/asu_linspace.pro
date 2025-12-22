@@ -18,6 +18,6 @@
                                                           
 function asu_linspace, from, to, N
 
-return, dindgen(N)*(to - from)/(N-1) + from 
+return, N eq 1 ? from : dindgen(N)*(to - from)/(N-1) + from 
 
 end
