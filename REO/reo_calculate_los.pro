@@ -99,10 +99,12 @@ if n gt 0 then begin
     endfor    
 endif
 
-parameterMap = replicate({itemName:'',itemvalue:0d},2)
+parameterMap = replicate({itemName:'',itemvalue:0d},3)
 parameterMap[0].itemName = asu_subst_map_name('use_laplace')
 parameterMap[0].itemValue = use_laplace
-parameterMap[1].itemName = '!____idl_map_terminator_key___!'
+parameterMap[1].itemName = asu_subst_map_name('cycloMap.nThreadsInitial')
+parameterMap[1].itemValue = 0
+parameterMap[2].itemName = '!____idl_map_terminator_key___!'
 
 vtotInts = dblarr(2, nfreqs)
 vtottau = dblarr(2, nfreqs)

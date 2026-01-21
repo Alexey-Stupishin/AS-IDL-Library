@@ -9,14 +9,18 @@ restore, filename
 ; => height, temperature, density
 ; массивы одинаковой длины
 
-from = 50
-to = 51
+height = [height[1:2], height[55:-1]]
+temperature = [temperature[1:2], temperature[55:-1]]
+density = [density[1:2], density[55:-1]]
 
-NT = temperature[from]*density[from]
-temperature[from] = 500000
-temperature[to] = temperature[from]
-density[from] = NT/temperature[from]
-density[to] = NT/temperature[to]
+;from = 50
+;to = 51
+;
+;NT = temperature[from]*density[from]
+;temperature[from] = 500000
+;temperature[to] = temperature[from]
+;density[from] = NT/temperature[from]
+;density[to] = NT/temperature[to]
 
 ; поле, угол
 ; загрузим поле диполя
