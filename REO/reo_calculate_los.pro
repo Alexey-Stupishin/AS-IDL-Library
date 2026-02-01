@@ -68,6 +68,11 @@ function reo_calculate_los, H, B, Th, Ha, T, D, freqs $
                           , dll_location = dll_location $
                           , _extra = _extra
 
+if n_elements(H) le 1 then                                                return, 1048576 ; 0x0010000
+if n_elements(H) ne n_elements(H)|| n_elements(H) ne n_elements(Th)  then return, 1048577 ; 0x0010001
+if n_elements(Ha) le 1 then                                               return, 1048578 ; 0x0010010
+if n_elements(Ha) ne n_elements(T)|| n_elements(Ha) ne n_elements(D) then return, 1048579 ; 0x0010011
+
 vptr = ulong64(reo_init(dll_location = dll_location, _extra = _extra))
 
 vL = long(n_elements(H))
