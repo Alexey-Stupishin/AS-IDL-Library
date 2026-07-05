@@ -1,10 +1,10 @@
-pro sample_calc_los_tau_v3
+;pro sample_calc_los_tau_v3
 
 P = 3d15
-H = 40d8
-W = 1e7
-factorB = 2
-valueT = 200000 
+H = 35d8
+W = 1e8
+factorB = 1.3
+valueT = 10000 
 
 resolve_routine,'asu_get_anchor_module_dir',/compile_full_file, /either
 dirpath = file_dirname((ROUTINE_INFO('asu_get_anchor_module_dir', /source, /functions)).path, /mark)
@@ -16,6 +16,7 @@ temperature0 = [4d3, 4d3, 1d6, 1.5d6, 2d6]
 
 ; встраиваем холодный слой
 is_atm_ok = asu_modify_LOS_gauss(height0, temperature0, H, W, height, temperature, value = valueT, /log)
+
 ;height = height0
 ;temperature = temperature0
 density = P/temperature
@@ -50,8 +51,8 @@ rc = reo_calculate_los(height_B, field, inclination, height, temperature, densit
                       , harmonics = harmonics, tau_ctrl = taus $
                       , totInts = totInts, totTau = totTau $
                       , depth = depth, profHeight = profHeight, profInts = profInts, profHarm = profHarm, profAbsorb = profAbsorb $
-                      ; , dll_location = 's:\Projects\ProgramD64\agsGeneralRadioEmission.dll' $
                       )
+;, dll_location = 's:\Projects\ProgramD64\agsGeneralRadioEmission.dll' $
 
 ; все нарисуем
 windim = [1500, 1000]
@@ -63,6 +64,8 @@ intsR = plot(freqs*1d-9, totInts[0, *], color = 'RED', linestyle = '-', thick = 
     , title = 'Intensity specta', xtitle = 'Frequency, GHz', ytitle = 'Intencity, $s.f.u./arcsec^2$', /current)
 intsL = plot(freqs*1d-9, totInts[1, *], color = 'BLUE', linestyle = '-', thick = 2, name = 'Left', overplot = intsR)
 dummy = legend(target = [intsR, intsL])
+
+;return
 
 win.Save, base_path + 'spectra.png', width = windim[0], height = windim[1], bit_depth = 2
                       
