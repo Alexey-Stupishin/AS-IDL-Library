@@ -1,6 +1,8 @@
-function asu_gxbox_get_line, line_res, index, boxdata, rotator = rotator
+function asu_gxbox_get_line, line_res, index, boxdata, rotator = rotator, closed = closed
 
 line = line_res.coords[0:2, line_res.linesPos[index]:(line_res.linesPos[index]+line_res.linesLength[index]-1)]
+status = line_res.status[line_res.linesIndex[index]]
+closed = status AND 4
 
 if n_elements(rotator) eq 0 then begin
     line[0, *] *= boxdata.dx*boxdata.rsun

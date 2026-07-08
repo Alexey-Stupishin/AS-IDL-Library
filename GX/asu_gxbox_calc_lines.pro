@@ -6,13 +6,13 @@ if n_elements(lib_location) eq 0 then begin
  end
 
 nonStored = gx_box_calculate_lines(lib_location, box $
-                        , coords = coords, linesPos = linesPos, linesLength = linesLength, nLines = nLines $
+                        , coords = coords, linesPos = linesPos, linesLength = linesLength, linesIndex = linesIndex, status = status, nLines = nLines $
                         , inputSeeds = seeds $
                         , maxLength = 1000000 $
                         , _extra = _extra $
                         )
                         
-result = {coords:coords, linesPos:linesPos, linesLength:linesLength, nLines:nLines, nonStored:nonStored}
+result = {coords:coords, linesPos:linesPos, linesLength:linesLength, linesIndex:linesIndex, status:status, nLines:nLines, nonStored:nonStored}
 
 return, nLines                        
 
